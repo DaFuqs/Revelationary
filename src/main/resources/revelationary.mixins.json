@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "package": "de.dafuqs.revelationary.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "AbstractBlockMixin",
+    "ItemModelsMixin",
+    "PlayerAdvancementTrackerMixin"
+  ],
+  "client": [
+    "client.AccessorClientAdvancementManager",
+    "client.BlockClientMixin",
+    "client.BlockModelsMixin",
+    "client.ClientAdvancementManagerMixin",
+    "client.ItemMixin",
+    "client.MinecraftClientMixin",
+    "client.WorldRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
