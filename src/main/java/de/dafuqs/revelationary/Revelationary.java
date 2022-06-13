@@ -38,7 +38,6 @@ public class Revelationary implements ModInitializer {
 		
 		ServerWorldEvents.LOAD.register((minecraftServer, serverWorld) -> {
 			Revelationary.minecraftServer = minecraftServer;
-			RevelationRegistry.registerCloakables();
 		});
 		
 		logInfo("Common startup completed!");

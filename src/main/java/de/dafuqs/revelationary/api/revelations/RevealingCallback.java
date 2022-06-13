@@ -9,7 +9,7 @@ import java.util.Set;
 
 public interface RevealingCallback {
 	
-	void trigger(Set<Identifier> advancements, Set<Block> blocks, Set<Item> items);
+	void trigger(Set<Identifier> advancements, Set<Block> blocks, Set<Item> items, boolean isJoinPacket);
 	
 	static void register(RevealingCallback callback) {
 		RevelationHolder.callbacks.add(callback);

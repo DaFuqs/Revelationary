@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class BlockClientMixin {
 	
 	@Inject(method = "getName()Lnet/minecraft/text/MutableText;", at = @At("RETURN"), cancellable = true)
-	private void getCloakedName(CallbackInfoReturnable<MutableText> callbackInfoReturnable) {
+	private void getCgraloakedName(CallbackInfoReturnable<MutableText> callbackInfoReturnable) {
 		Block thisBlock = (Block) (Object) this;
 		if (RevelationHolder.isCloaked(thisBlock)) {
 			// Get the localized name of the block and scatter it using §k to make it unreadable

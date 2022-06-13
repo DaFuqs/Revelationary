@@ -43,7 +43,7 @@ public class RevelationRegistry {
         notedRevelationAwares.add(revelationAware);
     }
     
-    public static void registerCloakables() {
+    public static void addRevelationAwares() {
         for(RevelationAware revelationAware : notedRevelationAwares) {
             Identifier advancementIdentifier = revelationAware.getCloakAdvancementIdentifier();
             for (Map.Entry<BlockState, BlockState> states : revelationAware.getBlockStateCloaks().entrySet()) {

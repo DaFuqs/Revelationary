@@ -25,15 +25,11 @@ public class ItemModelsMixin {
 	@Final
 	private BakedModelManager modelManager;
 	
-	private static int getTheModelId(Item item) {
-		return Item.getRawId(item);
-	}
-	
 	@Inject(at = @At("HEAD"), method = "getModel(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;", cancellable = true)
 	private void revelationary$getModel(ItemStack itemStack, CallbackInfoReturnable<BakedModel> callbackInfoReturnable) {
 		if (RevelationHolder.isCloaked(itemStack.getItem())) {
 			Item destinationItem = RevelationHolder.getCloakTarget(itemStack.getItem());
-			BakedModel overriddenModel = this.models.getOrDefault(getTheModelId(destinationItem), modelManager.getMissingModel());
+			BakedModel overriddenModel = this.models.getOrDefault(Item.getRawId(destinationItem), modelManager.getMissingModel());
 			callbackInfoReturnable.setReturnValue(overriddenModel);
 		}
 	}

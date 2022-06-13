@@ -2,6 +2,7 @@ package de.dafuqs.revelationary.api.advancements;
 
 import de.dafuqs.revelationary.mixin.client.AccessorClientAdvancementManager;
 import de.dafuqs.revelationary.revelationary.RevelationHolder;
+import de.dafuqs.revelationary.revelationary.RevelationRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancement.Advancement;
@@ -22,18 +23,18 @@ public class ClientAdvancements {
 	protected static List<ClientAdvancementPacketCallback> callbacks = new ArrayList<>();
 	
 	public static void onClientPacket(@NotNull AdvancementUpdateS2CPacket packet) {
-		if(!callbacks.isEmpty()) {
-			Set<Identifier> doneAdvancements = getDoneAdvancements(packet);
-			Set<Identifier> removedAdvancements = packet.getAdvancementIdsToRemove();
-			
-			RevelationHolder.processRemovedAdvancements(removedAdvancements);
-			RevelationHolder.processNewAdvancements(doneAdvancements, receivedFirstAdvancementPacket);
-			
-			for(ClientAdvancementPacketCallback callback : callbacks) {
-				callback.onClientAdvancementPacket(doneAdvancements, removedAdvancements, !receivedFirstAdvancementPacket);
-			}
-		}
+		boolean hadPacketBefore = receivedFirstAdvancementPacket;
 		receivedFirstAdvancementPacket = true;
+		
+		Set<Identifier> doneAdvancements = getDoneAdvancements(packet);
+		Set<Identifier> removedAdvancements = packet.getAdvancementIdsToRemove();
+		
+		RevelationHolder.processRemovedAdvancements(removedAdvancements);
+		RevelationHolder.processNewAdvancements(doneAdvancements, !hadPacketBefore);
+		
+		for(ClientAdvancementPacketCallback callback : callbacks) {
+			callback.onClientAdvancementPacket(doneAdvancements, removedAdvancements, !hadPacketBefore);
+		}
 	}
 	
 	public static boolean hasDone(Identifier identifier) {
@@ -75,6 +76,7 @@ public class ClientAdvancements {
 	}
 	
 	public static void playerLogout() {
+		RevelationRegistry.addRevelationAwares();
 		RevelationHolder.cloakAll();
 		receivedFirstAdvancementPacket = false;
 	}

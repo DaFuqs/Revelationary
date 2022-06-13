@@ -26,7 +26,7 @@ public class RevelationHolder {
 	private static final List<BlockState> activeBlockStateSwaps = new ArrayList<>();
 	private static final List<Item> activeItemSwaps = new ArrayList<>();
 	
-	public static void processNewAdvancements(Set<Identifier> doneAdvancements, boolean triggerCallback) {
+	public static void processNewAdvancements(Set<Identifier> doneAdvancements, boolean isJoinPacket) {
 		if(!doneAdvancements.isEmpty()) {
 			Set<Item> revealedItems = new HashSet<>();
 			Set<BlockState> revealedBlockStates = new HashSet<>();
@@ -63,9 +63,9 @@ public class RevelationHolder {
 				}
 			}
 			
-			if (triggerCallback && (!revealedBlocks.isEmpty() || !revealedItems.isEmpty())) {
+			if (!revealedBlocks.isEmpty() || !revealedItems.isEmpty()) {
 				for (RevealingCallback callback : callbacks) {
-					callback.trigger(doneAdvancements, revealedBlocks, revealedItems);
+					callback.trigger(doneAdvancements, revealedBlocks, revealedItems, isJoinPacket);
 				}
 			}
 		}

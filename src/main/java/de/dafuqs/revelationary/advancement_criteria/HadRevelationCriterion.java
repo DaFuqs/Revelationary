@@ -16,7 +16,7 @@ import net.minecraft.util.registry.Registry;
 
 public class HadRevelationCriterion extends AbstractCriterion<HadRevelationCriterion.Conditions> {
 	
-	static final Identifier ID = new Identifier(Revelationary.MOD_ID, "had_revelation");
+	public static final Identifier ID = new Identifier(Revelationary.MOD_ID, "had_revelation");
 	
 	public static HadRevelationCriterion.Conditions create(Identifier id) {
 		return new HadRevelationCriterion.Conditions(EntityPredicate.Extended.EMPTY, id);
