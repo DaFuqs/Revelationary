@@ -14,7 +14,7 @@ import net.minecraft.util.JsonHelper;
 
 public class AdvancementGottenCriterion extends AbstractCriterion<AdvancementGottenCriterion.Conditions> {
 	
-	public static final Identifier ID = new Identifier(Revelationary.MOD_ID, "has_advancement");
+	public static final Identifier ID = new Identifier(Revelationary.MOD_ID, "advancement_gotten");
 	
 	public static AdvancementGottenCriterion.Conditions create(Identifier id) {
 		return new AdvancementGottenCriterion.Conditions(EntityPredicate.Extended.EMPTY, id);

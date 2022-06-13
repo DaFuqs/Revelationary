@@ -3,6 +3,8 @@ package de.dafuqs.revelationary.api.revelations;
 import de.dafuqs.revelationary.api.advancements.AdvancementHelper;
 import de.dafuqs.revelationary.revelationary.RevelationRegistry;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.EntityShapeContext;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -38,6 +40,16 @@ public interface RevelationAware {
 	}
 	
 	default void onUncloak() {
+	}
+	
+	default boolean isVisibleTo(ShapeContext context) {
+		if (context instanceof EntityShapeContext) {
+			Entity entity = ((EntityShapeContext) context).getEntity();
+			if (entity instanceof PlayerEntity) {
+				return this.isVisibleTo((PlayerEntity) entity);
+			}
+		}
+		return true;
 	}
 	
 	default boolean isVisibleTo(PlayerEntity playerEntity) {
