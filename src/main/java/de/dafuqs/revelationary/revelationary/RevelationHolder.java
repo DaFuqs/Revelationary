@@ -23,8 +23,8 @@ public class RevelationHolder {
 	
 	public static List<RevealingCallback> callbacks = new ArrayList<>();
 	
-	private static final List<BlockState> activeBlockStateSwaps = new ArrayList<>();
-	private static final List<Item> activeItemSwaps = new ArrayList<>();
+	private static final Set<BlockState> activeBlockStateSwaps = new HashSet<>();
+	private static final Set<Item> activeItemSwaps = new HashSet<>();
 	
 	public static void processNewAdvancements(Set<Identifier> doneAdvancements, boolean isJoinPacket) {
 		if(!doneAdvancements.isEmpty()) {
@@ -58,6 +58,7 @@ public class RevelationHolder {
 				}
 			}
 			for (Item revealedItem : revealedItems) {
+				activeItemSwaps.remove(revealedItem);
 				if (revealedItem instanceof RevelationAware revelationAware) {
 					revelationAware.onUncloak();
 				}
@@ -102,6 +103,8 @@ public class RevelationHolder {
 				}
 				rebuildAllChunks();
 			}
+			
+			activeItemSwaps.addAll(concealedItems);
 			
 			for (Block concealedBlock : concealedBlocks) {
 				if (concealedBlock instanceof RevelationAware revelationAware) {
