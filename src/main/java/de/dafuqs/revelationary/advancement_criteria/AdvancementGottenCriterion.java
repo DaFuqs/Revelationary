@@ -12,25 +12,25 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
-public class HasAdvancementCriterion extends AbstractCriterion<HasAdvancementCriterion.Conditions> {
+public class AdvancementGottenCriterion extends AbstractCriterion<AdvancementGottenCriterion.Conditions> {
 	
 	public static final Identifier ID = new Identifier(Revelationary.MOD_ID, "has_advancement");
 	
-	public static HasAdvancementCriterion.Conditions create(Identifier id) {
-		return new HasAdvancementCriterion.Conditions(EntityPredicate.Extended.EMPTY, id);
+	public static AdvancementGottenCriterion.Conditions create(Identifier id) {
+		return new AdvancementGottenCriterion.Conditions(EntityPredicate.Extended.EMPTY, id);
 	}
 	
 	public Identifier getId() {
 		return ID;
 	}
 	
-	public HasAdvancementCriterion.Conditions conditionsFromAdvancementIdentifier(EntityPredicate.Extended extended, Identifier identifier) {
-		return new HasAdvancementCriterion.Conditions(extended, identifier);
+	public AdvancementGottenCriterion.Conditions conditionsFromAdvancementIdentifier(EntityPredicate.Extended extended, Identifier identifier) {
+		return new AdvancementGottenCriterion.Conditions(extended, identifier);
 	}
 	
-	public HasAdvancementCriterion.Conditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended extended, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
+	public AdvancementGottenCriterion.Conditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended extended, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
 		Identifier identifier = new Identifier(JsonHelper.getString(jsonObject, "advancement_identifier"));
-		return new HasAdvancementCriterion.Conditions(extended, identifier);
+		return new AdvancementGottenCriterion.Conditions(extended, identifier);
 	}
 	
 	public void trigger(ServerPlayerEntity player, Advancement advancement) {

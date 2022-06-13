@@ -1,5 +1,6 @@
 package de.dafuqs.revelationary.revelationary;
 
+import de.dafuqs.revelationary.api.revelations.RevealingCallback;
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
 import de.dafuqs.revelationary.api.revelations.WorldRendererAccessor;
 import net.fabricmc.api.EnvType;
@@ -13,34 +14,29 @@ import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Environment(EnvType.CLIENT)
 public class RevelationHolder {
 	
-	public static List<UncloakCallback> callbacks = new ArrayList<>();
-	
-	public interface UncloakCallback {
-		void trigger(List<Identifier> advancements, List<Block> blocks, List<Item> items);
-	}
+	public static List<RevealingCallback> callbacks = new ArrayList<>();
 	
 	private static final List<BlockState> activeBlockStateSwaps = new ArrayList<>();
 	private static final List<Item> activeItemSwaps = new ArrayList<>();
 	
-	public static void processNewAdvancements(List<Identifier> doneAdvancements, boolean triggerCallback) {
+	public static void processNewAdvancements(Set<Identifier> doneAdvancements, boolean triggerCallback) {
 		if(!doneAdvancements.isEmpty()) {
-			List<Item> revealedItems = new ArrayList<>();
-			List<BlockState> revealedBlockStates = new ArrayList<>();
-			List<Block> revealedBlocks = new ArrayList<>();
+			Set<Item> revealedItems = new HashSet<>();
+			Set<BlockState> revealedBlockStates = new HashSet<>();
+			Set<Block> revealedBlocks = new HashSet<>();
 			for (Identifier doneAdvancement : doneAdvancements) {
 				revealedItems.addAll(RevelationRegistry.getRevealedItems(doneAdvancement));
 				revealedBlockStates.addAll(RevelationRegistry.getRevealedBlockStates(doneAdvancement));
 				for (BlockState state : revealedBlockStates) {
 					Block block = state.getBlock();
-					if (!revealedBlocks.contains(block)) {
-						revealedBlocks.add(block);
-					}
+					revealedBlocks.add(block);
 				}
 			}
 			
@@ -68,7 +64,7 @@ public class RevelationHolder {
 			}
 			
 			if (triggerCallback && (!revealedBlocks.isEmpty() || !revealedItems.isEmpty())) {
-				for (UncloakCallback callback : callbacks) {
+				for (RevealingCallback callback : callbacks) {
 					callback.trigger(doneAdvancements, revealedBlocks, revealedItems);
 				}
 			}
@@ -120,16 +116,13 @@ public class RevelationHolder {
 		}
 	}
 	
-	public static void registerRevelationCallback(UncloakCallback callback) {
-		callbacks.add(callback);
-	}
-	
 	// rerender chunks to show newly swapped blocks
 	static void rebuildAllChunks() {
 		WorldRenderer renderer = MinecraftClient.getInstance().worldRenderer;
 		((WorldRendererAccessor) renderer).rebuildAllChunks();
 	}
 	
+	// BLOCKS
 	private static void cloak(BlockState blockState) {
 		activeBlockStateSwaps.add(blockState);
 		if(blockState instanceof RevelationAware revelationAware) {
@@ -137,19 +130,10 @@ public class RevelationHolder {
 		}
 	}
 	
-	private static void cloak(Item item) {
-		activeItemSwaps.add(item);
-		if(item instanceof RevelationAware revelationAware) {
-			revelationAware.onCloak();
-		}
-	}
-	
-	// BLOCKS
 	public static boolean isCloaked(Block block) {
 		return activeBlockStateSwaps.contains(block.getDefaultState());
 	}
-	
-	// BLOCKS
+
 	public static boolean isCloaked(BlockState blockState) {
 		return activeBlockStateSwaps.contains(blockState);
 	}
@@ -163,6 +147,13 @@ public class RevelationHolder {
 	}
 	
 	// ITEMS
+	private static void cloak(Item item) {
+		activeItemSwaps.add(item);
+		if(item instanceof RevelationAware revelationAware) {
+			revelationAware.onCloak();
+		}
+	}
+	
 	public static boolean isCloaked(Item item) {
 		return activeItemSwaps.contains(item);
 	}

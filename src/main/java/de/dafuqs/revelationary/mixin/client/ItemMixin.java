@@ -21,7 +21,6 @@ public abstract class ItemMixin {
 	public void getCloakedName(ItemStack stack, CallbackInfoReturnable<Text> callbackInfoReturnable) {
 		Item thisItem = (Item) (Object) this;
 		if (RevelationHolder.isCloaked(thisItem)) {
-			
 			// Get the localized name of the item and scatter it using §k to make it unreadable
 			Language language = Language.getInstance();
 			LiteralText newText = new LiteralText("§k" + language.get(thisItem.getTranslationKey()));

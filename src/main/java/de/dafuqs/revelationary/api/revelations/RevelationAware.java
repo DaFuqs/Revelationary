@@ -3,8 +3,6 @@ package de.dafuqs.revelationary.api.revelations;
 import de.dafuqs.revelationary.api.advancements.AdvancementHelper;
 import de.dafuqs.revelationary.revelationary.RevelationRegistry;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.EntityShapeContext;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -22,13 +20,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Objects;
 
 public interface RevelationAware {
 	
 	Identifier getCloakAdvancementIdentifier();
 	
-	default void registerCloak() {
-		RevelationRegistry.registerCloakable(this, getCloakAdvancementIdentifier());
+	static void register(RevelationAware revelationAware) {
+		RevelationRegistry.registerRevelationAware(revelationAware);
 	}
 	
 	Hashtable<BlockState, BlockState> getBlockStateCloaks();
@@ -39,16 +38,6 @@ public interface RevelationAware {
 	}
 	
 	default void onUncloak() {
-	}
-	
-	default boolean isVisibleTo(ShapeContext context) {
-		if (context instanceof EntityShapeContext) {
-			Entity entity = ((EntityShapeContext) context).getEntity();
-			if (entity instanceof PlayerEntity) {
-				return this.isVisibleTo((PlayerEntity) entity);
-			}
-		}
-		return true;
 	}
 	
 	default boolean isVisibleTo(PlayerEntity playerEntity) {
@@ -89,11 +78,7 @@ public interface RevelationAware {
 			return Collections.emptyList();
 		} else {
 			LootContext lootContext;
-			if (cloakedBlockState == null) {
-				lootContext = builder.parameter(LootContextParameters.BLOCK_STATE, state).build(LootContextTypes.BLOCK);
-			} else {
-				lootContext = builder.parameter(LootContextParameters.BLOCK_STATE, cloakedBlockState).build(LootContextTypes.BLOCK);
-			}
+			lootContext = builder.parameter(LootContextParameters.BLOCK_STATE, Objects.requireNonNullElse(cloakedBlockState, state)).build(LootContextTypes.BLOCK);
 			ServerWorld serverWorld = lootContext.getWorld();
 			LootTable lootTable = serverWorld.getServer().getLootManager().getTable(identifier);
 			return lootTable.generateLoot(lootContext);

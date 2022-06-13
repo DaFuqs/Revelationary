@@ -1,0 +1,11 @@
+{
+  "advancement": "minecraft:adventure/root",
+  "block_states": {
+    "minecraft:grass": "minecraft:beacon",
+    "minecraft:tall_grass": "minecraft:obsidian",
+    "minecraft:tall_grass[half=upper]": "minecraft:netherite_block"
+  },
+  "items": {
+    "minecraft:nether_star": "minecraft:gunpowder"
+  }
+}

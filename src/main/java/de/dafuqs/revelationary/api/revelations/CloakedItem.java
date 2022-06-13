@@ -17,7 +17,7 @@ public class CloakedItem extends Item implements RevelationAware {
 		this.cloakAdvancementIdentifier = cloakAdvancementIdentifier;
 		this.cloakItem = cloakItem;
 		
-		registerCloak();
+		RevelationAware.register(this);
 	}
 	
 	@Override

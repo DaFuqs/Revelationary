@@ -26,6 +26,9 @@ public class ClientAdvancements {
 			Set<Identifier> doneAdvancements = getDoneAdvancements(packet);
 			Set<Identifier> removedAdvancements = packet.getAdvancementIdsToRemove();
 			
+			RevelationHolder.processRemovedAdvancements(removedAdvancements);
+			RevelationHolder.processNewAdvancements(doneAdvancements, receivedFirstAdvancementPacket);
+			
 			for(ClientAdvancementPacketCallback callback : callbacks) {
 				callback.onClientAdvancementPacket(doneAdvancements, removedAdvancements, !receivedFirstAdvancementPacket);
 			}

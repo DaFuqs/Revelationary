@@ -26,17 +26,16 @@ public class AbstractBlockMixin {
 	
 	@Inject(method = "getDroppedStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/loot/context/LootContext$Builder;)Ljava/util/List;", at = @At("HEAD"), cancellable = true)
 	public void revelationary$getDroppedStacks(BlockState state, LootContext.Builder builder, CallbackInfoReturnable<List<ItemStack>> cir) {
-		// workaround: since onStacksDropped() has no way of checking if it was
-		// triggered by a player we have to cache that information here
-		PlayerEntity lootPlayerEntity = RevelationAware.getLootPlayerEntity(builder);
-		
 		BlockState cloak = RevelationRegistry.getCloak(state);
-		if(cloak != null && !RevelationRegistry.isVisibleTo(state, lootPlayerEntity)) {
-			cir.setReturnValue(getCloakedDroppedStacks(state, builder, cloak, lootPlayerEntity));
+		if(cloak != null) {
+			PlayerEntity lootPlayerEntity = RevelationAware.getLootPlayerEntity(builder);
+			if (!RevelationRegistry.isVisibleTo(state, lootPlayerEntity)) {
+				cir.setReturnValue(getLootForSwappedState(builder, cloak));
+			}
 		}
 	}
 	
-	private List<ItemStack> getCloakedDroppedStacks(BlockState originalState, LootContext.Builder builder, BlockState cloakedState, PlayerEntity lootPlayerEntity) {
+	private List<ItemStack> getLootForSwappedState(LootContext.Builder builder, BlockState cloakedState) {
 		Identifier lootTableId = cloakedState.getBlock().getLootTableId();
 		
 		if (lootTableId == LootTables.EMPTY) {
