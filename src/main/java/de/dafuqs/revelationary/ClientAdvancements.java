@@ -1,8 +1,7 @@
-package de.dafuqs.revelationary.api.advancements;
+package de.dafuqs.revelationary;
 
+import de.dafuqs.revelationary.api.advancements.ClientAdvancementPacketCallback;
 import de.dafuqs.revelationary.mixin.client.AccessorClientAdvancementManager;
-import de.dafuqs.revelationary.revelationary.RevelationHolder;
-import de.dafuqs.revelationary.revelationary.RevelationRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancement.Advancement;
@@ -29,8 +28,8 @@ public class ClientAdvancements {
 		Set<Identifier> doneAdvancements = getDoneAdvancements(packet);
 		Set<Identifier> removedAdvancements = packet.getAdvancementIdsToRemove();
 		
-		RevelationHolder.processRemovedAdvancements(removedAdvancements);
-		RevelationHolder.processNewAdvancements(doneAdvancements, !hadPacketBefore);
+		ClientRevelationHolder.processRemovedAdvancements(removedAdvancements);
+		ClientRevelationHolder.processNewAdvancements(doneAdvancements, !hadPacketBefore);
 		
 		for(ClientAdvancementPacketCallback callback : callbacks) {
 			callback.onClientAdvancementPacket(doneAdvancements, removedAdvancements, !hadPacketBefore);
@@ -77,7 +76,7 @@ public class ClientAdvancements {
 	
 	public static void playerLogout() {
 		RevelationRegistry.addRevelationAwares();
-		RevelationHolder.cloakAll();
+		ClientRevelationHolder.cloakAll();
 		receivedFirstAdvancementPacket = false;
 	}
 	

@@ -1,8 +1,7 @@
-package de.dafuqs.revelationary.revelationary;
+package de.dafuqs.revelationary;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import de.dafuqs.revelationary.Revelationary;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.resource.JsonDataLoader;
 import net.minecraft.resource.ResourceManager;

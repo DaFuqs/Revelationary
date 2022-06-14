@@ -1,7 +1,7 @@
 package de.dafuqs.revelationary.api.revelations;
 
 import de.dafuqs.revelationary.api.advancements.AdvancementHelper;
-import de.dafuqs.revelationary.revelationary.RevelationRegistry;
+import de.dafuqs.revelationary.RevelationRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.EntityShapeContext;
 import net.minecraft.block.ShapeContext;

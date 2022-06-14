@@ -1,8 +1,6 @@
 package de.dafuqs.revelationary;
 
 import de.dafuqs.revelationary.api.advancements.AdvancementCriteria;
-import de.dafuqs.revelationary.revelationary.RevelationDataLoader;
-import de.dafuqs.revelationary.revelationary.RevelationRegistry;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;

@@ -1,7 +1,7 @@
 package de.dafuqs.revelationary.mixin;
 
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
-import de.dafuqs.revelationary.revelationary.RevelationRegistry;
+import de.dafuqs.revelationary.RevelationRegistry;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;

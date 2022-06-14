@@ -1,5 +1,6 @@
 package de.dafuqs.revelationary.api.advancements;
 
+import de.dafuqs.revelationary.ClientAdvancements;
 import net.minecraft.util.Identifier;
 
 import java.util.Set;

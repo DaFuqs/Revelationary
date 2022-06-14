@@ -1,6 +1,6 @@
 package de.dafuqs.revelationary.mixin.client;
 
-import de.dafuqs.revelationary.revelationary.RevelationHolder;
+import de.dafuqs.revelationary.ClientRevelationHolder;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.block.BlockModels;
 import net.minecraft.client.render.model.BakedModel;
@@ -27,8 +27,8 @@ public class BlockModelsMixin {
 	
 	@Inject(at = @At("HEAD"), method = "getModel", cancellable = true)
 	private void getModel(BlockState blockState, CallbackInfoReturnable<BakedModel> callbackInfoReturnable) {
-		if (RevelationHolder.isCloaked(blockState)) {
-			BlockState destinationBlockState = RevelationHolder.getCloakTarget(blockState);
+		if (ClientRevelationHolder.isCloaked(blockState)) {
+			BlockState destinationBlockState = ClientRevelationHolder.getCloakTarget(blockState);
 			BakedModel overriddenModel = this.models.getOrDefault(destinationBlockState, modelManager.getMissingModel());
 			callbackInfoReturnable.setReturnValue(overriddenModel);
 		}

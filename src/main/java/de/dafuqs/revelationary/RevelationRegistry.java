@@ -1,4 +1,4 @@
-package de.dafuqs.revelationary.revelationary;
+package de.dafuqs.revelationary;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

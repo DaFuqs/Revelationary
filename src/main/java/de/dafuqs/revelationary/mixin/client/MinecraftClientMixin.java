@@ -1,6 +1,6 @@
 package de.dafuqs.revelationary.mixin.client;
 
-import de.dafuqs.revelationary.api.advancements.ClientAdvancements;
+import de.dafuqs.revelationary.ClientAdvancements;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import org.spongepowered.asm.mixin.Mixin;

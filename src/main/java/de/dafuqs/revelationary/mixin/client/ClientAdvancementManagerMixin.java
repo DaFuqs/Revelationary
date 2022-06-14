@@ -1,6 +1,6 @@
 package de.dafuqs.revelationary.mixin.client;
 
-import de.dafuqs.revelationary.api.advancements.ClientAdvancements;
+import de.dafuqs.revelationary.ClientAdvancements;
 import net.minecraft.client.network.ClientAdvancementManager;
 import net.minecraft.network.packet.s2c.play.AdvancementUpdateS2CPacket;
 import org.spongepowered.asm.mixin.Mixin;

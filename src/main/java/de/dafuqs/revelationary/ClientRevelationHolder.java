@@ -1,4 +1,4 @@
-package de.dafuqs.revelationary.revelationary;
+package de.dafuqs.revelationary;
 
 import de.dafuqs.revelationary.api.revelations.RevealingCallback;
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 @Environment(EnvType.CLIENT)
-public class RevelationHolder {
+public class ClientRevelationHolder {
 	
 	public static List<RevealingCallback> callbacks = new ArrayList<>();
 	

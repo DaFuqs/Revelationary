@@ -1,6 +1,7 @@
 package de.dafuqs.revelationary.api.advancements;
 
 import de.dafuqs.revelationary.Revelationary;
+import de.dafuqs.revelationary.ClientAdvancements;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancement.Advancement;
@@ -30,8 +31,7 @@ public class AdvancementHelper {
 		} else if (playerEntity.getClass().getCanonicalName().startsWith("net.minecraft")) {
 			return hasAdvancementClient(advancementIdentifier);
 		} else {
-			// thank you, Kibe FakePlayerEntity
-			// it neither is a ServerPlayerEntity, nor a ClientPlayerEntity
+			// Kibe's FakePlayerEntity is neither is a ServerPlayerEntity, nor a ClientPlayerEntity
 			return false;
 		}
 	}

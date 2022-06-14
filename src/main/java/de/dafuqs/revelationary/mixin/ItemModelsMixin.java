@@ -1,6 +1,6 @@
 package de.dafuqs.revelationary.mixin;
 
-import de.dafuqs.revelationary.revelationary.RevelationHolder;
+import de.dafuqs.revelationary.ClientRevelationHolder;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.client.render.item.ItemModels;
 import net.minecraft.client.render.model.BakedModel;
@@ -27,8 +27,8 @@ public class ItemModelsMixin {
 	
 	@Inject(at = @At("HEAD"), method = "getModel(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;", cancellable = true)
 	private void revelationary$getModel(ItemStack itemStack, CallbackInfoReturnable<BakedModel> callbackInfoReturnable) {
-		if (RevelationHolder.isCloaked(itemStack.getItem())) {
-			Item destinationItem = RevelationHolder.getCloakTarget(itemStack.getItem());
+		if (ClientRevelationHolder.isCloaked(itemStack.getItem())) {
+			Item destinationItem = ClientRevelationHolder.getCloakTarget(itemStack.getItem());
 			BakedModel overriddenModel = this.models.getOrDefault(Item.getRawId(destinationItem), modelManager.getMissingModel());
 			callbackInfoReturnable.setReturnValue(overriddenModel);
 		}

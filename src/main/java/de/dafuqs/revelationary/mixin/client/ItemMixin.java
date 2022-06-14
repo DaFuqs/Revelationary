@@ -1,6 +1,6 @@
 package de.dafuqs.revelationary.mixin.client;
 
-import de.dafuqs.revelationary.revelationary.RevelationHolder;
+import de.dafuqs.revelationary.ClientRevelationHolder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.item.Item;
@@ -20,7 +20,7 @@ public abstract class ItemMixin {
 	@Inject(at = @At("HEAD"), method = "getName(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/text/Text;", cancellable = true)
 	public void getCloakedName(ItemStack stack, CallbackInfoReturnable<Text> callbackInfoReturnable) {
 		Item thisItem = (Item) (Object) this;
-		if (RevelationHolder.isCloaked(thisItem)) {
+		if (ClientRevelationHolder.isCloaked(thisItem)) {
 			// Get the localized name of the item and scatter it using §k to make it unreadable
 			Language language = Language.getInstance();
 			LiteralText newText = new LiteralText("§k" + language.get(thisItem.getTranslationKey()));
