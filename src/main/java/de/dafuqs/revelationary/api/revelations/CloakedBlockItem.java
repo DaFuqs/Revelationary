@@ -7,14 +7,14 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 
-import java.util.Hashtable;
+import java.util.Map;
 
 public class CloakedBlockItem extends BlockItem implements RevelationAware {
 	
 	Identifier cloakAdvancementIdentifier;
-	Item cloakItem;
+	BlockItem cloakItem;
 	
-	public CloakedBlockItem(Block block, Settings settings, Identifier cloakAdvancementIdentifier, Item cloakItem) {
+	public CloakedBlockItem(Block block, Settings settings, Identifier cloakAdvancementIdentifier, BlockItem cloakItem) {
 		super(block, settings);
 		this.cloakAdvancementIdentifier = cloakAdvancementIdentifier;
 		this.cloakItem = cloakItem;
@@ -28,8 +28,8 @@ public class CloakedBlockItem extends BlockItem implements RevelationAware {
 	}
 	
 	@Override
-	public Hashtable<BlockState, BlockState> getBlockStateCloaks() {
-		return new Hashtable<>();
+	public Map<BlockState, BlockState> getBlockStateCloaks() {
+		return Map.of(this.getBlock().getDefaultState(), this.cloakItem.getBlock().getDefaultState());
 	}
 	
 	@Override

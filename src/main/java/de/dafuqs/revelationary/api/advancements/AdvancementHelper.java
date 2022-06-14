@@ -1,7 +1,7 @@
 package de.dafuqs.revelationary.api.advancements;
 
-import de.dafuqs.revelationary.Revelationary;
 import de.dafuqs.revelationary.ClientAdvancements;
+import de.dafuqs.revelationary.Revelationary;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancement.Advancement;

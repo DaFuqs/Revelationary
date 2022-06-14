@@ -19,7 +19,7 @@ import java.util.*;
 public class ClientAdvancements {
 	
 	protected static boolean receivedFirstAdvancementPacket = false;
-	protected static List<ClientAdvancementPacketCallback> callbacks = new ArrayList<>();
+	public static List<ClientAdvancementPacketCallback> callbacks = new ArrayList<>();
 	
 	public static void onClientPacket(@NotNull AdvancementUpdateS2CPacket packet) {
 		boolean hadPacketBefore = receivedFirstAdvancementPacket;

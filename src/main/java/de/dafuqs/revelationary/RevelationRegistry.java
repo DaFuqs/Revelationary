@@ -3,7 +3,6 @@ package de.dafuqs.revelationary;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.StringReader;
-import de.dafuqs.revelationary.Revelationary;
 import de.dafuqs.revelationary.api.advancements.AdvancementHelper;
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
 import net.minecraft.block.Block;
