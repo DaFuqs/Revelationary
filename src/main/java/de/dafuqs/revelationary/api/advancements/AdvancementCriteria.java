@@ -6,7 +6,13 @@ import net.fabricmc.fabric.mixin.object.builder.CriteriaAccessor;
 
 public class AdvancementCriteria {
 	
+	/**
+	 * Triggered every time a player gets a new advancement
+	 */
 	public static AdvancementGottenCriterion ADVANCEMENT_GOTTEN;
+	/**
+	 * Triggers every time a new block is revealed
+	 */
 	public static HadRevelationCriterion HAD_REVELATION;
 	
 	public static void register() {
