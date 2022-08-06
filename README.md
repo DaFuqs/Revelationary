@@ -3,6 +3,12 @@
 ## Overview
 Data Driven Block and Item Revelation system. Discover as you go!
 
+Revelationary adds a way to gate the discovery of new blocks in the world via data pack, or API (for other mods). Using Revelationary, you can design your packs / mods progression in a way the player does not feel overwhelmed when starting a new playthrough. They can only perceive these worldgen blocks when they unlocked a specific advancement, making the block visible for them.
+
+Example: The player sees a specific ore as stone. As they defeat the enderdragon they can now see and mine your ore in the world - it was always there from the start. Individual for each player and very performant.
+
+Find lots of examples for data packs & the API in Revelationary's wiki: https://github.com/DaFuqs/Revelationary/wiki
+
 
 ## Registering Revelations via Data Pack
 Have to be placed in the folder `resources/data/<<mod_id>>/revelations`
