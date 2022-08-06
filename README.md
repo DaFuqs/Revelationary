@@ -1,6 +1,7 @@
 ![Revelationary Banner](/images/banner.png "Revelationary's Banner")
 
 ## Overview
+Data Driven Block and Item Revelation system. Discover as you go!
 
 
 ## Registering Revelations via Data Pack
