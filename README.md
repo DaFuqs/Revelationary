@@ -1,13 +1,24 @@
-![Revelationary Banner](/images/banner.png "Revelationary's Banner")
+<img src="/images/icon.png" alt="Revelationary's Icon" width="200" />
 
-## Overview
-Data Driven Block and Item Revelation system. Discover as you go!
+# Revelations
+"[a] revelation is the revealing or disclosing of some form of truth or knowledge"
 
-Revelationary adds a way to gate the discovery of new blocks in the world via data pack, or API (for other mods). Using Revelationary, you can design your packs / mods progression in a way the player does not feel overwhelmed when starting a new playthrough. They can only perceive these worldgen blocks when they unlocked a specific advancement, making the block visible for them.
+If you are the designer of a progression based mod or modpack you have come to the right place.
 
-Example: The player sees a specific ore as stone. As they defeat the enderdragon they can now see and mine your ore in the world - it was always there from the start. Individual for each player and very performant.
+With Revelationary, you are able to use Data Packs or the Revelation API to gradually reveal blocks in the world as the player progresses. A plain stone filled cleft might be revealed as bursting with life and ore as the player defeats a boss or reaches an important milestone.
 
-Find lots of examples for data packs & the API in Revelationary's wiki: https://github.com/DaFuqs/Revelationary/wiki
+As long as a player does not have the necessary progress the blocks and items you register with Revelationary via API or Data Pack will just have cryptic names and in case of blocks in the world, will drop the same drops as the block it is disguised as, giving the player a seamless experience without getting flooded with unknown resources that they are not able to use at the start. Instead you can introduce resources just as they are needed.
+
+Limitations
+Besides visuals and drops, disguised blocks retain all the properties of the original block: Hitbox, if light passes through and everything else. Keep that in mind when searching for fitting candidates. A perfect disguise for your Ore would be stone or deepslate, since these share a lot of similarities. Similarly you could disguise your elusive plant with a poppy: Both have a small hitbox and players can walk through them.
+
+If you are a programmer you can use the Revelation API to dynamically change your blocks properties depending on if they are visible to the player, or not. This way you could even disguise your flower as air: Giving it an empty hitbox when disguised, your players might not even know it is there until they can see them!
+
+# Advancement API
+Revelationary provides utilities to make the handling of advancements easier - both client- and serverside.
+
+# Documentation and examples
+Find everything you need to know in [Revelationary's Wiki](https://github.com/DaFuqs/Revelationary/wiki) or take a look at [the examples](https://github.com/DaFuqs/Revelationary/blob/master/examples/example_revelations.json)
 
 
 ## Registering Revelations via Data Pack
