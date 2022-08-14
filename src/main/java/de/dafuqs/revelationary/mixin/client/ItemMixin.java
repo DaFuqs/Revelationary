@@ -5,7 +5,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Language;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,7 +23,7 @@ public abstract class ItemMixin {
 		if (ClientRevelationHolder.isCloaked(thisItem)) {
 			// Get the localized name of the item and scatter it using §k to make it unreadable
 			Language language = Language.getInstance();
-			LiteralText newText = new LiteralText("§k" + language.get(thisItem.getTranslationKey()));
+			MutableText newText = Text.literal("§k" + language.get(thisItem.getTranslationKey()));
 			callbackInfoReturnable.setReturnValue(newText);
 		}
 	}

@@ -2,8 +2,8 @@ package de.dafuqs.revelationary.mixin.client;
 
 import de.dafuqs.revelationary.ClientRevelationHolder;
 import net.minecraft.block.Block;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Language;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -19,7 +19,7 @@ public class BlockClientMixin {
 		if (ClientRevelationHolder.isCloaked(thisBlock)) {
 			// Get the localized name of the block and scatter it using §k to make it unreadable
 			Language language = Language.getInstance();
-			LiteralText newText = new LiteralText("§k" + language.get(thisBlock.getTranslationKey()));
+			MutableText newText = Text.literal("§k" + language.get(thisBlock.getTranslationKey()));
 			
 			callbackInfoReturnable.setReturnValue(newText);
 		}

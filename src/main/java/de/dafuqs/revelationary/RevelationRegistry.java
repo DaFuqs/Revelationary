@@ -11,6 +11,7 @@ import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.server.command.SetBlockCommand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.Pair;
@@ -62,8 +63,8 @@ public class RevelationRegistry {
         
         for(Map.Entry<String, JsonElement> stateEntry : jsonObject.get("block_states").getAsJsonObject().entrySet()) {
             try {
-                BlockState sourceBlockState = new BlockArgumentParser(new StringReader(stateEntry.getKey()), true).parse(false).getBlockState();
-                BlockState targetBlockState = new BlockArgumentParser(new StringReader(stateEntry.getValue().getAsString()), true).parse(false).getBlockState();
+                BlockState sourceBlockState = BlockArgumentParser.block(Registry.BLOCK, new StringReader(stateEntry.getKey()), true).blockState();
+                BlockState targetBlockState = BlockArgumentParser.block(Registry.BLOCK, new StringReader(stateEntry.getValue().getAsString()), true).blockState();
     
                 registerBlockState(advancementIdentifier, sourceBlockState, targetBlockState);
             } catch (Exception e) {
