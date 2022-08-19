@@ -7,6 +7,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.BuiltChunkStorage;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.chunk.ChunkBuilder;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
@@ -17,20 +18,22 @@ public abstract class WorldRendererMixin implements WorldRendererAccessor {
 	@Shadow
 	private BuiltChunkStorage chunks;
 	
-	@Shadow
-	public abstract void scheduleTerrainUpdate();
-	
 	/**
 	 * When triggered on client side lets the client redraw ALL chunks
 	 * Warning: Costly + LagSpike!
 	 */
 	public void rebuildAllChunks() {
-		if (MinecraftClient.getInstance().world != null) {
-			if (MinecraftClient.getInstance().worldRenderer != null && MinecraftClient.getInstance().player != null) {
+		World world = MinecraftClient.getInstance().world;
+		if (world != null) {
+			WorldRenderer worldRenderer = MinecraftClient.getInstance().worldRenderer;
+			if (worldRenderer != null) {
 				for (ChunkBuilder.BuiltChunk chunk : this.chunks.chunks) {
-					chunk.scheduleRebuild(true);
+					int startY = world.getBottomSectionCoord();
+					int endY = world.getTopSectionCoord();
+					for (int y = startY; y <= endY; y++) {
+						((de.dafuqs.revelationary.mixin.client.WorldRendererAccessor) worldRenderer).invokeScheduleChunkRender(chunk.getOrigin().getX(), startY + y, chunk.getOrigin().getZ(), false);
+					}
 				}
-				scheduleTerrainUpdate();
 			}
 		}
 	}
