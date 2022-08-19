@@ -14,8 +14,7 @@
     "client.ClientAdvancementManagerMixin",
     "client.ItemMixin",
     "client.MinecraftClientMixin",
-    "client.WorldRendererMixin",
-    "client.WorldRendererMixinAccessor"
+    "client.WorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
