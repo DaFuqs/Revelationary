@@ -59,7 +59,7 @@ public abstract class WorldRendererMixin implements WorldRendererAccessor {
 		WorldRendererMixinAccessor wra = (de.dafuqs.revelationary.mixin.client.WorldRendererMixinAccessor) worldRenderer;
 		ClientPlayerEntity clientPlayerEntity = MinecraftClient.getInstance().player;
 		ChunkPos chunkPos = clientPlayerEntity.getChunkPos();
-		int viewDistance = MinecraftClient.getInstance().options.getViewDistance();
+		int viewDistance = MinecraftClient.getInstance().options.getViewDistance().getValue();
 		
 		int startY = world.getBottomSectionCoord();
 		int endY = world.getTopSectionCoord();
