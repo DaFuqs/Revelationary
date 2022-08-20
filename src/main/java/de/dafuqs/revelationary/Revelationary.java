@@ -4,6 +4,7 @@ import de.dafuqs.revelationary.api.advancements.AdvancementCriteria;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
@@ -37,6 +38,10 @@ public class Revelationary implements ModInitializer {
 		ServerWorldEvents.LOAD.register((minecraftServer, serverWorld) -> {
 			Revelationary.minecraftServer = minecraftServer;
 		});
+		
+		if(FabricLoader.getInstance().isModLoaded("sodium")) {
+			logWarning("Sodium detected. Chunk rebuilding will be done in cursed mode.");
+		}
 		
 		logInfo("Common startup completed!");
 	}
