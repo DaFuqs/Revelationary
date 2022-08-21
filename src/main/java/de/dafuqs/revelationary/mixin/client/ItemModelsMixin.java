@@ -1,4 +1,4 @@
-package de.dafuqs.revelationary.mixin;
+package de.dafuqs.revelationary.mixin.client;
 
 import de.dafuqs.revelationary.ClientRevelationHolder;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;

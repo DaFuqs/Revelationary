@@ -2,7 +2,7 @@ package de.dafuqs.revelationary;
 
 import de.dafuqs.revelationary.api.advancements.AdvancementCriteria;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resource.ResourceType;
@@ -35,8 +35,9 @@ public class Revelationary implements ModInitializer {
 		AdvancementCriteria.register();
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(RevelationDataLoader.INSTANCE);
 		
-		ServerWorldEvents.LOAD.register((minecraftServer, serverWorld) -> {
-			Revelationary.minecraftServer = minecraftServer;
+		ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+			Revelationary.minecraftServer = server;
+			RevelationRegistry.addRevelationAwares();
 		});
 		
 		if(FabricLoader.getInstance().isModLoaded("sodium")) {
