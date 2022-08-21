@@ -4,7 +4,6 @@
   "compatibilityLevel": "JAVA_17",
   "mixins": [
     "AbstractBlockMixin",
-    "ItemModelsMixin",
     "PlayerAdvancementTrackerMixin"
   ],
   "client": [
@@ -13,6 +12,7 @@
     "client.BlockModelsMixin",
     "client.ClientAdvancementManagerMixin",
     "client.ItemMixin",
+    "client.ItemModelsMixin",
     "client.MinecraftClientMixin",
     "client.WorldRendererAccessor",
     "client.WorldRendererMixin"

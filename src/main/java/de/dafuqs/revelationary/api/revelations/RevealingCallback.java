@@ -13,7 +13,7 @@ import java.util.Set;
 public interface RevealingCallback {
 	
 	/**
-	 * Get's called every time blocks or items get revealed.
+	 * Gets called every time blocks or items get revealed.
 	 * The block and item lists are complete and do contain all entries from all mods
 	 * that use the revelation system. If you want to only trigger actions for your
 	 * own mods entries you have to run a filter across those sets
