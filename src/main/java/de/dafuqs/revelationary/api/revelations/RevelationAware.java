@@ -59,13 +59,15 @@ public interface RevelationAware {
 	@Nullable Pair<Item, Item> getItemCloak();
 	
 	/**
-	 *
+	 * Optionally return a mapping of a revelation aware item and the text that should be used as translation
+	 * If you return null (the default) it's name will be scattered unreadable instead
 	 * @return the matching of the item and the text it will use when not revealed
 	 */
 	@Nullable default Pair<Item, MutableText> getCloakedItemTranslation() { return null; }
 	
 	/**
-	 *
+	 * Optionally return a mapping of a revelation aware block and the text that should be used as translation
+	 * If you return null (the default) it's name will be scattered unreadable instead
 	 * @return the matching of the block and the text it will use when not revealed
 	 */
 	@Nullable default Pair<Block, MutableText> getCloakedBlockTranslation() { return null; }
