@@ -6,6 +6,15 @@
     "minecraft:tall_grass[half=upper]": "minecraft:netherite_block"
   },
   "items": {
-    "minecraft:nether_star": "minecraft:gunpowder"
+    "minecraft:nether_star": "minecraft:gunpowder",
+    "minecraft:diamond_ore": "minecraft:stone"
+  },
+  "item_name_replacements": {
+    "minecraft:nether_star": "block.minecraft.poppy",
+    "minecraft:diamond_ore": "Probably Stone?",
+    "minecraft:gold_ore": "Since Gold Ore is not in the items tag above, you should never see this"
+  },
+  "block_name_replacements": {
+    "minecraft:grass": "block.minecraft.dandelion"
   }
 }

@@ -11,8 +11,13 @@ import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
+import net.minecraft.util.Language;
 import net.minecraft.util.Pair;
 import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.NotNull;
@@ -29,12 +34,37 @@ public class RevelationRegistry {
     private static final Map<Identifier, List<Item>> ADVANCEMENT_ITEM_REGISTRY = new HashMap<>();
     private static final Map<Item, Identifier> ITEM_ADVANCEMENT_REGISTRY = new HashMap<>();
     private static final Map<Item, Item> ITEM_REGISTRY = new HashMap<>();
+    
+    private static final Map<Block, MutableText> ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY = new HashMap<>();
+    private static final Map<Item, MutableText> ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY = new HashMap<>();
 
+    public static MutableText getTranslationString(Item item) {
+        if(ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.containsKey(item)) {
+            return ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.get(item);
+        } else {
+            // Get the localized name of the block and scatter it using §k to make it unreadable
+            Language language = Language.getInstance();
+            return new LiteralText("§k" + language.get(item.getTranslationKey()));
+        }
+    }
+
+    public static MutableText getTranslationString(Block block) {
+        if(ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.containsKey(block)) {
+            return ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.get(block);
+        } else {
+            // Get the localized name of the block and scatter it using §k to make it unreadable
+            Language language = Language.getInstance();
+            return new LiteralText("§k" + language.get(block.getTranslationKey()));
+        }
+    }
+    
     public static void clear() {
         ADVANCEMENT_BLOCK_REGISTRY.clear();
         ADVANCEMENT_ITEM_REGISTRY.clear();
         BLOCK_STATE_REGISTRY.clear();
         ITEM_REGISTRY.clear();
+        ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.clear();
+        ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.clear();
     }
     
     private static final Set<RevelationAware> notedRevelationAwares = new HashSet<>();
@@ -52,6 +82,15 @@ public class RevelationRegistry {
             if (item != null) {
                 registerItem(advancementIdentifier, item.getLeft(), item.getRight());
             }
+            
+            Pair<Block, MutableText> blockTranslation = revelationAware.getCloakedBlockTranslation();
+            if (blockTranslation != null) {
+                registerBlockTranslation(blockTranslation.getLeft(), blockTranslation.getRight());
+            }
+            Pair<Item, MutableText> itemTranslation = revelationAware.getCloakedItemTranslation();
+            if (itemTranslation != null) {
+                registerItemTranslation(itemTranslation.getLeft(), itemTranslation.getRight());
+            }
         }
         
         notedRevelationAwares.clear();
@@ -62,8 +101,8 @@ public class RevelationRegistry {
         
         for(Map.Entry<String, JsonElement> stateEntry : jsonObject.get("block_states").getAsJsonObject().entrySet()) {
             try {
-                BlockState sourceBlockState = new BlockArgumentParser(new StringReader(stateEntry.getKey()), true).parse(false).getBlockState();
-                BlockState targetBlockState = new BlockArgumentParser(new StringReader(stateEntry.getValue().getAsString()), true).parse(false).getBlockState();
+                BlockState sourceBlockState = new BlockArgumentParser(new StringReader(stateEntry.getKey()), false).parse(false).getBlockState();
+                BlockState targetBlockState = new BlockArgumentParser(new StringReader(stateEntry.getValue().getAsString()), false).parse(false).getBlockState();
     
                 registerBlockState(advancementIdentifier, sourceBlockState, targetBlockState);
             } catch (Exception e) {
@@ -78,6 +117,20 @@ public class RevelationRegistry {
             Item targetItem = Registry.ITEM.get(targetId);
     
             registerItem(advancementIdentifier, sourceItem, targetItem);
+        }
+        for(Map.Entry<String, JsonElement> itemNameEntry : jsonObject.get("item_name_replacements").getAsJsonObject().entrySet()) {
+            Identifier sourceId = Identifier.tryParse(itemNameEntry.getKey());
+            TranslatableText targetText = new TranslatableText(itemNameEntry.getValue().getAsString());
+            
+            Item sourceItem = Registry.ITEM.get(sourceId);
+            ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.put(sourceItem, targetText);
+        }
+        for(Map.Entry<String, JsonElement> blockNameEntry : jsonObject.get("block_name_replacements").getAsJsonObject().entrySet()) {
+            Identifier sourceId = Identifier.tryParse(blockNameEntry.getKey());
+            TranslatableText targetText = new TranslatableText(blockNameEntry.getValue().getAsString());
+            
+            Block sourceBlock = Registry.BLOCK.get(sourceId);
+            ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.put(sourceBlock, targetText);
         }
     }
     
@@ -103,6 +156,10 @@ public class RevelationRegistry {
         
         BLOCK_STATE_REGISTRY.put(sourceBlockState, targetBlockState);
         BLOCK_ADVANCEMENT_REGISTRY.put(sourceBlockState, advancementIdentifier);
+    }
+    
+    private static void registerBlockTranslation(Block sourceBlock, MutableText targetTranslation) {
+        ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.put(sourceBlock, targetTranslation);
     }
     
     public static boolean hasCloak(BlockState blockState) {
@@ -177,6 +234,10 @@ public class RevelationRegistry {
         }
         ITEM_REGISTRY.put(sourceItem, targetItem);
         ITEM_ADVANCEMENT_REGISTRY.put(sourceItem, advancementIdentifier);
+    }
+    
+    private static void registerItemTranslation(Item sourceItem, MutableText targetTranslation) {
+        ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.put(sourceItem, targetTranslation);
     }
     
     public static boolean hasCloak(Item item) {
