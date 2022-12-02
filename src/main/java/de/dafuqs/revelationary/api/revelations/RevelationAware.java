@@ -2,6 +2,7 @@ package de.dafuqs.revelationary.api.revelations;
 
 import de.dafuqs.revelationary.RevelationRegistry;
 import de.dafuqs.revelationary.api.advancements.AdvancementHelper;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.EntityShapeContext;
 import net.minecraft.block.ShapeContext;
@@ -10,6 +11,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import org.jetbrains.annotations.Nullable;
@@ -19,9 +22,9 @@ import java.util.Map;
 /**
  * Interface for defining a block/item/blockitem/... as revealable.
  * Using this interface will allow more functionality than using Revelationary's json api
- *
+ * <p>
  * Blocks and items with this interface will disguise themselves as other blocks/items
- * until the player get's a specific advancement. It's name will get obfuscated.
+ * until the player gets a specific advancement. It's name will get obfuscated.
  * Disguised blocks will drop item stacks as if they were the block they are disguised as
  */
 public interface RevelationAware {
@@ -33,7 +36,7 @@ public interface RevelationAware {
 	
 	/**
 	 * Register this object as revealable
-	 * You can call this at the end of the objects constructur.
+	 * You can call this safely at the end of the objects' constructor.
 	 */
 	static void register(RevelationAware revelationAware) {
 		RevelationRegistry.registerRevelationAware(revelationAware);
@@ -56,16 +59,26 @@ public interface RevelationAware {
 	@Nullable Pair<Item, Item> getItemCloak();
 	
 	/**
+	 *
+	 * @return the matching of the item and the text it will use when not revealed
+	 */
+	@Nullable default Pair<Item, MutableText> getCloakedItemTranslation() { return null; }
+	
+	/**
+	 *
+	 * @return the matching of the block and the text it will use when not revealed
+	 */
+	@Nullable default Pair<Block, MutableText> getCloakedBlockTranslation() { return null; }
+	
+	/**
 	 * Gets called when this object gets disguised (like when taking an advancement from the player)
 	 */
-	default void onCloak() {
-	}
+	default void onCloak() {}
 	
 	/**
 	 * Gets called when this object gets revealed (when the player gets the matching advancement)
 	 */
-	default void onUncloak() {
-	}
+	default void onUncloak() {}
 	
 	/**
 	 * Helper method that checks, if the ShapeContext is of a player and if the player has the matching advancement
