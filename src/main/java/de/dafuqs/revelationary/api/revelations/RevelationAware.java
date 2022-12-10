@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * Interface for defining a block/item/blockitem/... as revealable.
  * Using this interface will allow more functionality than using Revelationary's json api
- *
+ * <p>
  * Blocks and items with this interface will disguise themselves as other blocks/items
  * until the player get's a specific advancement. It's name will get obfuscated.
  * Disguised blocks will drop item stacks as if they were the block they are disguised as
@@ -69,7 +69,8 @@ public interface RevelationAware {
 	
 	/**
 	 * Helper method that checks, if the ShapeContext is of a player and if the player has the matching advancement
-	 *  @param context the ShapeContext to check
+	 *
+	 * @param context the ShapeContext to check
 	 */
 	default boolean isVisibleTo(ShapeContext context) {
 		if (context instanceof EntityShapeContext) {
@@ -83,6 +84,7 @@ public interface RevelationAware {
 	
 	/**
 	 * Helper method that checks, if the player has the matching advancement
+	 *
 	 * @param player the player to check
 	 */
 	default boolean isVisibleTo(@Nullable PlayerEntity player) {
@@ -92,6 +94,7 @@ public interface RevelationAware {
 	
 	/**
 	 * Helper method that returns the player in a lootContextBuilder
+	 *
 	 * @param lootContextBuilder The loot context builder to search a player in
 	 * @return the player of that loot context builder. null if there is no player in that context
 	 */

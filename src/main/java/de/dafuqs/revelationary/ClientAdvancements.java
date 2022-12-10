@@ -31,7 +31,7 @@ public class ClientAdvancements {
 		ClientRevelationHolder.processRemovedAdvancements(removedAdvancements);
 		ClientRevelationHolder.processNewAdvancements(doneAdvancements, !hadPacketBefore);
 		
-		for(ClientAdvancementPacketCallback callback : callbacks) {
+		for (ClientAdvancementPacketCallback callback : callbacks) {
 			callback.onClientAdvancementPacket(doneAdvancements, removedAdvancements, !hadPacketBefore);
 		}
 	}

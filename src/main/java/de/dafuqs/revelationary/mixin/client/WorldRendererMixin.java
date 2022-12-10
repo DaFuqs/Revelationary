@@ -30,7 +30,7 @@ public abstract class WorldRendererMixin implements WorldRendererAccessor {
 	 * Warning: Costly + LagSpike!
 	 */
 	public void rebuildAllChunks() {
-		if(FabricLoader.getInstance().isModLoaded("sodium")) {
+		if (FabricLoader.getInstance().isModLoaded("sodium")) {
 			rebuildAllChunksSodium();
 			return;
 		}
@@ -47,7 +47,7 @@ public abstract class WorldRendererMixin implements WorldRendererAccessor {
 	
 	private static void rebuildAllChunksSodium() {
 		World world = MinecraftClient.getInstance().world;
-		if(world == null) {
+		if (world == null) {
 			return;
 		}
 		
@@ -67,7 +67,7 @@ public abstract class WorldRendererMixin implements WorldRendererAccessor {
 		for (int x = -viewDistance; x < viewDistance; x++) {
 			for (int z = -viewDistance; z < viewDistance; z++) {
 				WorldChunk chunk = MinecraftClient.getInstance().world.getChunkManager().getWorldChunk(chunkPos.x + x, chunkPos.z + z, false);
-				if(chunk != null) {
+				if (chunk != null) {
 					for (int y = startY; y <= endY; y++) {
 						wra.invokeScheduleChunkRender(chunk.getPos().x, y, chunk.getPos().z, false);
 					}
