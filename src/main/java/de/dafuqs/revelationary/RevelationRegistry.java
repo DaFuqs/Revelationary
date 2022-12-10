@@ -130,7 +130,7 @@ public class RevelationRegistry {
 				ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.put(sourceBlock, targetText);
 				
 				Item blockItem = sourceBlock.asItem();
-				if(blockItem != null && blockItem != Items.AIR) {
+				if (blockItem != null && blockItem != Items.AIR) {
 					ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.put(blockItem, targetText);
 				}
 			}
