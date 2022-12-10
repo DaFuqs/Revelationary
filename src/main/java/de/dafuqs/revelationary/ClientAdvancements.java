@@ -75,8 +75,6 @@ public class ClientAdvancements {
 	}
 	
 	public static void playerLogout() {
-		RevelationRegistry.addRevelationAwares();
-		ClientRevelationHolder.cloakAll();
 		receivedFirstAdvancementPacket = false;
 	}
 	

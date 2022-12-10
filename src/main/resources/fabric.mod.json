@@ -18,6 +18,9 @@
   "entrypoints": {
     "main": [
       "de.dafuqs.revelationary.Revelationary"
+    ],
+    "client": [
+      "de.dafuqs.revelationary.RevelationaryClient"
     ]
   },
   "mixins": [
