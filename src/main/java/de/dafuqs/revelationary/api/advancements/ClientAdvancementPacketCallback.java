@@ -18,11 +18,10 @@ public interface ClientAdvancementPacketCallback {
 	
 	/**
 	 * Gets called every time advancements get synched from server- to client side
-	 *
-	 * @param gottenAdvancements  Advancements that the player got
+	 * @param gottenAdvancements Advancements that the player got
 	 * @param removedAdvancements Advancements that the player lost (like via /advancements remove ...)
-	 * @param isJoinPacket        True if the trigger is because of the first advancement packet after world join
-	 *                            (synching from all the advancements of previous play sessions)
+	 * @param isJoinPacket True if the trigger is because of the first advancement packet after world join
+	 *               (synching from all the advancements of previous play sessions)
 	 */
 	void onClientAdvancementPacket(Set<Identifier> gottenAdvancements, Set<Identifier> removedAdvancements, boolean isJoinPacket);
 	

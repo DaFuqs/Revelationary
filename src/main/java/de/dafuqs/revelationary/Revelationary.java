@@ -40,7 +40,7 @@ public class Revelationary implements ModInitializer {
 			RevelationRegistry.addRevelationAwares();
 		});
 		
-		if (FabricLoader.getInstance().isModLoaded("sodium")) {
+		if(FabricLoader.getInstance().isModLoaded("sodium")) {
 			logWarning("Sodium detected. Chunk rebuilding will be done in cursed mode.");
 		}
 		

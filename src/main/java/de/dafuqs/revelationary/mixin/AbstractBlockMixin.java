@@ -15,8 +15,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(AbstractBlock.class)
 public abstract class AbstractBlockMixin {
 	
-	@Shadow
-	public abstract Identifier getLootTableId();
+	@Shadow public abstract Identifier getLootTableId();
 	
 	@Redirect(
 			method = "getDroppedStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/loot/context/LootContext$Builder;)Ljava/util/List;",
@@ -24,7 +23,7 @@ public abstract class AbstractBlockMixin {
 	)
 	private Identifier injected(AbstractBlock instance, BlockState state, LootContext.Builder builder) {
 		BlockState cloakState = RevelationRegistry.getCloak(state);
-		if (cloakState != null) {
+		if(cloakState != null) {
 			PlayerEntity lootPlayerEntity = RevelationAware.getLootPlayerEntity(builder);
 			if (!RevelationRegistry.isVisibleTo(state, lootPlayerEntity)) {
 				return cloakState.getBlock().getLootTableId();

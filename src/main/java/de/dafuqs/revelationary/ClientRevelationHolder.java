@@ -27,7 +27,7 @@ public class ClientRevelationHolder {
 	private static final Set<Item> activeItemSwaps = new HashSet<>();
 	
 	public static void processNewAdvancements(Set<Identifier> doneAdvancements, boolean isJoinPacket) {
-		if (!doneAdvancements.isEmpty()) {
+		if(!doneAdvancements.isEmpty()) {
 			Set<Item> revealedItems = new HashSet<>();
 			Set<BlockState> revealedBlockStates = new HashSet<>();
 			Set<Block> revealedBlocks = new HashSet<>();
@@ -73,7 +73,7 @@ public class ClientRevelationHolder {
 	}
 	
 	public static void processRemovedAdvancements(@NotNull Set<Identifier> removedAdvancements) {
-		if (!removedAdvancements.isEmpty()) {
+		if(!removedAdvancements.isEmpty()) {
 			List<Item> concealedItems = new ArrayList<>();
 			List<BlockState> concealedBlockStates = new ArrayList<>();
 			List<Block> concealedBlocks = new ArrayList<>();
@@ -91,12 +91,12 @@ public class ClientRevelationHolder {
 			if (concealedBlockStates.size() > 0) {
 				// uncloak the blocks
 				for (BlockState concealedBlockState : concealedBlockStates) {
-					if (!activeBlockStateSwaps.contains(concealedBlockState)) {
+					if(!activeBlockStateSwaps.contains(concealedBlockState)) {
 						activeBlockStateSwaps.add(concealedBlockState);
 					}
 					Item blockItem = concealedBlockState.getBlock().asItem();
 					if (blockItem != null) {
-						if (!activeItemSwaps.contains(blockItem)) {
+						if(!activeItemSwaps.contains(blockItem)) {
 							activeItemSwaps.add(blockItem);
 						}
 					}
@@ -128,7 +128,7 @@ public class ClientRevelationHolder {
 	// BLOCKS
 	private static void cloak(BlockState blockState) {
 		activeBlockStateSwaps.add(blockState);
-		if (blockState instanceof RevelationAware revelationAware) {
+		if(blockState instanceof RevelationAware revelationAware) {
 			revelationAware.onCloak();
 		}
 	}
@@ -136,7 +136,7 @@ public class ClientRevelationHolder {
 	public static boolean isCloaked(Block block) {
 		return activeBlockStateSwaps.contains(block.getDefaultState());
 	}
-	
+
 	public static boolean isCloaked(BlockState blockState) {
 		return activeBlockStateSwaps.contains(blockState);
 	}
@@ -152,7 +152,7 @@ public class ClientRevelationHolder {
 	// ITEMS
 	private static void cloak(Item item) {
 		activeItemSwaps.add(item);
-		if (item instanceof RevelationAware revelationAware) {
+		if(item instanceof RevelationAware revelationAware) {
 			revelationAware.onCloak();
 		}
 	}

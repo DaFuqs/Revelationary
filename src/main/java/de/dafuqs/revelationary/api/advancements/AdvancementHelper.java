@@ -17,8 +17,7 @@ public class AdvancementHelper {
 	 * - if advancementIdentifier is null always returns true
 	 * - if playerEntity is null or the advancement does not exist always returns false
 	 * - if playerEntity is a fake player always returns false
-	 *
-	 * @param playerEntity          the player
+	 * @param playerEntity the player
 	 * @param advancementIdentifier the advancement identifier
 	 * @return weather or not the player has the advancement with the given identifier
 	 */
@@ -49,7 +48,6 @@ public class AdvancementHelper {
 	
 	/**
 	 * Checks, if the current client player has an advancement
-	 *
 	 * @param advancementIdentifier the identifier of the advancement to check
 	 * @return if the client player has the advancement
 	 */
