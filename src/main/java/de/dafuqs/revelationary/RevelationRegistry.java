@@ -13,6 +13,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
@@ -138,7 +139,7 @@ public class RevelationRegistry {
 		if (jsonObject.has("item_name_replacements")) {
 			for (Map.Entry<String, JsonElement> itemNameEntry : jsonObject.get("item_name_replacements").getAsJsonObject().entrySet()) {
 				Identifier sourceId = Identifier.tryParse(itemNameEntry.getKey());
-				MutableText targetText = Text.translatable(itemNameEntry.getValue().getAsString());
+				MutableText targetText = new TranslatableText(itemNameEntry.getValue().getAsString());
 				
 				Item sourceItem = Registry.ITEM.get(sourceId);
 				ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.put(sourceItem, targetText);
@@ -339,8 +340,8 @@ public class RevelationRegistry {
 			Identifier advancementIdentifier = buf.readIdentifier();
 			int blockStateCount = buf.readInt();
 			for (int j = 0; j < blockStateCount; j++) {
-				BlockState sourceState = BlockArgumentParser.block(Registry.BLOCK, buf.readString(), true).blockState();
-				BlockState targetState = BlockArgumentParser.block(Registry.BLOCK, buf.readString(), true).blockState();
+				BlockState sourceState = new BlockArgumentParser(new StringReader(buf.readString()), false).parse(false).getBlockState();
+				BlockState targetState = new BlockArgumentParser(new StringReader(buf.readString()), false).parse(false).getBlockState();
 				
 				if (ADVANCEMENT_BLOCK_REGISTRY.containsKey(advancementIdentifier)) {
 					List<BlockState> advancementStates = ADVANCEMENT_BLOCK_REGISTRY.get(advancementIdentifier);
