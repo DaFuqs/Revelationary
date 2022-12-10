@@ -3,6 +3,7 @@ package de.dafuqs.revelationary;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.dafuqs.revelationary.api.advancements.AdvancementHelper;
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
 import net.minecraft.block.Block;
@@ -11,6 +12,7 @@ import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -65,14 +67,14 @@ public class RevelationRegistry {
 		ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.clear();
 	}
 	
-	private static final Set<RevelationAware> notedRevelationAwares = new HashSet<>();
+	private static final Set<RevelationAware> revelationAwares = new HashSet<>();
 	
 	public static void registerRevelationAware(RevelationAware revelationAware) {
-		notedRevelationAwares.add(revelationAware);
+		revelationAwares.add(revelationAware);
 	}
 	
 	public static void addRevelationAwares() {
-		for (RevelationAware revelationAware : notedRevelationAwares) {
+		for (RevelationAware revelationAware : revelationAwares) {
 			Identifier advancementIdentifier = revelationAware.getCloakAdvancementIdentifier();
 			for (Map.Entry<BlockState, BlockState> states : revelationAware.getBlockStateCloaks().entrySet()) {
 				registerBlockState(advancementIdentifier, states.getKey(), states.getValue());
@@ -91,8 +93,6 @@ public class RevelationRegistry {
 				registerItemTranslation(itemTranslation.getLeft(), itemTranslation.getRight());
 			}
 		}
-		
-		notedRevelationAwares.clear();
 	}
 	
 	public static void registerFromJson(JsonObject jsonObject) {
@@ -130,7 +130,7 @@ public class RevelationRegistry {
 				ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.put(sourceBlock, targetText);
 				
 				Item blockItem = sourceBlock.asItem();
-				if(blockItem != null && blockItem != Items.AIR) {
+				if (blockItem != null && blockItem != Items.AIR) {
 					ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.put(blockItem, targetText);
 				}
 			}
@@ -288,6 +288,112 @@ public class RevelationRegistry {
 	
 	public static List<Item> getItemEntries(Identifier advancement) {
 		return ADVANCEMENT_ITEM_REGISTRY.getOrDefault(advancement, Collections.EMPTY_LIST);
+	}
+	
+	public static void write(PacketByteBuf buf) {
+		// Block States
+		buf.writeInt(ADVANCEMENT_BLOCK_REGISTRY.size());
+		for (Map.Entry<Identifier, List<BlockState>> advancementBlocks : ADVANCEMENT_BLOCK_REGISTRY.entrySet()) {
+			buf.writeIdentifier(advancementBlocks.getKey());
+			buf.writeInt(advancementBlocks.getValue().size());
+			for (BlockState blockState : advancementBlocks.getValue()) {
+				buf.writeString(BlockArgumentParser.stringifyBlockState(blockState));
+				buf.writeString(BlockArgumentParser.stringifyBlockState(BLOCK_STATE_REGISTRY.get(blockState)));
+			}
+		}
+		
+		// Items
+		buf.writeInt(ADVANCEMENT_ITEM_REGISTRY.size());
+		for (Map.Entry<Identifier, List<Item>> advancementItems : ADVANCEMENT_ITEM_REGISTRY.entrySet()) {
+			buf.writeIdentifier(advancementItems.getKey());
+			buf.writeInt(advancementItems.getValue().size());
+			for (Item item : advancementItems.getValue()) {
+				buf.writeString(Registry.ITEM.getId(item).toString());
+				buf.writeString(Registry.ITEM.getId(ITEM_REGISTRY.get(item)).toString());
+			}
+		}
+		
+		// Block Translations
+		buf.writeInt(ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.size());
+		for (Map.Entry<Block, MutableText> blockTranslation : ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.entrySet()) {
+			buf.writeIdentifier(Registry.BLOCK.getId(blockTranslation.getKey()));
+			buf.writeText(blockTranslation.getValue());
+		}
+		
+		// Item Translations
+		buf.writeInt(ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.size());
+		for (Map.Entry<Item, MutableText> itemTranslation : ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.entrySet()) {
+			buf.writeIdentifier(Registry.ITEM.getId(itemTranslation.getKey()));
+			buf.writeText(itemTranslation.getValue());
+		}
+		
+	}
+	
+	public static void fromPacket(PacketByteBuf buf) throws CommandSyntaxException {
+		RevelationRegistry.clear();
+		RevelationRegistry.addRevelationAwares();
+		
+		// Block States
+		int blockEntries = buf.readInt();
+		for (int i = 0; i < blockEntries; i++) {
+			Identifier advancementIdentifier = buf.readIdentifier();
+			int blockStateCount = buf.readInt();
+			for (int j = 0; j < blockStateCount; j++) {
+				BlockState sourceState = BlockArgumentParser.block(Registry.BLOCK, buf.readString(), true).blockState();
+				BlockState targetState = BlockArgumentParser.block(Registry.BLOCK, buf.readString(), true).blockState();
+				
+				if (ADVANCEMENT_BLOCK_REGISTRY.containsKey(advancementIdentifier)) {
+					List<BlockState> advancementStates = ADVANCEMENT_BLOCK_REGISTRY.get(advancementIdentifier);
+					advancementStates.add(sourceState);
+				} else {
+					List<BlockState> advancementStates = new ArrayList<>();
+					advancementStates.add(sourceState);
+					ADVANCEMENT_BLOCK_REGISTRY.put(advancementIdentifier, advancementStates);
+				}
+				BLOCK_ADVANCEMENT_REGISTRY.put(sourceState, advancementIdentifier);
+				BLOCK_STATE_REGISTRY.put(sourceState, targetState);
+			}
+		}
+		
+		// Items
+		int itemEntries = buf.readInt();
+		for (int i = 0; i < itemEntries; i++) {
+			Identifier advancementIdentifier = buf.readIdentifier();
+			int itemCount = buf.readInt();
+			for (int j = 0; j < itemCount; j++) {
+				Identifier sourceId = Identifier.tryParse(buf.readString());
+				Identifier targetId = Identifier.tryParse(buf.readString());
+				Item sourceItem = Registry.ITEM.get(sourceId);
+				Item targetItem = Registry.ITEM.get(targetId);
+				
+				if (ADVANCEMENT_ITEM_REGISTRY.containsKey(advancementIdentifier)) {
+					List<Item> advancementItems = ADVANCEMENT_ITEM_REGISTRY.get(advancementIdentifier);
+					advancementItems.add(sourceItem);
+				} else {
+					List<Item> advancementItems = new ArrayList<>();
+					advancementItems.add(sourceItem);
+					ADVANCEMENT_ITEM_REGISTRY.put(advancementIdentifier, advancementItems);
+				}
+				ITEM_ADVANCEMENT_REGISTRY.put(sourceItem, advancementIdentifier);
+				ITEM_REGISTRY.put(sourceItem, targetItem);
+			}
+		}
+		
+		// Block Translations
+		int blockTranslations = buf.readInt();
+		for (int i = 0; i < blockTranslations; i++) {
+			Block block = Registry.BLOCK.get(buf.readIdentifier());
+			MutableText text = (MutableText) buf.readText();
+			ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.put(block, text);
+		}
+		
+		// Item Translations
+		int itemTranslations = buf.readInt();
+		for (int i = 0; i < itemTranslations; i++) {
+			Item item = Registry.ITEM.get(buf.readIdentifier());
+			MutableText text = (MutableText) buf.readText();
+			ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.put(item, text);
+		}
 	}
 	
 }

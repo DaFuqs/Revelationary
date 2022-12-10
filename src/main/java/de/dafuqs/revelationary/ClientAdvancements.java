@@ -31,7 +31,7 @@ public class ClientAdvancements {
 		ClientRevelationHolder.processRemovedAdvancements(removedAdvancements);
 		ClientRevelationHolder.processNewAdvancements(doneAdvancements, !hadPacketBefore);
 		
-		for(ClientAdvancementPacketCallback callback : callbacks) {
+		for (ClientAdvancementPacketCallback callback : callbacks) {
 			callback.onClientAdvancementPacket(doneAdvancements, removedAdvancements, !hadPacketBefore);
 		}
 	}
@@ -75,8 +75,6 @@ public class ClientAdvancements {
 	}
 	
 	public static void playerLogout() {
-		RevelationRegistry.addRevelationAwares();
-		ClientRevelationHolder.cloakAll();
 		receivedFirstAdvancementPacket = false;
 	}
 	
