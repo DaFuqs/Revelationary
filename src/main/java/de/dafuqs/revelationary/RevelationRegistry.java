@@ -121,15 +121,6 @@ public class RevelationRegistry {
 				registerItem(advancementIdentifier, sourceItem, targetItem);
 			}
 		}
-		if (jsonObject.has("item_name_replacements")) {
-			for (Map.Entry<String, JsonElement> itemNameEntry : jsonObject.get("item_name_replacements").getAsJsonObject().entrySet()) {
-				Identifier sourceId = Identifier.tryParse(itemNameEntry.getKey());
-				MutableText targetText = Text.translatable(itemNameEntry.getValue().getAsString());
-				
-				Item sourceItem = Registry.ITEM.get(sourceId);
-				ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.put(sourceItem, targetText);
-			}
-		}
 		if (jsonObject.has("block_name_replacements")) {
 			for (Map.Entry<String, JsonElement> blockNameEntry : jsonObject.get("block_name_replacements").getAsJsonObject().entrySet()) {
 				Identifier sourceId = Identifier.tryParse(blockNameEntry.getKey());
@@ -137,6 +128,20 @@ public class RevelationRegistry {
 				
 				Block sourceBlock = Registry.BLOCK.get(sourceId);
 				ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.put(sourceBlock, targetText);
+				
+				Item blockItem = sourceBlock.asItem();
+				if(blockItem != null && blockItem != Items.AIR) {
+					ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.put(blockItem, targetText);
+				}
+			}
+		}
+		if (jsonObject.has("item_name_replacements")) {
+			for (Map.Entry<String, JsonElement> itemNameEntry : jsonObject.get("item_name_replacements").getAsJsonObject().entrySet()) {
+				Identifier sourceId = Identifier.tryParse(itemNameEntry.getKey());
+				MutableText targetText = Text.translatable(itemNameEntry.getValue().getAsString());
+				
+				Item sourceItem = Registry.ITEM.get(sourceId);
+				ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.put(sourceItem, targetText);
 			}
 		}
 	}
