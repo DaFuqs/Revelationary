@@ -12,7 +12,6 @@ import net.minecraft.item.Item;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import org.jetbrains.annotations.Nullable;
@@ -61,30 +60,41 @@ public interface RevelationAware {
 	/**
 	 * Optionally return a mapping of a revelation aware item and the text that should be used as translation
 	 * If you return null (the default) it's name will be scattered unreadable instead
+	 *
 	 * @return the matching of the item and the text it will use when not revealed
 	 */
-	@Nullable default Pair<Item, MutableText> getCloakedItemTranslation() { return null; }
+	@Nullable
+	default Pair<Item, MutableText> getCloakedItemTranslation() {
+		return null;
+	}
 	
 	/**
 	 * Optionally return a mapping of a revelation aware block and the text that should be used as translation
 	 * If you return null (the default) it's name will be scattered unreadable instead
+	 *
 	 * @return the matching of the block and the text it will use when not revealed
 	 */
-	@Nullable default Pair<Block, MutableText> getCloakedBlockTranslation() { return null; }
+	@Nullable
+	default Pair<Block, MutableText> getCloakedBlockTranslation() {
+		return null;
+	}
 	
 	/**
 	 * Gets called when this object gets disguised (like when taking an advancement from the player)
 	 */
-	default void onCloak() {}
+	default void onCloak() {
+	}
 	
 	/**
 	 * Gets called when this object gets revealed (when the player gets the matching advancement)
 	 */
-	default void onUncloak() {}
+	default void onUncloak() {
+	}
 	
 	/**
 	 * Helper method that checks, if the ShapeContext is of a player and if the player has the matching advancement
-	 *  @param context the ShapeContext to check
+	 *
+	 * @param context the ShapeContext to check
 	 */
 	default boolean isVisibleTo(ShapeContext context) {
 		if (context instanceof EntityShapeContext) {
@@ -98,6 +108,7 @@ public interface RevelationAware {
 	
 	/**
 	 * Helper method that checks, if the player has the matching advancement
+	 *
 	 * @param player the player to check
 	 */
 	default boolean isVisibleTo(@Nullable PlayerEntity player) {
@@ -107,6 +118,7 @@ public interface RevelationAware {
 	
 	/**
 	 * Helper method that returns the player in a lootContextBuilder
+	 *
 	 * @param lootContextBuilder The loot context builder to search a player in
 	 * @return the player of that loot context builder. null if there is no player in that context
 	 */
