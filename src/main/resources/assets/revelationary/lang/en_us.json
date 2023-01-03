@@ -1,0 +1,5 @@
+{
+  "commands.revelationary.advancement.revoke": "Revoked %d advancements from %s in %s:%s",
+  "commands.revelationary.advancement.grant": "Granted %d advancements to %s in %s:%s",
+  "commands.revelationary.advancement.sync": "Synced %d advancements from %s to %s in %s:%s"
+}
