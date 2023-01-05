@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '0.12-SNAPSHOT'
+	id 'fabric-loom' version '1.0-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -11,12 +11,12 @@ version = project.mod_version
 group = project.maven_group
 
 repositories {
-
+	mavenCentral()
 }
 
 dependencies {
 	// jetbrains annotations @Nullabe @NotNull
-	implementation 'org.jetbrains:annotations:23.0.0'
+	implementation 'org.jetbrains:annotations:23.1.0'
 
 	// fabric
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
