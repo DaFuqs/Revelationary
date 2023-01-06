@@ -4,58 +4,86 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import de.dafuqs.revelationary.api.advancements.AdvancementUtils;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 
 import java.util.Map;
 
-import static de.dafuqs.revelationary.api.advancements.AdvancementUtils.advCount;
 import static de.dafuqs.revelationary.Revelationary.logError;
+import static de.dafuqs.revelationary.api.advancements.AdvancementUtils.advCount;
 
 public class Commands {
     //register the main commands
     public static void register() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> dispatcher
-                .register(CommandManager.literal("revelationary")
-                        .requires(source -> source.hasPermissionLevel(4))
-                        .then(CommandManager.literal("advancement")
-                                .then(CommandManager.literal("revoke")
-                                        .then(CommandManager.argument("targets", EntityArgumentType.players())
-                                                .executes(context -> { executeAdv("revoke", context, null, null); return 1;})
-                                                .then(CommandManager.argument("namespace", StringArgumentType.string())
-                                                        .executes(context -> { executeAdv("revoke", context, StringArgumentType.getString(context, "namespace"), null); return 1;})
-                                                        .then(CommandManager.argument("path", StringArgumentType.string())
-                                                                .executes(context -> { executeAdv("revoke", context, StringArgumentType.getString(context, "namespace"), StringArgumentType.getString(context, "path")); return 1;})
-                                                        )
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(CommandManager.literal("revelationary")
+                .requires(source -> source.hasPermissionLevel(4))
+                .then(CommandManager.literal("advancement")
+                        .then(CommandManager.literal("revoke")
+                                .then(CommandManager.argument("targets", EntityArgumentType.players())
+                                        .executes(context -> {
+                                            executeAdv("revoke", context, null, null);
+                                            return 1;
+                                        })
+                                        .then(CommandManager.argument("namespace", StringArgumentType.string())
+                                                .executes(context -> {
+                                                    executeAdv("revoke", context, StringArgumentType.getString(context, "namespace"), null);
+                                                    return 1;
+                                                })
+                                                .then(CommandManager.argument("path", StringArgumentType.string())
+                                                        .executes(context -> {
+                                                            executeAdv("revoke", context, StringArgumentType.getString(context, "namespace"), StringArgumentType.getString(context, "path"));
+                                                            return 1;
+                                                        })
                                                 )
                                         )
                                 )
-                                .then(CommandManager.literal("grant")
-                                        .then(CommandManager.argument("targets", EntityArgumentType.players())
-                                                .executes(context -> { executeAdv("grant", context, null, null); return 1;})
-                                                .then(CommandManager.argument("namespace", StringArgumentType.string())
-                                                        .executes(context -> { executeAdv("revoke", context, StringArgumentType.getString(context, "namespace"), null); return 1;})
-                                                        .then(CommandManager.argument("path", StringArgumentType.string())
-                                                                .executes(context -> { executeAdv("grant", context, StringArgumentType.getString(context, "namespace"), StringArgumentType.getString(context, "path")); return 1;})
-                                                        )
+                        )
+                        .then(CommandManager.literal("grant")
+                                .then(CommandManager.argument("targets", EntityArgumentType.players())
+                                        .executes(context -> {
+                                            executeAdv("grant", context, null, null);
+                                            return 1;
+                                        })
+                                        .then(CommandManager.argument("namespace", StringArgumentType.string())
+                                                .executes(context -> {
+                                                    executeAdv("revoke", context, StringArgumentType.getString(context, "namespace"), null);
+                                                    return 1;
+                                                })
+                                                .then(CommandManager.argument("path", StringArgumentType.string())
+                                                        .executes(context -> {
+                                                            executeAdv("grant", context, StringArgumentType.getString(context, "namespace"), StringArgumentType.getString(context, "path"));
+                                                            return 1;
+                                                        })
                                                 )
                                         )
                                 )
-                                .then(CommandManager.literal("sync")
-                                        .then(CommandManager.argument("target", EntityArgumentType.player())
-                                                .then(CommandManager.argument("targets", EntityArgumentType.players())
-                                                        .executes(context -> { executeAdv("sync", context, null, null); return 1;})
-                                                        .then(CommandManager.argument("namespace", StringArgumentType.string())
-                                                                .executes(context -> { executeAdv("sync", context, StringArgumentType.getString(context, "namespace"), null); return 1;})
-                                                                .then(CommandManager.argument("path", StringArgumentType.string())
-                                                                        .executes(context -> { executeAdv("sync", context, StringArgumentType.getString(context, "namespace"), StringArgumentType.getString(context, "path")); return 1;})
-                                                                        .then(CommandManager.argument("deleteOld", BoolArgumentType.bool())
-                                                                                .executes(context -> { executeAdv("sync", context, StringArgumentType.getString(context, "namespace"), StringArgumentType.getString(context, "path")); return 1;})
-                                                                        )
+                        )
+                        .then(CommandManager.literal("sync")
+                                .then(CommandManager.argument("target", EntityArgumentType.player())
+                                        .then(CommandManager.argument("targets", EntityArgumentType.players())
+                                                .executes(context -> {
+                                                    executeAdv("sync", context, null, null);
+                                                    return 1;
+                                                })
+                                                .then(CommandManager.argument("namespace", StringArgumentType.string())
+                                                        .executes(context -> {
+                                                            executeAdv("sync", context, StringArgumentType.getString(context, "namespace"), null);
+                                                            return 1;
+                                                        })
+                                                        .then(CommandManager.argument("path", StringArgumentType.string())
+                                                                .executes(context -> {
+                                                                    executeAdv("sync", context, StringArgumentType.getString(context, "namespace"), StringArgumentType.getString(context, "path"));
+                                                                    return 1;
+                                                                })
+                                                                .then(CommandManager.argument("deleteOld", BoolArgumentType.bool())
+                                                                        .executes(context -> {
+                                                                            executeAdv("sync", context, StringArgumentType.getString(context, "namespace"), StringArgumentType.getString(context, "path"));
+                                                                            return 1;
+                                                                        })
                                                                 )
                                                         )
                                                 )
@@ -63,8 +91,10 @@ public class Commands {
                                 )
                         )
                 )
-        );
+        ));
     }
+
+
     //probably a better way to do this? I think minecraft does it in an other way so maybe changing it to that could be neater? But the switch statement sounded better at the start and now Im not gonna change it
     private static void executeAdv(String command, CommandContext<ServerCommandSource> context, String namespace, String path) {
         Map<String, String> args = getCommandArgMap(context, namespace, path);
@@ -76,13 +106,13 @@ public class Commands {
                     for (ServerPlayerEntity player : EntityArgumentType.getPlayers(context, "targets")) {
                         AdvancementUtils.revokeAllAdvancements(player, utilNamespace, utilPath);
                     }
-                    context.getSource().getPlayer().sendMessage(new TranslatableText("commands.revelationary.advancement.revoke", advCount, args.get("targets"), args.get("namespace"), args.get("path")), false);
+                    context.getSource().getPlayer().sendMessage(Text.translatable("commands.revelationary.advancement.revoke", advCount, args.get("targets"), args.get("namespace"), args.get("path")), false);
                 }
                 case "grant" -> {
                     for (ServerPlayerEntity player : EntityArgumentType.getPlayers(context, "targets")) {
                         AdvancementUtils.grantAllAdvancements(player, utilNamespace, utilPath);
                     }
-                    context.getSource().getPlayer().sendMessage(new TranslatableText("commands.revelationary.advancement.grant", advCount, args.get("targets"), args.get("namespace"), args.get("path")), false);
+                    context.getSource().getPlayer().sendMessage(Text.translatable("commands.revelationary.advancement.grant", advCount, args.get("targets"), args.get("namespace"), args.get("path")), false);
                 }
                 case "sync" -> {
                     for (ServerPlayerEntity player2 : EntityArgumentType.getPlayers(context, "targets")) {
@@ -93,7 +123,7 @@ public class Commands {
                             AdvancementUtils.syncAdvancements(EntityArgumentType.getPlayer(context, "target"), player2, utilNamespace, utilPath, false);
                         }
                     }
-                    context.getSource().getPlayer().sendMessage(new TranslatableText("commands.revelationary.advancement.sync", advCount, EntityArgumentType.getPlayer(context, "target").getDisplayName(), args.get("targets"), args.get("namespace"), args.get("path")), false);
+                    context.getSource().getPlayer().sendMessage(Text.translatable("commands.revelationary.advancement.sync", advCount, EntityArgumentType.getPlayer(context, "target").getDisplayName(), args.get("targets"), args.get("namespace"), args.get("path")), false);
                 }
             }
         } catch (Exception e) {
@@ -127,4 +157,5 @@ public class Commands {
         }
         return null;
     }
+
 }
