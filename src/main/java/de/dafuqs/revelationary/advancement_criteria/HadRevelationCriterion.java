@@ -9,10 +9,10 @@ import net.minecraft.item.Item;
 import net.minecraft.predicate.entity.AdvancementEntityPredicateDeserializer;
 import net.minecraft.predicate.entity.AdvancementEntityPredicateSerializer;
 import net.minecraft.predicate.entity.EntityPredicate;
+import net.minecraft.registry.*;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
-import net.minecraft.util.registry.Registry;
 
 public class HadRevelationCriterion extends AbstractCriterion<HadRevelationCriterion.Conditions> {
 	
@@ -56,9 +56,9 @@ public class HadRevelationCriterion extends AbstractCriterion<HadRevelationCrite
 				// if "revelation_identifier": "" => trigger with any revelation
 				return true;
 			} else if (object instanceof Block cloakableBlock) {
-				return Registry.BLOCK.getId(cloakableBlock).equals(identifier);
+				return Registries.BLOCK.getId(cloakableBlock).equals(identifier);
 			} else if (object instanceof Item cloakableItem) {
-				return Registry.ITEM.getId(cloakableItem).equals(identifier);
+				return Registries.ITEM.getId(cloakableItem).equals(identifier);
 			} else {
 				return false;
 			}

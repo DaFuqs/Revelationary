@@ -13,13 +13,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.*;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.Language;
 import net.minecraft.util.Pair;
-import net.minecraft.util.registry.Registry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -101,8 +101,8 @@ public class RevelationRegistry {
 		if (jsonObject.has("block_states")) {
 			for (Map.Entry<String, JsonElement> stateEntry : jsonObject.get("block_states").getAsJsonObject().entrySet()) {
 				try {
-					BlockState sourceBlockState = BlockArgumentParser.block(Registry.BLOCK, new StringReader(stateEntry.getKey()), true).blockState();
-					BlockState targetBlockState = BlockArgumentParser.block(Registry.BLOCK, new StringReader(stateEntry.getValue().getAsString()), true).blockState();
+					BlockState sourceBlockState = BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), stateEntry.getKey(), true).blockState();
+					BlockState targetBlockState = BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), stateEntry.getValue().getAsString(), true).blockState();
 					
 					registerBlockState(advancementIdentifier, sourceBlockState, targetBlockState);
 				} catch (Exception e) {
@@ -115,8 +115,8 @@ public class RevelationRegistry {
 				Identifier sourceId = Identifier.tryParse(itemEntry.getKey());
 				Identifier targetId = Identifier.tryParse(itemEntry.getValue().getAsString());
 				
-				Item sourceItem = Registry.ITEM.get(sourceId);
-				Item targetItem = Registry.ITEM.get(targetId);
+				Item sourceItem = Registries.ITEM.get(sourceId);
+				Item targetItem = Registries.ITEM.get(targetId);
 				
 				registerItem(advancementIdentifier, sourceItem, targetItem);
 			}
@@ -126,7 +126,7 @@ public class RevelationRegistry {
 				Identifier sourceId = Identifier.tryParse(blockNameEntry.getKey());
 				MutableText targetText = Text.translatable(blockNameEntry.getValue().getAsString());
 				
-				Block sourceBlock = Registry.BLOCK.get(sourceId);
+				Block sourceBlock = Registries.BLOCK.get(sourceId);
 				ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.put(sourceBlock, targetText);
 				
 				Item blockItem = sourceBlock.asItem();
@@ -140,7 +140,7 @@ public class RevelationRegistry {
 				Identifier sourceId = Identifier.tryParse(itemNameEntry.getKey());
 				MutableText targetText = Text.translatable(itemNameEntry.getValue().getAsString());
 				
-				Item sourceItem = Registry.ITEM.get(sourceId);
+				Item sourceItem = Registries.ITEM.get(sourceId);
 				ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.put(sourceItem, targetText);
 			}
 		}
@@ -308,22 +308,22 @@ public class RevelationRegistry {
 			buf.writeIdentifier(advancementItems.getKey());
 			buf.writeInt(advancementItems.getValue().size());
 			for (Item item : advancementItems.getValue()) {
-				buf.writeString(Registry.ITEM.getId(item).toString());
-				buf.writeString(Registry.ITEM.getId(ITEM_REGISTRY.get(item)).toString());
+				buf.writeString(Registries.ITEM.getId(item).toString());
+				buf.writeString(Registries.ITEM.getId(ITEM_REGISTRY.get(item)).toString());
 			}
 		}
 		
 		// Block Translations
 		buf.writeInt(ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.size());
 		for (Map.Entry<Block, MutableText> blockTranslation : ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.entrySet()) {
-			buf.writeIdentifier(Registry.BLOCK.getId(blockTranslation.getKey()));
+			buf.writeIdentifier(Registries.BLOCK.getId(blockTranslation.getKey()));
 			buf.writeText(blockTranslation.getValue());
 		}
 		
 		// Item Translations
 		buf.writeInt(ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.size());
 		for (Map.Entry<Item, MutableText> itemTranslation : ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.entrySet()) {
-			buf.writeIdentifier(Registry.ITEM.getId(itemTranslation.getKey()));
+			buf.writeIdentifier(Registries.ITEM.getId(itemTranslation.getKey()));
 			buf.writeText(itemTranslation.getValue());
 		}
 		
@@ -339,8 +339,8 @@ public class RevelationRegistry {
 			Identifier advancementIdentifier = buf.readIdentifier();
 			int blockStateCount = buf.readInt();
 			for (int j = 0; j < blockStateCount; j++) {
-				BlockState sourceState = BlockArgumentParser.block(Registry.BLOCK, buf.readString(), true).blockState();
-				BlockState targetState = BlockArgumentParser.block(Registry.BLOCK, buf.readString(), true).blockState();
+				BlockState sourceState = BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), buf.readString(), true).blockState();
+				BlockState targetState = BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), buf.readString(), true).blockState();
 				
 				if (ADVANCEMENT_BLOCK_REGISTRY.containsKey(advancementIdentifier)) {
 					List<BlockState> advancementStates = ADVANCEMENT_BLOCK_REGISTRY.get(advancementIdentifier);
@@ -363,8 +363,8 @@ public class RevelationRegistry {
 			for (int j = 0; j < itemCount; j++) {
 				Identifier sourceId = Identifier.tryParse(buf.readString());
 				Identifier targetId = Identifier.tryParse(buf.readString());
-				Item sourceItem = Registry.ITEM.get(sourceId);
-				Item targetItem = Registry.ITEM.get(targetId);
+				Item sourceItem = Registries.ITEM.get(sourceId);
+				Item targetItem = Registries.ITEM.get(targetId);
 				
 				if (ADVANCEMENT_ITEM_REGISTRY.containsKey(advancementIdentifier)) {
 					List<Item> advancementItems = ADVANCEMENT_ITEM_REGISTRY.get(advancementIdentifier);
@@ -382,7 +382,7 @@ public class RevelationRegistry {
 		// Block Translations
 		int blockTranslations = buf.readInt();
 		for (int i = 0; i < blockTranslations; i++) {
-			Block block = Registry.BLOCK.get(buf.readIdentifier());
+			Block block = Registries.BLOCK.get(buf.readIdentifier());
 			MutableText text = (MutableText) buf.readText();
 			ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.put(block, text);
 		}
@@ -390,7 +390,7 @@ public class RevelationRegistry {
 		// Item Translations
 		int itemTranslations = buf.readInt();
 		for (int i = 0; i < itemTranslations; i++) {
-			Item item = Registry.ITEM.get(buf.readIdentifier());
+			Item item = Registries.ITEM.get(buf.readIdentifier());
 			MutableText text = (MutableText) buf.readText();
 			ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.put(item, text);
 		}

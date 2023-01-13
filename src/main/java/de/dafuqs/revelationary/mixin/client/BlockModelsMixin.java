@@ -18,7 +18,6 @@ import java.util.Map;
 public class BlockModelsMixin {
 	
 	@Shadow
-	@Final
 	private Map<BlockState, BakedModel> models;
 	
 	@Shadow

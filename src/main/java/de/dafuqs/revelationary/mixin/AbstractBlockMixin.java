@@ -22,7 +22,7 @@ public abstract class AbstractBlockMixin {
 			method = "getDroppedStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/loot/context/LootContext$Builder;)Ljava/util/List;",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/block/AbstractBlock;getLootTableId()Lnet/minecraft/util/Identifier;")
 	)
-	private Identifier injected(AbstractBlock instance, BlockState state, LootContext.Builder builder) {
+	private Identifier spectrum$switchLootTableForCloakedBlock(AbstractBlock instance, BlockState state, LootContext.Builder builder) {
 		BlockState cloakState = RevelationRegistry.getCloak(state);
 		if (cloakState != null) {
 			PlayerEntity lootPlayerEntity = RevelationAware.getLootPlayerEntity(builder);
