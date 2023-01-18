@@ -14,6 +14,6 @@ public class RevelarionaryConfig implements ConfigData {
 	public String NameForCloakedBlocks = "";
 
 	@Comment("Name for cloaked Items")
-	public String NameForCloakedItems = "item.minecraft.poppy";
+	public String NameForCloakedItems = "";
 	
 }
