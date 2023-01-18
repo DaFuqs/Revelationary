@@ -14,9 +14,9 @@ import net.minecraft.text.Text;
 import java.util.Map;
 
 import static de.dafuqs.revelationary.Revelationary.logError;
-import static de.dafuqs.revelationary.api.advancements.AdvancementUtils.advCount;
 
 public class Commands {
+
     //register the main commands
     public static void register() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(CommandManager.literal("revelationary")
@@ -94,8 +94,7 @@ public class Commands {
         ));
     }
 
-
-    //probably a better way to do this? I think minecraft does it in an other way so maybe changing it to that could be neater? But the switch statement sounded better at the start and now Im not gonna change it
+    //probably a better way to do this? I think minecraft does it in another way so maybe changing it to that could be neater? But the switch statement sounded better at the start and now Im not gonna change it
     private static void executeAdv(String command, CommandContext<ServerCommandSource> context, String namespace, String path) {
         Map<String, String> args = getCommandArgMap(context, namespace, path);
         String utilNamespace = args.get("namespace").replace("*", "all");
@@ -103,24 +102,26 @@ public class Commands {
         try {
             switch (command) {
                 case "revoke" -> {
+                    int advCount = 0;
                     for (ServerPlayerEntity player : EntityArgumentType.getPlayers(context, "targets")) {
-                        AdvancementUtils.revokeAllAdvancements(player, utilNamespace, utilPath);
+                        advCount += AdvancementUtils.revokeAllAdvancements(player, utilNamespace, utilPath);
                     }
                     context.getSource().getPlayer().sendMessage(Text.translatable("commands.revelationary.advancement.revoke", advCount, args.get("targets"), args.get("namespace"), args.get("path")), false);
                 }
                 case "grant" -> {
+                    int advCount = 0;
                     for (ServerPlayerEntity player : EntityArgumentType.getPlayers(context, "targets")) {
-                        AdvancementUtils.grantAllAdvancements(player, utilNamespace, utilPath);
+                        advCount += AdvancementUtils.grantAllAdvancements(player, utilNamespace, utilPath);
                     }
                     context.getSource().getPlayer().sendMessage(Text.translatable("commands.revelationary.advancement.grant", advCount, args.get("targets"), args.get("namespace"), args.get("path")), false);
                 }
                 case "sync" -> {
-                    for (ServerPlayerEntity player2 : EntityArgumentType.getPlayers(context, "targets")) {
-                        //Im so sorry for this, but it works!
+                    int advCount = 0;
+                    for (ServerPlayerEntity targetPlayer : EntityArgumentType.getPlayers(context, "targets")) {
                         try {
-                            AdvancementUtils.syncAdvancements(EntityArgumentType.getPlayer(context, "target"), player2, utilNamespace, utilPath, BoolArgumentType.getBool(context, "deleteOld"));
+                            advCount += AdvancementUtils.syncAdvancements(EntityArgumentType.getPlayer(context, "target"), targetPlayer, utilNamespace, utilPath, BoolArgumentType.getBool(context, "deleteOld"));
                         } catch (Exception e) {
-                            AdvancementUtils.syncAdvancements(EntityArgumentType.getPlayer(context, "target"), player2, utilNamespace, utilPath, false);
+                            advCount += AdvancementUtils.syncAdvancements(EntityArgumentType.getPlayer(context, "target"), targetPlayer, utilNamespace, utilPath, false);
                         }
                     }
                     context.getSource().getPlayer().sendMessage(Text.translatable("commands.revelationary.advancement.sync", advCount, EntityArgumentType.getPlayer(context, "target").getDisplayName(), args.get("targets"), args.get("namespace"), args.get("path")), false);
