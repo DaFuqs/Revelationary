@@ -1,6 +1,9 @@
 package de.dafuqs.revelationary;
 
 import de.dafuqs.revelationary.api.advancements.AdvancementCriteria;
+import de.dafuqs.revelationary.config.*;
+import me.shedaniel.autoconfig.*;
+import me.shedaniel.autoconfig.serializer.*;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
@@ -15,6 +18,8 @@ public class Revelationary implements ModInitializer {
 	public static final String MOD_ID = "revelationary";
 	private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static MinecraftServer minecraftServer;
+
+	public static RevelarionaryConfig CONFIG;
 	
 	public static void logInfo(String message) {
 		LOGGER.info("[Revelationary] " + message);
@@ -31,6 +36,9 @@ public class Revelationary implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		logInfo("Starting Common Startup");
+
+		AutoConfig.register(RevelarionaryConfig.class, JanksonConfigSerializer::new);
+		CONFIG = AutoConfig.getConfigHolder(RevelarionaryConfig.class).getConfig();
 		
 		AdvancementCriteria.register();
 		Commands.register();

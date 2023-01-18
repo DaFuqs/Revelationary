@@ -2,7 +2,6 @@ package de.dafuqs.revelationary;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.dafuqs.revelationary.api.advancements.AdvancementHelper;
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
@@ -10,8 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.*;
 import net.minecraft.text.MutableText;
@@ -30,7 +28,8 @@ public class RevelationRegistry {
 	private static final Map<Identifier, List<BlockState>> ADVANCEMENT_BLOCK_REGISTRY = new HashMap<>();
 	private static final Map<BlockState, Identifier> BLOCK_ADVANCEMENT_REGISTRY = new HashMap<>();
 	private static final Map<BlockState, BlockState> BLOCK_STATE_REGISTRY = new HashMap<>();
-	
+	private static final Map<Block, Block> BLOCK_REGISTRY = new HashMap<>();
+
 	private static final Map<Identifier, List<Item>> ADVANCEMENT_ITEM_REGISTRY = new HashMap<>();
 	private static final Map<Item, Identifier> ITEM_ADVANCEMENT_REGISTRY = new HashMap<>();
 	private static final Map<Item, Item> ITEM_REGISTRY = new HashMap<>();
@@ -41,21 +40,33 @@ public class RevelationRegistry {
 	public static MutableText getTranslationString(Item item) {
 		if (ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.containsKey(item)) {
 			return ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.get(item);
-		} else {
-			// Get the localized name of the block and scatter it using §k to make it unreadable
-			Language language = Language.getInstance();
-			return Text.literal("§k" + language.get(item.getTranslationKey()));
 		}
+		boolean isBlockItem = item instanceof BlockItem;
+		if(isBlockItem && !Revelationary.CONFIG.NameForCloakedBlocks.isEmpty()) {
+			return Text.translatable(Revelationary.CONFIG.NameForCloakedBlocks);
+		}
+		if(!isBlockItem && !Revelationary.CONFIG.NameForCloakedItems.isEmpty()) {
+			return Text.translatable(Revelationary.CONFIG.NameForCloakedItems);
+		}
+		if(Revelationary.CONFIG.UseTargetBlockOrItemNameInsteadOfScatter) {
+			return Text.translatable(ITEM_REGISTRY.get(item).getTranslationKey());
+		}
+		// Get the localized name of the item and scatter it using §k to make it unreadable
+		return Text.literal("§k" + Language.getInstance().get(item.getTranslationKey()));
 	}
 	
 	public static MutableText getTranslationString(Block block) {
 		if (ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.containsKey(block)) {
 			return ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.get(block);
-		} else {
-			// Get the localized name of the block and scatter it using §k to make it unreadable
-			Language language = Language.getInstance();
-			return Text.literal("§k" + language.get(block.getTranslationKey()));
 		}
+		if(!Revelationary.CONFIG.NameForCloakedBlocks.isEmpty()) {
+			return Text.translatable(Revelationary.CONFIG.NameForCloakedBlocks);
+		}
+		if(Revelationary.CONFIG.UseTargetBlockOrItemNameInsteadOfScatter) {
+			return BLOCK_REGISTRY.get(block).getName();
+		}
+		// Get the localized name of the block and scatter it using §k to make it unreadable
+		return Text.literal("§k" + Language.getInstance().get(block.getTranslationKey()));
 	}
 	
 	public static void clear() {
@@ -167,6 +178,7 @@ public class RevelationRegistry {
 		}
 		
 		BLOCK_STATE_REGISTRY.put(sourceBlockState, targetBlockState);
+		BLOCK_REGISTRY.putIfAbsent(sourceBlockState.getBlock(), targetBlockState.getBlock());
 		BLOCK_ADVANCEMENT_REGISTRY.put(sourceBlockState, advancementIdentifier);
 	}
 	
@@ -352,6 +364,7 @@ public class RevelationRegistry {
 				}
 				BLOCK_ADVANCEMENT_REGISTRY.put(sourceState, advancementIdentifier);
 				BLOCK_STATE_REGISTRY.put(sourceState, targetState);
+				BLOCK_REGISTRY.putIfAbsent(sourceState.getBlock(), targetState.getBlock());
 			}
 		}
 		
