@@ -21,6 +21,9 @@
     ],
     "client": [
       "de.dafuqs.revelationary.RevelationaryClient"
+    ],
+    "modmenu": [
+      "de.dafuqs.revelationary.config.ModMenuConfig"
     ]
   },
   "mixins": [
