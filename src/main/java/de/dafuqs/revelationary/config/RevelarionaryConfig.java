@@ -11,7 +11,7 @@ public class RevelarionaryConfig {
 
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-	public boolean UnrevealedBlocksAreUnbreakable = false;
+	public boolean PreventMiningOfUnrevealedBlocks = false;
 	public boolean UseTargetBlockOrItemNameInsteadOfScatter = false;
 	public String NameForUnrevealedBlocks = "";
 	public String NameForUnrevealedItems = "";
@@ -43,7 +43,7 @@ public class RevelarionaryConfig {
 			return;
 		}
 
-		UnrevealedBlocksAreUnbreakable = JsonHelper.getBoolean(jsonObject, "UnrevealedBlocksAreUnbreakable", false);
+		PreventMiningOfUnrevealedBlocks = JsonHelper.getBoolean(jsonObject, "PreventMiningOfUnrevealedBlocks", false);
 		UseTargetBlockOrItemNameInsteadOfScatter = JsonHelper.getBoolean(jsonObject, "UseTargetBlockOrItemNameInsteadOfScatter", false);
 		NameForUnrevealedBlocks = JsonHelper.getString(jsonObject, "NameForUnrevealedBlocks", "");
 		NameForUnrevealedItems = JsonHelper.getString(jsonObject, "NameForUnrevealedItems", "");
@@ -51,7 +51,7 @@ public class RevelarionaryConfig {
 
 	private static final String DEFAULT_CONFIG = """
 {
-	"UnrevealedBlocksAreUnbreakable": false,
+	"PreventMiningOfUnrevealedBlocks": false,
 	"UseTargetBlockOrItemNameInsteadOfScatter": false,
 	"NameForUnrevealedBlocks": "",
 	"NameForUnrevealedItems": ""
