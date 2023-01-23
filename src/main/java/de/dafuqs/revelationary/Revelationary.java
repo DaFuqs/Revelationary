@@ -32,7 +32,6 @@ public class Revelationary implements ModInitializer {
     public void onInitialize() {
         logInfo("Starting Common Startup");
 
-        RevelationaryConfig.load();
         AdvancementCriteria.register();
         Commands.register();
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(RevelationDataLoader.INSTANCE);

@@ -44,13 +44,13 @@ public class RevelationRegistry {
 			return ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.get(item);
 		}
 		boolean isBlockItem = item instanceof BlockItem;
-		if(isBlockItem && !RevelationaryConfig.CONFIG.NameForUnrevealedBlocks.isEmpty()) {
-			return Text.translatable(RevelationaryConfig.CONFIG.NameForUnrevealedBlocks);
+		if(isBlockItem && !RevelationaryConfig.get().NameForUnrevealedBlocks.isEmpty()) {
+			return Text.translatable(RevelationaryConfig.get().NameForUnrevealedBlocks);
 		}
-		if(!isBlockItem && !RevelationaryConfig.CONFIG.NameForUnrevealedItems.isEmpty()) {
-			return Text.translatable(RevelationaryConfig.CONFIG.NameForUnrevealedItems);
+		if(!isBlockItem && !RevelationaryConfig.get().NameForUnrevealedItems.isEmpty()) {
+			return Text.translatable(RevelationaryConfig.get().NameForUnrevealedItems);
 		}
-		if(RevelationaryConfig.CONFIG.UseTargetBlockOrItemNameInsteadOfScatter) {
+		if(RevelationaryConfig.get().UseTargetBlockOrItemNameInsteadOfScatter) {
 			return Text.translatable(ITEM_REGISTRY.get(item).getTranslationKey());
 		}
 		// Get the localized name of the item and scatter it using §k to make it unreadable
@@ -61,10 +61,10 @@ public class RevelationRegistry {
 		if (ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.containsKey(block)) {
 			return ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.get(block);
 		}
-		if(!RevelationaryConfig.CONFIG.NameForUnrevealedBlocks.isEmpty()) {
-			return Text.translatable(RevelationaryConfig.CONFIG.NameForUnrevealedBlocks);
+		if(!RevelationaryConfig.get().NameForUnrevealedBlocks.isEmpty()) {
+			return Text.translatable(RevelationaryConfig.get().NameForUnrevealedBlocks);
 		}
-		if(RevelationaryConfig.CONFIG.UseTargetBlockOrItemNameInsteadOfScatter) {
+		if(RevelationaryConfig.get().UseTargetBlockOrItemNameInsteadOfScatter) {
 			return BLOCK_REGISTRY.get(block).getName();
 		}
 		// Get the localized name of the block and scatter it using §k to make it unreadable

@@ -7,34 +7,42 @@ import net.fabricmc.loader.api.FabricLoader;
 import java.io.*;
 
 public class RevelationaryConfig {
-	public static Config CONFIG = new Config();
 
-	static File configFile = new File(FabricLoader.getInstance().getConfigDir().toFile(), "Revelationary.json");
-	private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+	private static final File CONFIG_FILE_PATH = new File(FabricLoader.getInstance().getConfigDir().toFile(), "Revelationary.json");
+	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+	private static Config CONFIG = null;
 
-	public static void load() {
-		if (!configFile.exists()) {
+	public static Config get() {
+		if(CONFIG == null) {
+			load();
+		}
+		return CONFIG;
+	}
+
+	private static void load() {
+		if (!CONFIG_FILE_PATH.exists()) {
 			try {
-				configFile.createNewFile();
+				CONFIG_FILE_PATH.createNewFile();
 				save();
 			} catch (IOException e) {
-				Revelationary.logError("Could not generate config file under " + configFile.getAbsolutePath() + ".\n" + e.getLocalizedMessage());
+				Revelationary.logError("Could not generate config file under " + CONFIG_FILE_PATH.getAbsolutePath() + ".\n" + e.getLocalizedMessage());
 			}
 		} else {
 			try {
-				CONFIG = gson.fromJson(new FileReader(configFile), Config.class);
+				CONFIG = GSON.fromJson(new FileReader(CONFIG_FILE_PATH), Config.class);
 			} catch (FileNotFoundException e) {
-				Revelationary.logError("Could not load config file under " + configFile.getAbsolutePath() + ".\n" + e.getLocalizedMessage());
+				Revelationary.logError("Could not load config file under " + CONFIG_FILE_PATH.getAbsolutePath() + ".\n" + e.getLocalizedMessage());
 			}
 		}
 	}
-	public static void save() {
+
+	private static void save() {
 		try {
-			FileWriter writer = new FileWriter(configFile);
-			gson.toJson(CONFIG, writer);
+			FileWriter writer = new FileWriter(CONFIG_FILE_PATH);
+			GSON.toJson(CONFIG, writer);
 			writer.close();
 		} catch (IOException e) {
-			Revelationary.logError("Could not save config file under " + configFile.getAbsolutePath() + ".\n" + e.getLocalizedMessage());
+			Revelationary.logError("Could not save config file under " + CONFIG_FILE_PATH.getAbsolutePath() + ".\n" + e.getLocalizedMessage());
 		}
 	}
 
@@ -44,6 +52,10 @@ public class RevelationaryConfig {
 		public String NameForUnrevealedBlocks = "";
 		public String NameForUnrevealedItems = "";
 
-		public Config() {}
+		public Config() {
+
+		}
+
 	}
+
 }
