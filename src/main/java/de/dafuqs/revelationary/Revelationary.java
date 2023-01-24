@@ -16,8 +16,6 @@ public class Revelationary implements ModInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static MinecraftServer minecraftServer;
 
-    public static RevelarionaryConfig CONFIG;
-
     public static void logInfo(String message) {
         LOGGER.info("[Revelationary] " + message);
     }
@@ -34,7 +32,7 @@ public class Revelationary implements ModInitializer {
     public void onInitialize() {
         logInfo("Starting Common Startup");
 
-        CONFIG = new RevelarionaryConfig();
+        RevelationaryConfig.load();
         AdvancementCriteria.register();
         Commands.register();
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(RevelationDataLoader.INSTANCE);

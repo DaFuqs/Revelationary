@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.dafuqs.revelationary.api.advancements.AdvancementHelper;
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
+import de.dafuqs.revelationary.config.RevelationaryConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.argument.BlockArgumentParser;
@@ -42,13 +43,13 @@ public class RevelationRegistry {
 			return ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.get(item);
 		}
 		boolean isBlockItem = item instanceof BlockItem;
-		if(isBlockItem && !Revelationary.CONFIG.NameForUnrevealedBlocks.isEmpty()) {
-			return Text.translatable(Revelationary.CONFIG.NameForUnrevealedBlocks);
+		if(isBlockItem && !RevelationaryConfig.CONFIG.NameForUnrevealedBlocks.isEmpty()) {
+			return Text.translatable(RevelationaryConfig.CONFIG.NameForUnrevealedBlocks);
 		}
-		if(!isBlockItem && !Revelationary.CONFIG.NameForUnrevealedItems.isEmpty()) {
-			return Text.translatable(Revelationary.CONFIG.NameForUnrevealedItems);
+		if(!isBlockItem && !RevelationaryConfig.CONFIG.NameForUnrevealedItems.isEmpty()) {
+			return Text.translatable(RevelationaryConfig.CONFIG.NameForUnrevealedItems);
 		}
-		if(Revelationary.CONFIG.UseTargetBlockOrItemNameInsteadOfScatter) {
+		if(RevelationaryConfig.CONFIG.UseTargetBlockOrItemNameInsteadOfScatter) {
 			return Text.translatable(ITEM_REGISTRY.get(item).getTranslationKey());
 		}
 		// Get the localized name of the item and scatter it using §k to make it unreadable
@@ -59,10 +60,10 @@ public class RevelationRegistry {
 		if (ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.containsKey(block)) {
 			return ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.get(block);
 		}
-		if(!Revelationary.CONFIG.NameForUnrevealedBlocks.isEmpty()) {
-			return Text.translatable(Revelationary.CONFIG.NameForUnrevealedBlocks);
+		if(!RevelationaryConfig.CONFIG.NameForUnrevealedBlocks.isEmpty()) {
+			return Text.translatable(RevelationaryConfig.CONFIG.NameForUnrevealedBlocks);
 		}
-		if(Revelationary.CONFIG.UseTargetBlockOrItemNameInsteadOfScatter) {
+		if(RevelationaryConfig.CONFIG.UseTargetBlockOrItemNameInsteadOfScatter) {
 			return BLOCK_REGISTRY.get(block).getName();
 		}
 		// Get the localized name of the block and scatter it using §k to make it unreadable
