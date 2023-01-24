@@ -2,8 +2,10 @@
   "required": true,
   "package": "de.dafuqs.revelationary.mixin",
   "compatibilityLevel": "JAVA_17",
+  "plugin": "de.dafuqs.revelationary.mixin.Plugin",
   "mixins": [
     "AbstractBlockMixin",
+    "BlockUnbreakingMixin",
     "MixinPlayerManager",
     "PlayerAdvancementTrackerMixin"
   ],

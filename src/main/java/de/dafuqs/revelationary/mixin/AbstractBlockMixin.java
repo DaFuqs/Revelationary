@@ -34,16 +34,5 @@ public abstract class AbstractBlockMixin {
 		}
 		return getLootTableId();
 	}
-
-	/**
-	 * Prevent players from accidentally mining unrevealed blocks. In no way exhaustive.
-	 * Cloaked plants will still drop themselves when the block below them is broken, for example
-	 */
-	@Inject(method = "calcBlockBreakingDelta(Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)F", at = @At("HEAD"), cancellable = true)
-	public void calcBlockBreakingDelta(BlockState state, PlayerEntity player, BlockView world, BlockPos pos, CallbackInfoReturnable<Float> cir) {
-		if(!RevelationRegistry.isVisibleTo(state, player) && RevelationaryConfig.CONFIG.PreventMiningOfUnrevealedBlocks) {
-			cir.setReturnValue(0F);
-		}
-	}
 	
 }
