@@ -2,6 +2,7 @@ package de.dafuqs.revelationary.mixin;
 
 import de.dafuqs.revelationary.*;
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
+import de.dafuqs.revelationary.config.RevelationaryConfig;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.loot.context.LootContext;
@@ -40,9 +41,8 @@ public abstract class AbstractBlockMixin {
 	 */
 	@Inject(method = "calcBlockBreakingDelta(Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)F", at = @At("HEAD"), cancellable = true)
 	public void calcBlockBreakingDelta(BlockState state, PlayerEntity player, BlockView world, BlockPos pos, CallbackInfoReturnable<Float> cir) {
-		if(!RevelationRegistry.isVisibleTo(state, player)) {
+		if(!RevelationRegistry.isVisibleTo(state, player) && RevelationaryConfig.CONFIG.PreventMiningOfUnrevealedBlocks) {
 			cir.setReturnValue(0F);
 		}
 	}
-	
 }
