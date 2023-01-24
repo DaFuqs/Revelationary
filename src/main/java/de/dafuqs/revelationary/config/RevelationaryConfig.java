@@ -14,36 +14,9 @@ public class RevelationaryConfig {
 
 	public static Config get() {
 		if(CONFIG == null) {
-			load();
+			CONFIG = Config.load();
 		}
 		return CONFIG;
-	}
-
-	private static void load() {
-		if (!CONFIG_FILE_PATH.exists()) {
-			try {
-				CONFIG_FILE_PATH.createNewFile();
-				save();
-			} catch (IOException e) {
-				Revelationary.logError("Could not generate config file under " + CONFIG_FILE_PATH.getAbsolutePath() + ".\n" + e.getLocalizedMessage());
-			}
-		} else {
-			try {
-				CONFIG = GSON.fromJson(new FileReader(CONFIG_FILE_PATH), Config.class);
-			} catch (FileNotFoundException e) {
-				Revelationary.logError("Could not load config file under " + CONFIG_FILE_PATH.getAbsolutePath() + ".\n" + e.getLocalizedMessage());
-			}
-		}
-	}
-
-	private static void save() {
-		try {
-			FileWriter writer = new FileWriter(CONFIG_FILE_PATH);
-			GSON.toJson(CONFIG, writer);
-			writer.close();
-		} catch (IOException e) {
-			Revelationary.logError("Could not save config file under " + CONFIG_FILE_PATH.getAbsolutePath() + ".\n" + e.getLocalizedMessage());
-		}
 	}
 
 	public static class Config {
@@ -52,8 +25,37 @@ public class RevelationaryConfig {
 		public String NameForUnrevealedBlocks = "";
 		public String NameForUnrevealedItems = "";
 
-		public Config() {
+		public Config() { }
 
+		private static Config load() {
+			if (!CONFIG_FILE_PATH.exists()) {
+				try {
+					CONFIG_FILE_PATH.createNewFile();
+					Config config = new Config();
+					config.save();
+					return config;
+				} catch (IOException e) {
+					Revelationary.logError("Could not generate config file under " + CONFIG_FILE_PATH.getAbsolutePath() + ".\n" + e.getLocalizedMessage());
+				}
+			}
+
+			try {
+				return GSON.fromJson(new FileReader(CONFIG_FILE_PATH), Config.class);
+			} catch (FileNotFoundException e) {
+				Revelationary.logError("Could not load config file under " + CONFIG_FILE_PATH.getAbsolutePath() + ".\n" + e.getLocalizedMessage());
+			}
+
+			return new Config();
+		}
+
+		private void save() {
+			try {
+				FileWriter writer = new FileWriter(CONFIG_FILE_PATH);
+				GSON.toJson(this, writer);
+				writer.close();
+			} catch (IOException e) {
+				Revelationary.logError("Could not save config file under " + CONFIG_FILE_PATH.getAbsolutePath() + ".\n" + e.getLocalizedMessage());
+			}
 		}
 
 	}
