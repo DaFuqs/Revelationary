@@ -38,6 +38,7 @@ public class Revelationary implements ModInitializer {
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             Revelationary.minecraftServer = server;
+            RevelationRegistry.addRevelationAwares();
         });
 
         if (FabricLoader.getInstance().isModLoaded("sodium")) {

@@ -79,7 +79,8 @@ public class RevelationRegistry {
 		ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.clear();
 		ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.clear();
 	}
-	
+
+	private static boolean revelationAwaresAdded = false;
 	private static final Set<RevelationAware> revelationAwares = new HashSet<>();
 	
 	public static void registerRevelationAware(RevelationAware revelationAware) {
@@ -87,6 +88,10 @@ public class RevelationRegistry {
 	}
 	
 	public static void addRevelationAwares() {
+		if(revelationAwaresAdded) {
+			return;
+		}
+
 		for (RevelationAware revelationAware : revelationAwares) {
 			Identifier advancementIdentifier = revelationAware.getCloakAdvancementIdentifier();
 			for (Map.Entry<BlockState, BlockState> states : revelationAware.getBlockStateCloaks().entrySet()) {
@@ -106,6 +111,8 @@ public class RevelationRegistry {
 				registerItemTranslation(itemTranslation.getLeft(), itemTranslation.getRight());
 			}
 		}
+
+		revelationAwaresAdded = true;
 	}
 	
 	public static void registerFromJson(JsonObject jsonObject) {
