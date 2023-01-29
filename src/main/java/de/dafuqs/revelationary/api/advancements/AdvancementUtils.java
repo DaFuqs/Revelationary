@@ -1,93 +1,63 @@
 package de.dafuqs.revelationary.api.advancements;
 
-import de.dafuqs.revelationary.advancement_criteria.*;
-import net.minecraft.advancement.*;
-import net.minecraft.advancement.criterion.*;
-import net.minecraft.server.*;
-import net.minecraft.server.network.*;
-import net.minecraft.util.*;
+import de.dafuqs.revelationary.advancement_criteria.AdvancementGottenCriterion;
+import net.minecraft.advancement.Advancement;
+import net.minecraft.advancement.PlayerAdvancementTracker;
+import net.minecraft.server.ServerAdvancementLoader;
+import net.minecraft.server.network.ServerPlayerEntity;
 
-import java.util.*;
+import java.util.function.BiConsumer;
 
 public class AdvancementUtils {
+    protected String namespace = "all";
+    protected String path = "all";
+    protected final ServerPlayerEntity player;
+    protected final ServerAdvancementLoader advancementLoader;
+    protected final PlayerAdvancementTracker advancementTracker;
 
-    public static int revokeAllAdvancements(ServerPlayerEntity player, String namespace , String path) {
-        int advCount = 0;
-        if (player.getServer() == null) {
-            return 0;
-        }
-        ServerAdvancementLoader sal = player.getServer().getAdvancementLoader();
-        PlayerAdvancementTracker tracker = player.getAdvancementTracker();
-
-        for (Advancement advancement : sal.getAdvancements()) {
-            if (advancement.getId().getNamespace().equals(namespace) || namespace.equals("all")) {
-                if (advancement.getId().getPath().startsWith(path) || path.equals("all")) {
-                    advCount++;
-                    for (String criterion : advancement.getCriteria().keySet()) {
-                        tracker.revokeCriterion(advancement, criterion);
-                    }
-                }
-            }
-        }
-        return advCount;
+    protected AdvancementUtils(ServerPlayerEntity player) {
+        this.player = player;
+        advancementLoader = player.getServer().getAdvancementLoader();
+        advancementTracker = player.getAdvancementTracker();
     }
 
-    public static int grantAllAdvancements(ServerPlayerEntity player, String namespace , String path) {
-        int advCount = 0;
-        if (player.getServer() == null) {
-            return 0;
-        }
-        ServerAdvancementLoader sal = player.getServer().getAdvancementLoader();
-        PlayerAdvancementTracker tracker = player.getAdvancementTracker();
-
-        for (Advancement advancement : sal.getAdvancements()) {
-            if (advancement.getId().getNamespace().equals(namespace) || namespace.equals("all")) {
-                if (advancement.getId().getPath().startsWith(path) || path.equals("all")) {
-                    advCount++;
-                    for (String criterion : advancement.getCriteria().keySet()) {
-                        tracker.grantCriterion(advancement, criterion);
-                    }
-                }
-            }
-        }
-        return advCount;
+    public static AdvancementUtils forPlayer(ServerPlayerEntity player) {
+        return new AdvancementUtils(player);
     }
 
-    public static int syncAdvancements(ServerPlayerEntity player1, ServerPlayerEntity player2, String namespace, String path, Boolean deleteOld) {
-        int advCount = 0;
-        if (player1.getServer() == null || player2.getServer() == null) {
-            return 0;
-        }
-        ServerAdvancementLoader sal = player1.getServer().getAdvancementLoader();
-        PlayerAdvancementTracker tracker1 = player1.getAdvancementTracker();
-        PlayerAdvancementTracker tracker2 = player2.getAdvancementTracker();
+    public AdvancementUtils withNamespace(String namespace) {
+        this.namespace = namespace;
+        return this;
+    }
+
+    public AdvancementUtils withPath(String path) {
+        this.path = path;
+        return this;
+    }
+
+    public int grant() {
+        return act(advancementTracker::grantCriterion);
+    }
+
+    public int revoke() {
+        return act(advancementTracker::revokeCriterion);
+    }
+
+    public int syncTo(ServerPlayerEntity targetPlayer, boolean deleteOld) {
+        var count = 0;
+        var targetAdvancementTracker = targetPlayer.getAdvancementTracker();
 
         if (deleteOld) {
-            for (Advancement advancement : sal.getAdvancements()) {
-                if (advancement.getId().getNamespace().equals(namespace) || namespace.equals("all")) {
-                    if (advancement.getId().getPath().startsWith(path) || path.equals("all")) {
-                        advCount++;
-                        for (String criterion : advancement.getCriteria().keySet()) {
-                            tracker2.revokeCriterion(advancement, criterion);
-                        }
-                    }
-                }
-            }
+            count += act(targetAdvancementTracker::revokeCriterion);
         }
 
-        for (Advancement advancement : sal.getAdvancements()) {
-            if (advancement.getId().getNamespace().equals(namespace) || namespace.equals("all")) {
-                if (advancement.getId().getPath().startsWith(path) || path.equals("all")) {
-                    advCount++;
-                    for (String criterion : advancement.getCriteria().keySet()) {
-                        if (tracker1.getProgress(advancement).isDone()) {
-                            tracker2.grantCriterion(advancement, criterion);
-                        }
-                    }
-                }
+        count += act((advancement, criterion) -> {
+            if (advancementTracker.getProgress(advancement).isDone()) {
+                targetAdvancementTracker.grantCriterion(advancement, criterion);
             }
-        }
-        return advCount;
+        });
+
+        return count;
     }
 
     /**
@@ -95,32 +65,17 @@ public class AdvancementUtils {
      * where the player has an advancement, but a criterion that is set to get triggered
      * by it is not granted. (like after you changed your mods advancement criteria in an update)
      * Can only use used on the logical server
-     *
-     * @param serverPlayerEntity The player to reprocess unlocks
-     * @param namespace the namespace to reprocess. Usually will match your mod id
      */
-    public static void reprocessAdvancementUnlocks(ServerPlayerEntity serverPlayerEntity, String namespace) {
-        if (serverPlayerEntity.getServer() == null) {
-            return;
-        }
-
-        PlayerAdvancementTracker tracker = serverPlayerEntity.getAdvancementTracker();
-        ServerAdvancementLoader loader = serverPlayerEntity.getServer().getAdvancementLoader();
-        for (Advancement advancement : loader.getAdvancements()) {
-            if (advancement.getId().getNamespace().equals(namespace)) {
-                AdvancementProgress hasAdvancement = tracker.getProgress(advancement);
-                if (!hasAdvancement.isDone()) {
-                    for (Map.Entry<String, AdvancementCriterion> criterionEntry : advancement.getCriteria().entrySet()) {
-                        CriterionConditions conditions = criterionEntry.getValue().getConditions();
-                        if (conditions != null && conditions.getId().equals(AdvancementGottenCriterion.ID) && conditions instanceof AdvancementGottenCriterion.Conditions hasAdvancementConditions) {
-                            Identifier advancementIdentifier = hasAdvancementConditions.getAdvancementIdentifier();
-                            Advancement advancementCriterionAdvancement = loader.get(advancementIdentifier);
-                            if (advancementCriterionAdvancement != null) {
-                                AdvancementProgress hasAdvancementCriterionAdvancement = tracker.getProgress(advancementCriterionAdvancement);
-                                if (hasAdvancementCriterionAdvancement.isDone()) {
-                                    tracker.grantCriterion(advancement, criterionEntry.getKey());
-                                }
-                            }
+    public void reprocessUnlocks() {
+        for (var advancement : advancementLoader.getAdvancements()) {
+            if (advancement.getId().getNamespace().equals(namespace) && !advancementTracker.getProgress(advancement).isDone()) {
+                for (var criterionEntry : advancement.getCriteria().entrySet()) {
+                    // 1: instanceof checks for null automatically
+                    // 2: AdvancementGottenCriterion.Conditions will always have the appropriate ID, no need to check for that
+                    if (criterionEntry.getValue().getConditions() instanceof AdvancementGottenCriterion.Conditions gottenConditions) {
+                        var gottenAdvancement = advancementLoader.get(gottenConditions.getAdvancementIdentifier());
+                        if (gottenAdvancement != null && advancementTracker.getProgress(gottenAdvancement).isDone()) {
+                            advancementTracker.grantCriterion(advancement, criterionEntry.getKey());
                         }
                     }
                 }
@@ -128,4 +83,40 @@ public class AdvancementUtils {
         }
     }
 
+    protected int act(BiConsumer<Advancement, String> action) {
+        var count = 0;
+
+        for (var advancement : advancementLoader.getAdvancements()) {
+            if (advancement.getId().getNamespace().equals(namespace) || namespace.equals("all")) {
+                if (advancement.getId().getPath().startsWith(path) || path.equals("all")) {
+                    count++;
+                    for (var criterion : advancement.getCriteria().keySet()) {
+                        action.accept(advancement, criterion);
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
+
+    @Deprecated
+    public static int revokeAllAdvancements(ServerPlayerEntity player, String namespace , String path) {
+        return forPlayer(player).withNamespace(namespace).withPath(path).revoke();
+    }
+
+    @Deprecated
+    public static int grantAllAdvancements(ServerPlayerEntity player, String namespace , String path) {
+        return forPlayer(player).withNamespace(namespace).withPath(path).grant();
+    }
+
+    @Deprecated
+    public static int syncAdvancements(ServerPlayerEntity sourcePlayer, ServerPlayerEntity targetPlayer, String namespace, String path, Boolean deleteOld) {
+        return forPlayer(sourcePlayer).withNamespace(namespace).withPath(path).syncTo(targetPlayer, deleteOld);
+    }
+
+    @Deprecated
+    public static void reprocessAdvancementUnlocks(ServerPlayerEntity player, String namespace) {
+        forPlayer(player).withNamespace(namespace).reprocessUnlocks();
+    }
 }

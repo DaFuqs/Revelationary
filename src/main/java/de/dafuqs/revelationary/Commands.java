@@ -1,162 +1,132 @@
 package de.dafuqs.revelationary;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.tree.CommandNode;
 import de.dafuqs.revelationary.api.advancements.AdvancementUtils;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
-import java.util.Map;
-
-import static de.dafuqs.revelationary.Revelationary.logError;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class Commands {
-
-    //register the main commands
-    public static void register() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(CommandManager.literal("revelationary")
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
+        var revelationaryNode = CommandManager
+                .literal("revelationary")
                 .requires(source -> source.hasPermissionLevel(4))
-                .then(CommandManager.literal("advancement")
-                        .then(CommandManager.literal("revoke")
-                                .then(CommandManager.argument("targets", EntityArgumentType.players())
-                                        .executes(context -> {
-                                            executeAdv("revoke", context, null, null);
-                                            return 1;
-                                        })
-                                        .then(CommandManager.argument("namespace", StringArgumentType.string())
-                                                .executes(context -> {
-                                                    executeAdv("revoke", context, StringArgumentType.getString(context, "namespace"), null);
-                                                    return 1;
-                                                })
-                                                .then(CommandManager.argument("path", StringArgumentType.string())
-                                                        .executes(context -> {
-                                                            executeAdv("revoke", context, StringArgumentType.getString(context, "namespace"), StringArgumentType.getString(context, "path"));
-                                                            return 1;
-                                                        })
-                                                )
-                                        )
-                                )
-                        )
-                        .then(CommandManager.literal("grant")
-                                .then(CommandManager.argument("targets", EntityArgumentType.players())
-                                        .executes(context -> {
-                                            executeAdv("grant", context, null, null);
-                                            return 1;
-                                        })
-                                        .then(CommandManager.argument("namespace", StringArgumentType.string())
-                                                .executes(context -> {
-                                                    executeAdv("revoke", context, StringArgumentType.getString(context, "namespace"), null);
-                                                    return 1;
-                                                })
-                                                .then(CommandManager.argument("path", StringArgumentType.string())
-                                                        .executes(context -> {
-                                                            executeAdv("grant", context, StringArgumentType.getString(context, "namespace"), StringArgumentType.getString(context, "path"));
-                                                            return 1;
-                                                        })
-                                                )
-                                        )
-                                )
-                        )
-                        .then(CommandManager.literal("sync")
-                                .then(CommandManager.argument("target", EntityArgumentType.player())
-                                        .then(CommandManager.argument("targets", EntityArgumentType.players())
-                                                .executes(context -> {
-                                                    executeAdv("sync", context, null, null);
-                                                    return 1;
-                                                })
-                                                .then(CommandManager.argument("namespace", StringArgumentType.string())
-                                                        .executes(context -> {
-                                                            executeAdv("sync", context, StringArgumentType.getString(context, "namespace"), null);
-                                                            return 1;
-                                                        })
-                                                        .then(CommandManager.argument("path", StringArgumentType.string())
-                                                                .executes(context -> {
-                                                                    executeAdv("sync", context, StringArgumentType.getString(context, "namespace"), StringArgumentType.getString(context, "path"));
-                                                                    return 1;
-                                                                })
-                                                                .then(CommandManager.argument("deleteOld", BoolArgumentType.bool())
-                                                                        .executes(context -> {
-                                                                            executeAdv("sync", context, StringArgumentType.getString(context, "namespace"), StringArgumentType.getString(context, "path"));
-                                                                            return 1;
-                                                                        })
-                                                                )
-                                                        )
-                                                )
-                                        )
-                                )
-                        )
-                )
-        ));
+                .build();
+        dispatcher.getRoot().addChild(revelationaryNode);
+
+        var advancementNode = CommandManager.literal("advancement").build();
+        revelationaryNode.addChild(advancementNode);
+
+        var revokeNode = CommandManager.literal("revoke").build();
+        advancementNode.addChild(revokeNode);
+        executesWithTargetsNamespacePathArguments(revokeNode, Executors::revoke);
+
+        var grantNode = CommandManager.literal("grant").build();
+        advancementNode.addChild(grantNode);
+        executesWithTargetsNamespacePathArguments(grantNode, Executors::grant);
+
+        var syncNode = CommandManager.literal("sync").build();
+        advancementNode.addChild(syncNode);
+        var sourceSyncArgument = CommandManager
+                .argument("source", EntityArgumentType.player())
+                .build();
+        var targetsSyncArgument = CommandManager
+                .argument("targets", EntityArgumentType.players())
+                .executes(context -> Executors.sync(context, false, false, false))
+                .build();
+        var namespaceSyncArgument = CommandManager
+                .argument("namespace", StringArgumentType.string())
+                .executes(context -> Executors.sync(context, true, false, false))
+                .build();
+        var pathSyncArgument = CommandManager
+                .argument("path", StringArgumentType.string())
+                .executes(context -> Executors.sync(context, true, true, false))
+                .build();
+        var deleteOldSyncArgument = CommandManager
+                .argument("deleteOld", BoolArgumentType.bool())
+                .executes(context -> Executors.sync(context, true, true, true))
+                .build();
+
+        syncNode.addChild(sourceSyncArgument);
+        sourceSyncArgument.addChild(targetsSyncArgument);
+        targetsSyncArgument.addChild(namespaceSyncArgument);
+        namespaceSyncArgument.addChild(pathSyncArgument);
+        pathSyncArgument.addChild(deleteOldSyncArgument);
     }
 
-    //probably a better way to do this? I think minecraft does it in another way so maybe changing it to that could be neater? But the switch statement sounded better at the start and now Im not gonna change it
-    private static void executeAdv(String command, CommandContext<ServerCommandSource> context, String namespace, String path) {
-        Map<String, String> args = getCommandArgMap(context, namespace, path);
-        String utilNamespace = args.get("namespace").replace("*", "all");
-        String utilPath = args.get("path").replace("*", "all");
-        try {
-            switch (command) {
-                case "revoke" -> {
-                    int advCount = 0;
-                    for (ServerPlayerEntity player : EntityArgumentType.getPlayers(context, "targets")) {
-                        advCount += AdvancementUtils.revokeAllAdvancements(player, utilNamespace, utilPath);
-                    }
-                    context.getSource().getPlayer().sendMessage(Text.translatable("commands.revelationary.advancement.revoke", advCount, args.get("targets"), args.get("namespace"), args.get("path")), false);
-                }
-                case "grant" -> {
-                    int advCount = 0;
-                    for (ServerPlayerEntity player : EntityArgumentType.getPlayers(context, "targets")) {
-                        advCount += AdvancementUtils.grantAllAdvancements(player, utilNamespace, utilPath);
-                    }
-                    context.getSource().getPlayer().sendMessage(Text.translatable("commands.revelationary.advancement.grant", advCount, args.get("targets"), args.get("namespace"), args.get("path")), false);
-                }
-                case "sync" -> {
-                    int advCount = 0;
-                    for (ServerPlayerEntity targetPlayer : EntityArgumentType.getPlayers(context, "targets")) {
-                        try {
-                            advCount += AdvancementUtils.syncAdvancements(EntityArgumentType.getPlayer(context, "target"), targetPlayer, utilNamespace, utilPath, BoolArgumentType.getBool(context, "deleteOld"));
-                        } catch (Exception e) {
-                            advCount += AdvancementUtils.syncAdvancements(EntityArgumentType.getPlayer(context, "target"), targetPlayer, utilNamespace, utilPath, false);
-                        }
-                    }
-                    context.getSource().getPlayer().sendMessage(Text.translatable("commands.revelationary.advancement.sync", advCount, EntityArgumentType.getPlayer(context, "target").getDisplayName(), args.get("targets"), args.get("namespace"), args.get("path")), false);
-                }
-            }
-        } catch (Exception e) {
-            logError("Error while executing command: " + e);
+    @FunctionalInterface
+    private interface TargetsNamespacePathExecutor {
+        int execute(CommandContext<ServerCommandSource> context, Collection<ServerPlayerEntity> targets, String namespace, String path) throws CommandSyntaxException;
+    }
+
+    private static int retrieveArgumentsAndCallExecutor(CommandContext<ServerCommandSource> context, TargetsNamespacePathExecutor executor, boolean checkNamespace, boolean checkPath) throws CommandSyntaxException {
+        return executor.execute(
+                context,
+                EntityArgumentType.getPlayers(context, "targets"),
+                checkNamespace ? StringArgumentType.getString(context, "namespace") : "all",
+                checkPath ? StringArgumentType.getString(context, "path") : "all");
+    }
+
+    private static CommandNode<ServerCommandSource> executesWithTargetsNamespacePathArguments(CommandNode<ServerCommandSource> parentNode, TargetsNamespacePathExecutor executor) {
+        var targetsArgument = CommandManager
+                .argument("targets", EntityArgumentType.players())
+                .executes(context -> retrieveArgumentsAndCallExecutor(context, executor, false, false))
+                .build();
+        var namespaceArgument = CommandManager
+                .argument("namespace", StringArgumentType.string())
+                .executes(context -> retrieveArgumentsAndCallExecutor(context, executor, true, false))
+                .build();
+        var pathArgument = CommandManager
+                .argument("path", StringArgumentType.string())
+                .executes(context -> retrieveArgumentsAndCallExecutor(context, executor, true, true))
+                .build();
+
+        parentNode.addChild(targetsArgument);
+        targetsArgument.addChild(namespaceArgument);
+        namespaceArgument.addChild(pathArgument);
+
+        return pathArgument;
+    }
+
+    // Utility function
+    private static String joinPlayersList(Collection<ServerPlayerEntity> players) {
+        return players.stream().map(player -> player.getDisplayName().getString()).collect(Collectors.joining(", "));
+    }
+
+    private static class Executors {
+        private static int revoke(CommandContext<ServerCommandSource> context, Collection<ServerPlayerEntity> targets, String namespace, String path) {
+            var count = targets.stream().mapToInt(player -> AdvancementUtils.forPlayer(player).withNamespace(namespace).withPath(path).revoke()).sum();
+            context.getSource().sendFeedback(Text.translatable("commands.revelationary.advancement.revoke", count, joinPlayersList(targets), namespace, path), false);
+            return count;
+        }
+
+        private static int grant(CommandContext<ServerCommandSource> context, Collection<ServerPlayerEntity> targets, String namespace, String path) {
+            var count = targets.stream().mapToInt(player -> AdvancementUtils.forPlayer(player).withNamespace(namespace).withPath(path).grant()).sum();
+            context.getSource().sendFeedback(Text.translatable("commands.revelationary.advancement.grant", count, joinPlayersList(targets), namespace, path), false);
+            return count;
+        }
+
+        private static int sync(CommandContext<ServerCommandSource> context, boolean checkNamespace, boolean checkPath, boolean checkDeleteOld) throws CommandSyntaxException {
+            var source = EntityArgumentType.getPlayer(context, "source");
+            var targets = EntityArgumentType.getPlayers(context, "targets");
+            var namespace = checkNamespace ? StringArgumentType.getString(context, "namespace") : "all";
+            var path = checkPath ? StringArgumentType.getString(context, "path") : "all";
+            var deleteOld = checkDeleteOld && BoolArgumentType.getBool(context, "deleteOld");
+
+            var count = targets.stream().mapToInt(player -> AdvancementUtils.forPlayer(source).withNamespace(namespace).withPath(path).syncTo(player, deleteOld)).sum();
+            context.getSource().sendFeedback(Text.translatable("commands.revelationary.advancement.sync", count, source.getDisplayName(), joinPlayersList(targets), namespace, path), false);
+            return count;
         }
     }
-
-    private static Map<String, String> getCommandArgMap(CommandContext<ServerCommandSource> context, String namespace, String path) {
-        //the if statements could probably be compacted
-        try {
-            if (namespace != null) {
-                namespace = StringArgumentType.getString(context, "namespace");
-                if (namespace.equals("all")) {
-                    namespace = "*";
-                }
-            } else {
-                namespace = "*";
-            }
-            if (path != null) {
-                path = StringArgumentType.getString(context, "path");
-                if (path.equals("all")) {
-                    path = "*";
-                }
-            } else {
-                path = "*";
-            }
-            String targets = EntityArgumentType.getPlayers(context, "targets").stream().map(player -> player.getDisplayName().getString()).reduce((a, b) -> a + ", " + b).orElse("null");
-            return Map.of("targets", targets, "namespace", namespace, "path", path);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 }

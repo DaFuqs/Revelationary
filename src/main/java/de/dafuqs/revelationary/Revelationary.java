@@ -3,6 +3,7 @@ package de.dafuqs.revelationary;
 import de.dafuqs.revelationary.api.advancements.*;
 import de.dafuqs.revelationary.config.RevelationaryConfig;
 import net.fabricmc.api.*;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.*;
 import net.fabricmc.fabric.api.resource.*;
 import net.fabricmc.loader.api.*;
@@ -33,7 +34,7 @@ public class Revelationary implements ModInitializer {
         logInfo("Starting Common Startup");
 
         AdvancementCriteria.register();
-        Commands.register();
+        CommandRegistrationCallback.EVENT.register(Commands::register);
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(RevelationDataLoader.INSTANCE);
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
