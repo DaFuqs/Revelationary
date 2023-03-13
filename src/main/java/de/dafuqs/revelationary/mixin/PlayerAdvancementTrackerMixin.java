@@ -26,6 +26,7 @@ public abstract class PlayerAdvancementTrackerMixin {
 		AdvancementProgress advancementProgress = ((PlayerAdvancementTracker) (Object) this).getProgress(advancement);
 		if (advancementProgress.isDone()) {
 			AdvancementCriteria.ADVANCEMENT_GOTTEN.trigger(owner, advancement);
+			AdvancementCriteria.ADVANCEMENT_COUNT.trigger(owner);
 			
 			List<Block> revelations = RevelationRegistry.getBlockEntries(advancement.getId());
 			for (Block revelation : revelations) {

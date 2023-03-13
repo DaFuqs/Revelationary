@@ -15,7 +15,6 @@ public class Revelationary implements ModInitializer {
 
     public static final String MOD_ID = "revelationary";
     private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-    public static MinecraftServer minecraftServer;
 
     public static void logInfo(String message) {
         LOGGER.info("[Revelationary] " + message);
@@ -38,7 +37,6 @@ public class Revelationary implements ModInitializer {
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(RevelationDataLoader.INSTANCE);
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-            Revelationary.minecraftServer = server;
             RevelationRegistry.addRevelationAwares();
         });
 
