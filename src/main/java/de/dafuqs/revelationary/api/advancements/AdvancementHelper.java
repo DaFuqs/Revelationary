@@ -30,6 +30,9 @@ public class AdvancementHelper {
 		}
 		
 		if (playerEntity instanceof ServerPlayerEntity) {
+			if(Revelationary.minecraftServer == null) {
+				return false; // mods querying loot tables before the instance has started?
+			}
 			Advancement advancement = Revelationary.minecraftServer.getAdvancementLoader().get(advancementIdentifier);
 			if (advancement == null) {
 				Revelationary.logError("Player " + playerEntity.getName() + " was getting an advancement check for an advancement that does not exist: " + advancementIdentifier);
