@@ -29,13 +29,13 @@ public class AdvancementHelper {
 			return true;
 		}
 		
-		if (playerEntity instanceof ServerPlayerEntity) {
-			Advancement advancement = Revelationary.minecraftServer.getAdvancementLoader().get(advancementIdentifier);
+		if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
+			Advancement advancement = serverPlayerEntity.server.getAdvancementLoader().get(advancementIdentifier);
 			if (advancement == null) {
 				Revelationary.logError("Player " + playerEntity.getName() + " was getting an advancement check for an advancement that does not exist: " + advancementIdentifier);
 				return false;
 			} else {
-				return ((ServerPlayerEntity) playerEntity).getAdvancementTracker().getProgress(advancement).isDone();
+				return serverPlayerEntity.getAdvancementTracker().getProgress(advancement).isDone();
 			}
 			// we cannot test for "net.minecraft.client.network.ClientPlayerEntity" there because that will get obfuscated
 			// to "net.minecraft.class_xxxxx" in compiled versions => works in dev env, breaks in prod
