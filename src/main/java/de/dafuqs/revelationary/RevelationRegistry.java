@@ -6,8 +6,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.dafuqs.revelationary.api.advancements.AdvancementHelper;
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
 import de.dafuqs.revelationary.config.RevelationaryConfig;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.*;
 import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
@@ -160,6 +159,13 @@ public class RevelationRegistry {
 	
 	// BLOCKS
 	private static void registerBlockState(Identifier advancementIdentifier, BlockState sourceBlockState, BlockState targetBlockState) {
+		if(sourceBlockState.isAir() || targetBlockState.isAir()) {
+			Revelationary.logError("Trying to register invalid block cloak. Advancement: " + advancementIdentifier
+					+ " Source Block: " + Registry.BLOCK.getId(sourceBlockState.getBlock())
+					+ " Target Block: " + Registry.BLOCK.getId(targetBlockState.getBlock()));
+			return;
+		}
+		
 		List<BlockState> list;
 		if (ADVANCEMENT_BLOCK_REGISTRY.containsKey(advancementIdentifier)) {
 			list = ADVANCEMENT_BLOCK_REGISTRY.get(advancementIdentifier);
@@ -246,6 +252,13 @@ public class RevelationRegistry {
 	
 	// ITEMS
 	private static void registerItem(Identifier advancementIdentifier, Item sourceItem, Item targetItem) {
+		if(sourceItem == Items.AIR || targetItem == Items.AIR) {
+			Revelationary.logError("Trying to register invalid item cloak. Advancement: " + advancementIdentifier
+					+ " Source Item: " + Registry.ITEM.getId(sourceItem)
+					+ " Target Item: " + Registry.ITEM.getId(targetItem));
+			return;
+		}
+		
 		if (ADVANCEMENT_ITEM_REGISTRY.containsKey(advancementIdentifier)) {
 			List<Item> list = ADVANCEMENT_ITEM_REGISTRY.get(advancementIdentifier);
 			if (list.contains(sourceItem)) {
