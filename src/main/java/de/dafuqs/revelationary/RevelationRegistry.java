@@ -161,8 +161,8 @@ public class RevelationRegistry {
 	private static void registerBlockState(Identifier advancementIdentifier, BlockState sourceBlockState, BlockState targetBlockState) {
 		if(sourceBlockState.isAir()) {
 			Revelationary.logError("Trying to register invalid block cloak. Advancement: " + advancementIdentifier
-					+ " Source Block: " + Registry.BLOCK.getId(sourceBlockState.getBlock())
-					+ " Target Block: " + Registry.BLOCK.getId(targetBlockState.getBlock()));
+					+ " Source Block: " + Registries.BLOCK.getId(sourceBlockState.getBlock())
+					+ " Target Block: " + Registries.BLOCK.getId(targetBlockState.getBlock()));
 			return;
 		}
 		
@@ -254,8 +254,8 @@ public class RevelationRegistry {
 	private static void registerItem(Identifier advancementIdentifier, Item sourceItem, Item targetItem) {
 		if(sourceItem == Items.AIR || targetItem == Items.AIR) {
 			Revelationary.logError("Trying to register invalid item cloak. Advancement: " + advancementIdentifier
-					+ " Source Item: " + Registry.ITEM.getId(sourceItem)
-					+ " Target Item: " + Registry.ITEM.getId(targetItem));
+					+ " Source Item: " + Registries.ITEM.getId(sourceItem)
+					+ " Target Item: " + Registries.ITEM.getId(targetItem));
 			return;
 		}
 		
