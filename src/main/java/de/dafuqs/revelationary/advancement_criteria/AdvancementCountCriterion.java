@@ -66,7 +66,7 @@ public class AdvancementCountCriterion extends AbstractCriterion<AdvancementCoun
 			boolean allMatched = true;
 			for(Identifier advancementIdentifier : this.advancementIdentifiers) {
 				Advancement advancement = serverPlayerEntity.server.getAdvancementLoader().get(advancementIdentifier);
-				if(serverPlayerEntity.getAdvancementTracker().getProgress(advancement).isDone()) {
+				if(advancement != null && serverPlayerEntity.getAdvancementTracker().getProgress(advancement).isDone()) {
 					matchingAdvancements++;
 				} else {
 					allMatched = false;
