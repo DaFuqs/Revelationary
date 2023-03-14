@@ -159,7 +159,7 @@ public class RevelationRegistry {
 	
 	// BLOCKS
 	private static void registerBlockState(Identifier advancementIdentifier, BlockState sourceBlockState, BlockState targetBlockState) {
-		if(sourceBlockState.isAir() || targetBlockState.isAir()) {
+		if(sourceBlockState.isAir()) {
 			Revelationary.logError("Trying to register invalid block cloak. Advancement: " + advancementIdentifier
 					+ " Source Block: " + Registry.BLOCK.getId(sourceBlockState.getBlock())
 					+ " Target Block: " + Registry.BLOCK.getId(targetBlockState.getBlock()));
