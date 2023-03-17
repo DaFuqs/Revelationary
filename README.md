@@ -10,9 +10,9 @@ With Revelationary, you are able to use Data Packs or the Revelation API to grad
 As long as a player does not have the necessary progress the blocks and items you register with Revelationary via API or Data Pack will just have cryptic names and in case of blocks in the world, will drop the same drops as the block it is disguised as, giving the player a seamless experience without getting flooded with unknown resources that they are not able to use at the start. Instead you can introduce resources just as they are needed.
 
 Limitations
-Besides visuals and drops, disguised blocks retain all the properties of the original block: Hitbox, if light passes through and everything else. Keep that in mind when searching for fitting candidates. A perfect disguise for your Ore would be stone or deepslate, since these share a lot of similarities. Similarly you could disguise your elusive plant with a poppy: Both have a small hitbox and players can walk through them.
+Besides visuals and drops, disguised blocks retain all the properties of the original block: Hitbox, if light passes through and everything else. Keep that in mind when searching for fitting candidates. A perfect disguise for your Ore would be stone or deepslate, since these share a lot of similarities. Similarly you could disguise your elusive plant as a poppy: Both have a small hitbox and players can walk through them.
 
-If you are a programmer you can use the Revelation API to dynamically change your blocks properties depending on if they are visible to the player, or not. This way you could even disguise your flower as air: Giving it an empty hitbox when disguised, your players might not even know it is there until they can see them!
+If you are a mod author you are able to use the Revelation API to dynamically change your blocks properties depending on if they are visible to the player, or not. This way you could even disguise your flower as air: Giving it an empty hitbox when disguised, your players might not even know it is there until they can see them!
 
 # Advancement API
 Revelationary provides utilities to make the handling of advancements easier - both client- and serverside.
