@@ -6,6 +6,7 @@ import net.minecraft.advancement.*;
 import net.minecraft.advancement.criterion.*;
 import net.minecraft.predicate.*;
 import net.minecraft.predicate.entity.*;
+import net.minecraft.server.*;
 import net.minecraft.server.network.*;
 import net.minecraft.util.*;
 
@@ -62,11 +63,20 @@ public class AdvancementCountCriterion extends AbstractCriterion<AdvancementCoun
 		}
 		
 		public boolean matches(ServerPlayerEntity serverPlayerEntity) {
+			ServerAdvancementLoader loader = serverPlayerEntity.server.getAdvancementLoader();
+			if(loader == null) {
+				return false;
+			}
+			PlayerAdvancementTracker tracker = serverPlayerEntity.getAdvancementTracker();
+			if(tracker == null) {
+				return false;
+			}
+			
 			int matchingAdvancements = 0;
 			boolean allMatched = true;
 			for(Identifier advancementIdentifier : this.advancementIdentifiers) {
-				Advancement advancement = serverPlayerEntity.server.getAdvancementLoader().get(advancementIdentifier);
-				if(advancement != null && serverPlayerEntity.getAdvancementTracker().getProgress(advancement).isDone()) {
+				Advancement advancement = loader.get(advancementIdentifier);
+				if(advancement != null && tracker.getProgress(advancement).isDone()) {
 					matchingAdvancements++;
 				} else {
 					allMatched = false;
