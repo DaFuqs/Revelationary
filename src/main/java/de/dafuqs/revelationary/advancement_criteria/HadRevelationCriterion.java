@@ -12,7 +12,7 @@ import net.minecraft.predicate.entity.EntityPredicate;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.*;
 
 public class HadRevelationCriterion extends AbstractCriterion<HadRevelationCriterion.Conditions> {
 	
