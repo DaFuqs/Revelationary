@@ -25,15 +25,16 @@ public class ClientAdvancements {
 		boolean hadPacketBefore = receivedFirstAdvancementPacket;
 		receivedFirstAdvancementPacket = true;
 		boolean isReset = packet.shouldClearCurrent();
+		boolean isFirstPacket = !hadPacketBefore || isReset;
 		
 		Set<Identifier> doneAdvancements = getDoneAdvancements(packet);
 		Set<Identifier> removedAdvancements = packet.getAdvancementIdsToRemove();
 		
 		ClientRevelationHolder.processRemovedAdvancements(removedAdvancements);
-		ClientRevelationHolder.processNewAdvancements(doneAdvancements, !hadPacketBefore);
+		ClientRevelationHolder.processNewAdvancements(doneAdvancements, isFirstPacket);
 		
 		for (ClientAdvancementPacketCallback callback : callbacks) {
-			callback.onClientAdvancementPacket(doneAdvancements, removedAdvancements, !hadPacketBefore || isReset);
+			callback.onClientAdvancementPacket(doneAdvancements, removedAdvancements, isFirstPacket);
 		}
 	}
 	
