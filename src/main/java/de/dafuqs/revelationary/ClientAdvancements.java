@@ -24,6 +24,7 @@ public class ClientAdvancements {
 	public static void onClientPacket(@NotNull AdvancementUpdateS2CPacket packet) {
 		boolean hadPacketBefore = receivedFirstAdvancementPacket;
 		receivedFirstAdvancementPacket = true;
+		boolean isReset = packet.shouldClearCurrent();
 		
 		Set<Identifier> doneAdvancements = getDoneAdvancements(packet);
 		Set<Identifier> removedAdvancements = packet.getAdvancementIdsToRemove();
@@ -32,7 +33,7 @@ public class ClientAdvancements {
 		ClientRevelationHolder.processNewAdvancements(doneAdvancements, !hadPacketBefore);
 		
 		for (ClientAdvancementPacketCallback callback : callbacks) {
-			callback.onClientAdvancementPacket(doneAdvancements, removedAdvancements, !hadPacketBefore);
+			callback.onClientAdvancementPacket(doneAdvancements, removedAdvancements, !hadPacketBefore || isReset);
 		}
 	}
 	
