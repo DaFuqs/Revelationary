@@ -15,6 +15,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class Commands {
@@ -107,13 +108,23 @@ public class Commands {
     private static class Executors {
         private static int revoke(CommandContext<ServerCommandSource> context, Collection<ServerPlayerEntity> targets, String namespace, String path) {
             var count = targets.stream().mapToInt(player -> AdvancementUtils.forPlayer(player).withNamespace(namespace).withPath(path).revoke()).sum();
-            context.getSource().sendFeedback(Text.translatable("commands.revelationary.advancement.revoke", count, joinPlayersList(targets), namespace, path), false);
+            context.getSource().sendFeedback(new Supplier<Text>() {
+                @Override
+                public Text get() {
+                    return Text.translatable("commands.revelationary.advancement.revoke", count, joinPlayersList(targets), namespace, path);
+                }
+            }, false);
             return count;
         }
 
         private static int grant(CommandContext<ServerCommandSource> context, Collection<ServerPlayerEntity> targets, String namespace, String path) {
             var count = targets.stream().mapToInt(player -> AdvancementUtils.forPlayer(player).withNamespace(namespace).withPath(path).grant()).sum();
-            context.getSource().sendFeedback(Text.translatable("commands.revelationary.advancement.grant", count, joinPlayersList(targets), namespace, path), false);
+            context.getSource().sendFeedback(new Supplier<Text>() {
+                @Override
+                public Text get() {
+                    return Text.translatable("commands.revelationary.advancement.grant", count, joinPlayersList(targets), namespace, path);
+                }
+            }, false);
             return count;
         }
 
@@ -125,7 +136,12 @@ public class Commands {
             var deleteOld = checkDeleteOld && BoolArgumentType.getBool(context, "deleteOld");
 
             var count = targets.stream().mapToInt(player -> AdvancementUtils.forPlayer(source).withNamespace(namespace).withPath(path).syncTo(player, deleteOld)).sum();
-            context.getSource().sendFeedback(Text.translatable("commands.revelationary.advancement.sync", count, source.getDisplayName(), joinPlayersList(targets), namespace, path), false);
+            context.getSource().sendFeedback(new Supplier<Text>() {
+                @Override
+                public Text get() {
+                    return Text.translatable("commands.revelationary.advancement.sync", count, source.getDisplayName(), joinPlayersList(targets), namespace, path);
+                }
+            }, false);
             return count;
         }
     }
