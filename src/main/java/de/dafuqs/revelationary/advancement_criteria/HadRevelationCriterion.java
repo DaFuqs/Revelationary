@@ -9,6 +9,7 @@ import net.minecraft.item.Item;
 import net.minecraft.predicate.entity.AdvancementEntityPredicateDeserializer;
 import net.minecraft.predicate.entity.AdvancementEntityPredicateSerializer;
 import net.minecraft.predicate.entity.EntityPredicate;
+import net.minecraft.predicate.entity.LootContextPredicate;
 import net.minecraft.registry.*;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -19,16 +20,16 @@ public class HadRevelationCriterion extends AbstractCriterion<HadRevelationCrite
 	public static final Identifier ID = new Identifier(Revelationary.MOD_ID, "had_revelation");
 	
 	public static HadRevelationCriterion.Conditions create(Identifier id) {
-		return new HadRevelationCriterion.Conditions(EntityPredicate.Extended.EMPTY, id);
+		return new HadRevelationCriterion.Conditions(LootContextPredicate.EMPTY, id);
 	}
 	
 	public Identifier getId() {
 		return ID;
 	}
 	
-	public HadRevelationCriterion.Conditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended extended, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
+	public HadRevelationCriterion.Conditions conditionsFromJson(JsonObject jsonObject, LootContextPredicate lootContextPredicate, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
 		Identifier identifier = new Identifier(JsonHelper.getString(jsonObject, "revelation_identifier"));
-		return new HadRevelationCriterion.Conditions(extended, identifier);
+		return new HadRevelationCriterion.Conditions(lootContextPredicate, identifier);
 	}
 	
 	public void trigger(ServerPlayerEntity player, Block block) {
@@ -40,8 +41,8 @@ public class HadRevelationCriterion extends AbstractCriterion<HadRevelationCrite
 	public static class Conditions extends AbstractCriterionConditions {
 		private final Identifier identifier;
 		
-		public Conditions(EntityPredicate.Extended player, Identifier identifier) {
-			super(ID, player);
+		public Conditions(LootContextPredicate lootContextPredicate, Identifier identifier) {
+			super(ID, lootContextPredicate);
 			this.identifier = identifier;
 		}
 		

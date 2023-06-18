@@ -10,6 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.loot.context.LootContext;
+import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Identifier;
@@ -119,15 +120,15 @@ public interface RevelationAware {
 	/**
 	 * Helper method that returns the player in a lootContextBuilder
 	 *
-	 * @param lootContextBuilder The loot context builder to search a player in
+	 * @param lootContextBuilderSet The loot context builder set to search a player in
 	 * @return the player of that loot context builder. null if there is no player in that context
 	 */
 	@Nullable
-	static PlayerEntity getLootPlayerEntity(LootContext.Builder lootContextBuilder) {
-		if (lootContextBuilder.getNullable(LootContextParameters.THIS_ENTITY) == null) {
+	static PlayerEntity getLootPlayerEntity(LootContextParameterSet.Builder lootContextBuilderSet) {
+		if (lootContextBuilderSet.get(LootContextParameters.THIS_ENTITY) == null) {
 			return null;
 		} else {
-			Entity entity = lootContextBuilder.get(LootContextParameters.THIS_ENTITY);
+			Entity entity = lootContextBuilderSet.get(LootContextParameters.THIS_ENTITY);
 			if (entity instanceof PlayerEntity) {
 				return (PlayerEntity) entity;
 			} else {

@@ -17,24 +17,24 @@ public class AdvancementCountCriterion extends AbstractCriterion<AdvancementCoun
 	public static final Identifier ID = new Identifier(Revelationary.MOD_ID, "advancement_count");
 	
 	public static AdvancementCountCriterion.Conditions create(Collection<Identifier> advancementIdentifiers, NumberRange.IntRange range) {
-		return new AdvancementCountCriterion.Conditions(EntityPredicate.Extended.EMPTY, advancementIdentifiers, range);
+		return new AdvancementCountCriterion.Conditions(LootContextPredicate.EMPTY, advancementIdentifiers, range);
 	}
 	
 	public Identifier getId() {
 		return ID;
 	}
 	
-	public AdvancementCountCriterion.Conditions conditionsFromAdvancementIdentifiers(EntityPredicate.Extended extended, Collection<Identifier> advancementIdentifiers, NumberRange.IntRange range) {
-		return new AdvancementCountCriterion.Conditions(extended, advancementIdentifiers, range);
+	public AdvancementCountCriterion.Conditions conditionsFromAdvancementIdentifiers(LootContextPredicate lootContextPredicate, Collection<Identifier> advancementIdentifiers, NumberRange.IntRange range) {
+		return new AdvancementCountCriterion.Conditions(lootContextPredicate, advancementIdentifiers, range);
 	}
 	
-	public AdvancementCountCriterion.Conditions conditionsFromJson(JsonObject jsonObject, EntityPredicate.Extended extended, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
+	public AdvancementCountCriterion.Conditions conditionsFromJson(JsonObject jsonObject, LootContextPredicate lootContextPredicate, AdvancementEntityPredicateDeserializer advancementEntityPredicateDeserializer) {
 		Collection<Identifier> advancementIdentifiers = new ArrayList<>();
 		for (JsonElement jsonElement : jsonObject.getAsJsonArray("advancement_identifiers")) {
 			advancementIdentifiers.add(Identifier.tryParse(jsonElement.getAsString()));
 		}
 		NumberRange.IntRange range = NumberRange.IntRange.fromJson(jsonObject.get("count"));
-		return new AdvancementCountCriterion.Conditions(extended, advancementIdentifiers, range);
+		return new AdvancementCountCriterion.Conditions(lootContextPredicate, advancementIdentifiers, range);
 	}
 	
 	public void trigger(ServerPlayerEntity player) {
@@ -45,8 +45,8 @@ public class AdvancementCountCriterion extends AbstractCriterion<AdvancementCoun
 		private final Collection<Identifier> advancementIdentifiers;
 		private final NumberRange.IntRange range;
 		
-		public Conditions(EntityPredicate.Extended player, Collection<Identifier> advancementIdentifiers, NumberRange.IntRange range) {
-			super(ID, player);
+		public Conditions(LootContextPredicate lootContextPredicate, Collection<Identifier> advancementIdentifiers, NumberRange.IntRange range) {
+			super(ID, lootContextPredicate);
 			this.advancementIdentifiers = advancementIdentifiers;
 			this.range = range;
 		}
