@@ -101,7 +101,7 @@ public interface RevelationAware {
 		if (context instanceof EntityShapeContext entityShapeContext && entityShapeContext.getEntity() instanceof PlayerEntity player) {
 			return this.isVisibleTo(player);
 		}
-		return true;
+		return false;
 	}
 	
 	/**
