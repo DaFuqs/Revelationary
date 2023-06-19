@@ -25,19 +25,14 @@ public abstract class AbstractBlockMixin {
 	@Shadow
 	public abstract Identifier getLootTableId();
 
-	@Shadow protected abstract Block asBlock();
-
-	private LootContextParameterSet.Builder spectrum$builder;
-
 	@Redirect(
 			method = "getDroppedStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/loot/context/LootContextParameterSet$Builder;)Ljava/util/List;",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/block/AbstractBlock;getLootTableId()Lnet/minecraft/util/Identifier;")
 	)
-	private Identifier spectrum$switchLootTableForCloakedBlock(AbstractBlock instance) {
-		BlockState state = this.asBlock().getDefaultState();
+	private Identifier spectrum$switchLootTableForCloakedBlock(AbstractBlock instance, BlockState state, LootContextParameterSet.Builder builder) {
 		BlockState cloakState = RevelationRegistry.getCloak(state);
 		if (cloakState != null) {
-			PlayerEntity lootPlayerEntity = RevelationAware.getLootPlayerEntity(spectrum$builder);
+			PlayerEntity lootPlayerEntity = RevelationAware.getLootPlayerEntity(builder);
 			if (!RevelationRegistry.isVisibleTo(state, lootPlayerEntity)) {
 				return cloakState.getBlock().getLootTableId();
 			}
@@ -45,9 +40,4 @@ public abstract class AbstractBlockMixin {
 		return getLootTableId();
 	}
 
-	// unsure if this works, but it should
-	@Inject(method = "getDroppedStacks", at = @At("HEAD"))
-	public final void spectrum$getBuilder(BlockState state, LootContextParameterSet.Builder builder, CallbackInfoReturnable<List<ItemStack>> cir) {
-		spectrum$builder = builder;
-	}
 }

@@ -98,11 +98,8 @@ public interface RevelationAware {
 	 * @param context the ShapeContext to check
 	 */
 	default boolean isVisibleTo(ShapeContext context) {
-		if (context instanceof EntityShapeContext) {
-			Entity entity = ((EntityShapeContext) context).getEntity();
-			if (entity instanceof PlayerEntity) {
-				return this.isVisibleTo((PlayerEntity) entity);
-			}
+		if (context instanceof EntityShapeContext entityShapeContext && entityShapeContext.getEntity() instanceof PlayerEntity player) {
+			return this.isVisibleTo(player);
 		}
 		return true;
 	}
@@ -125,16 +122,11 @@ public interface RevelationAware {
 	 */
 	@Nullable
 	static PlayerEntity getLootPlayerEntity(LootContextParameterSet.Builder lootContextBuilderSet) {
-		if (lootContextBuilderSet.get(LootContextParameters.THIS_ENTITY) == null) {
-			return null;
-		} else {
-			Entity entity = lootContextBuilderSet.get(LootContextParameters.THIS_ENTITY);
-			if (entity instanceof PlayerEntity) {
-				return (PlayerEntity) entity;
-			} else {
-				return null;
-			}
+		Entity entity = lootContextBuilderSet.getOptional(LootContextParameters.THIS_ENTITY);
+		if (entity instanceof PlayerEntity player) {
+			return player;
 		}
+		return null;
 	}
 	
 }
