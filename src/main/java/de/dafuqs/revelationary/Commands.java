@@ -50,7 +50,7 @@ public class Commands {
                                         })
                                         .then(CommandManager.argument("namespace", StringArgumentType.string())
                                                 .executes(context -> {
-                                                    executeAdv("revoke", context, StringArgumentType.getString(context, "namespace"), null);
+                                                    executeAdv("grant", context, StringArgumentType.getString(context, "namespace"), null);
                                                     return 1;
                                                 })
                                                 .then(CommandManager.argument("path", StringArgumentType.string())
