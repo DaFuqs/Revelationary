@@ -16,6 +16,7 @@
     "client.ClientAdvancementManagerMixin",
     "client.DrawContextMixin",
     "client.ItemMixin",
+    "client.ItemModelsMixin",
     "client.MinecraftClientMixin",
     "client.WorldRendererMixin",
     "client.WorldRendererMixinAccessor"

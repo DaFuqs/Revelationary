@@ -23,6 +23,12 @@ public final class Plugin implements IMixinConfigPlugin {
 		if(mixinClassName.contains("BlockUnbreakingMixin")) {
 			return RevelationaryConfig.get().PreventMiningOfUnrevealedBlocks;
 		}
+		if(mixinClassName.contains("DrawContextMixin")){
+			return FabricLoader.getInstance().isModLoaded("connectormod");
+		}
+		if(mixinClassName.contains("ItemModelsMixin")){
+			return !FabricLoader.getInstance().isModLoaded("connectormod");
+		}
 		return true;
 	}
 	
