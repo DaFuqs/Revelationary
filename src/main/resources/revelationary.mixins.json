@@ -14,7 +14,6 @@
     "client.BlockClientMixin",
     "client.BlockModelsMixin",
     "client.ClientAdvancementManagerMixin",
-    "client.DrawContextMixin",
     "client.ItemMixin",
     "client.ItemModelsMixin",
     "client.MinecraftClientMixin",
