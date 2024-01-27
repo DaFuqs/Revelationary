@@ -12,7 +12,7 @@
     "sources": "https://github.com/DaFuqs/Revelationary",
     "issues": "https://github.com/DaFuqs/Revelationary/issues"
   },
-  "license": "",
+  "license": "lGPL3",
   "icon": "assets/revelationary/icon.png",
   "environment": "*",
   "entrypoints": {
