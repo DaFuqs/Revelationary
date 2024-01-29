@@ -21,6 +21,9 @@
     ],
     "client": [
       "de.dafuqs.revelationary.RevelationaryClient"
+    ],
+    "jade": [
+      "de.dafuqs.revelationary.compat.jade.RevelationaryJadePlugin"
     ]
   },
   "mixins": [

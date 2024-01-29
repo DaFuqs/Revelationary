@@ -14,6 +14,8 @@ repositories {
 	mavenCentral()
 	maven { url "https://maven.shedaniel.me/" }
 	maven { url "https://maven.terraformersmc.com" }
+	maven { url "https://api.modrinth.com/maven/" }
+	maven { url "https://maven2.bai.lol" }
 }
 
 dependencies {
@@ -27,6 +29,9 @@ dependencies {
 
 	// dependencies
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	modCompileOnly "maven.modrinth:jade:${project.jade_version}"
+	modCompileOnly "mcp.mobius.waila:wthit-api:fabric-${project.wthit_version}"
 }
 
 processResources {
