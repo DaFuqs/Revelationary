@@ -2,6 +2,7 @@ package de.dafuqs.revelationary.api.advancements;
 
 import de.dafuqs.revelationary.advancement_criteria.AdvancementGottenCriterion;
 import net.minecraft.advancement.Advancement;
+import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -68,11 +69,11 @@ public class AdvancementUtils {
      */
     public void reprocessUnlocks() {
         for (var advancement : advancementLoader.getAdvancements()) {
-            if (advancement.getId().getNamespace().equals(namespace) && !advancementTracker.getProgress(advancement).isDone()) {
-                for (var criterionEntry : advancement.getCriteria().entrySet()) {
+            if (advancement.id().getNamespace().equals(namespace) && !advancementTracker.getProgress(advancement).isDone()) {
+                for (var criterionEntry : advancement.value().criteria().entrySet()) {
                     // 1: instanceof checks for null automatically
                     // 2: AdvancementGottenCriterion.Conditions will always have the appropriate ID, no need to check for that
-                    if (criterionEntry.getValue().getConditions() instanceof AdvancementGottenCriterion.Conditions gottenConditions) {
+                    if (criterionEntry.getValue().conditions() instanceof AdvancementGottenCriterion.Conditions gottenConditions) {
                         var gottenAdvancement = advancementLoader.get(gottenConditions.getAdvancementIdentifier());
                         if (gottenAdvancement != null && advancementTracker.getProgress(gottenAdvancement).isDone()) {
                             advancementTracker.grantCriterion(advancement, criterionEntry.getKey());
@@ -83,14 +84,14 @@ public class AdvancementUtils {
         }
     }
 
-    protected int act(BiConsumer<Advancement, String> action) {
+    protected int act(BiConsumer<AdvancementEntry, String> action) {
         var count = 0;
 
         for (var advancement : advancementLoader.getAdvancements()) {
-            if (advancement.getId().getNamespace().equals(namespace) || namespace.equals("all")) {
-                if (advancement.getId().getPath().startsWith(path) || path.equals("all")) {
+            if (advancement.id().getNamespace().equals(namespace) || namespace.equals("all")) {
+                if (advancement.id().getPath().startsWith(path) || path.equals("all")) {
                     count++;
-                    for (var criterion : advancement.getCriteria().keySet()) {
+                    for (var criterion : advancement.value().criteria().keySet()) {
                         action.accept(advancement, criterion);
                     }
                 }

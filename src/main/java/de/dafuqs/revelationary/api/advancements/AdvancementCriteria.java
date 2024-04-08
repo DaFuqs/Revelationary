@@ -20,9 +20,9 @@ public class AdvancementCriteria {
 	public static HadRevelationCriterion HAD_REVELATION;
 	
 	public static void register() {
-		ADVANCEMENT_COUNT = Criteria.register(new AdvancementCountCriterion());
-		HAD_REVELATION = Criteria.register(new HadRevelationCriterion());
-		ADVANCEMENT_GOTTEN = Criteria.register(new AdvancementGottenCriterion());
+		ADVANCEMENT_COUNT = Criteria.register("revelationary:advancement_count", new AdvancementCountCriterion());
+		HAD_REVELATION = Criteria.register("revelationary:had_revelation", new HadRevelationCriterion());
+		ADVANCEMENT_GOTTEN = Criteria.register("revelationary:advancement_gotten", new AdvancementGottenCriterion());
 	}
 	
 }
