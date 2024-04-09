@@ -22,7 +22,7 @@ public abstract class PlayerAdvancementTrackerMixin {
 	@Shadow
 	private ServerPlayerEntity owner;
 	
-	@Inject(at = @At("RETURN"), method = "Lnet/minecraft/advancement/PlayerAdvancementTracker;grantCriterion(Lnet/minecraft/advancement/AdvancementEntry;Ljava/lang/String;)Z")
+	@Inject(at = @At("RETURN"), method = "grantCriterion(Lnet/minecraft/advancement/AdvancementEntry;Ljava/lang/String;)Z")
 	public void triggerAdvancementCriteria(AdvancementEntry advancement, String criterionName, CallbackInfoReturnable<Boolean> cir) {
 		AdvancementProgress advancementProgress = ((PlayerAdvancementTracker) (Object) this).getProgress(advancement);
 		if (advancementProgress.isDone()) {
