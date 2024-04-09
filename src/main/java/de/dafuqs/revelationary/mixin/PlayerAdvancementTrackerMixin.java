@@ -3,6 +3,7 @@ package de.dafuqs.revelationary.mixin;
 import de.dafuqs.revelationary.RevelationRegistry;
 import de.dafuqs.revelationary.api.advancements.AdvancementCriteria;
 import net.minecraft.advancement.Advancement;
+import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.block.Block;
@@ -21,14 +22,14 @@ public abstract class PlayerAdvancementTrackerMixin {
 	@Shadow
 	private ServerPlayerEntity owner;
 	
-	@Inject(at = @At("RETURN"), method = "grantCriterion(Lnet/minecraft/advancement/Advancement;Ljava/lang/String;)Z")
-	public void triggerAdvancementCriteria(Advancement advancement, String criterionName, CallbackInfoReturnable<Boolean> cir) {
+	@Inject(at = @At("RETURN"), method = "grantCriterion(Lnet/minecraft/advancement/AdvancementEntry;Ljava/lang/String;)Z")
+	public void triggerAdvancementCriteria(AdvancementEntry advancement, String criterionName, CallbackInfoReturnable<Boolean> cir) {
 		AdvancementProgress advancementProgress = ((PlayerAdvancementTracker) (Object) this).getProgress(advancement);
 		if (advancementProgress.isDone()) {
 			AdvancementCriteria.ADVANCEMENT_GOTTEN.trigger(owner, advancement);
 			AdvancementCriteria.ADVANCEMENT_COUNT.trigger(owner);
 			
-			List<Block> revelations = RevelationRegistry.getBlockEntries(advancement.getId());
+			List<Block> revelations = RevelationRegistry.getBlockEntries(advancement.id());
 			for (Block revelation : revelations) {
 				AdvancementCriteria.HAD_REVELATION.trigger(owner, revelation);
 			}

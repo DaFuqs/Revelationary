@@ -5,6 +5,7 @@ import de.dafuqs.revelationary.mixin.client.AccessorClientAdvancementManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancement.Advancement;
+import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientAdvancementManager;
@@ -48,7 +49,7 @@ public class ClientAdvancements {
 			ClientPlayNetworkHandler conn = MinecraftClient.getInstance().getNetworkHandler();
 			if (conn != null) {
 				ClientAdvancementManager cm = conn.getAdvancementHandler();
-				Advancement adv = cm.getManager().get(identifier);
+				Advancement adv = cm.getManager().get(identifier).getAdvancement();
 				if (adv != null) {
 					Map<Advancement, AdvancementProgress> progressMap = ((AccessorClientAdvancementManager) cm).getAdvancementProgresses();
 					AdvancementProgress progress = progressMap.get(adv);
@@ -62,14 +63,12 @@ public class ClientAdvancements {
 	public static @NotNull Set<Identifier> getDoneAdvancements(@NotNull AdvancementUpdateS2CPacket packet) {
 		Set<Identifier> doneAdvancements = new HashSet<>();
 		
-		for (Identifier earnedAdvancementIdentifier : packet.getAdvancementsToEarn().keySet()) {
-			if (ClientAdvancements.hasDone(earnedAdvancementIdentifier)) {
-				doneAdvancements.add(earnedAdvancementIdentifier);
-			}
+		for (AdvancementEntry earnedAdvancementEntry : packet.getAdvancementsToEarn()) {
+			doneAdvancements.add(earnedAdvancementEntry.id());
 		}
-		for (Identifier progressedAdvancementIdentifier : packet.getAdvancementsToProgress().keySet()) {
-			if (ClientAdvancements.hasDone(progressedAdvancementIdentifier)) {
-				doneAdvancements.add(progressedAdvancementIdentifier);
+		for (Map.Entry<Identifier, AdvancementProgress> progressedAdvancement : packet.getAdvancementsToProgress().entrySet()) {
+			if (progressedAdvancement.getValue().isDone()) {
+				doneAdvancements.add(progressedAdvancement.getKey());
 			}
 		}
 		
