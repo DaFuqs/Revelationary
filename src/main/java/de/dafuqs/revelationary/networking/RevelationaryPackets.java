@@ -22,7 +22,7 @@ public class RevelationaryPackets {
 
 		private void write(RegistryByteBuf buf) {
 			buf.writeBytes(bufCopy);
-        }
+		}
 
 		@Override
 		public Id<? extends CustomPayload> getId() {
