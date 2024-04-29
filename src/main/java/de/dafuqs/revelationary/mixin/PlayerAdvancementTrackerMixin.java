@@ -2,7 +2,6 @@ package de.dafuqs.revelationary.mixin;
 
 import de.dafuqs.revelationary.RevelationRegistry;
 import de.dafuqs.revelationary.api.advancements.AdvancementCriteria;
-import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.advancement.PlayerAdvancementTracker;

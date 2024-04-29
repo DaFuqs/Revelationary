@@ -4,7 +4,6 @@ import de.dafuqs.revelationary.api.advancements.ClientAdvancementPacketCallback;
 import de.dafuqs.revelationary.mixin.client.AccessorClientAdvancementManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.client.MinecraftClient;
@@ -49,9 +48,9 @@ public class ClientAdvancements {
 			ClientPlayNetworkHandler conn = MinecraftClient.getInstance().getNetworkHandler();
 			if (conn != null) {
 				ClientAdvancementManager cm = conn.getAdvancementHandler();
-				Advancement adv = cm.getManager().get(identifier).getAdvancement();
+				AdvancementEntry adv = cm.getManager().get(identifier).getAdvancementEntry();
 				if (adv != null) {
-					Map<Advancement, AdvancementProgress> progressMap = ((AccessorClientAdvancementManager) cm).getAdvancementProgresses();
+					Map<AdvancementEntry, AdvancementProgress> progressMap = ((AccessorClientAdvancementManager) cm).getAdvancementProgresses();
 					AdvancementProgress progress = progressMap.get(adv);
 					return progress != null && progress.isDone();
 				}
