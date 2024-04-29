@@ -25,7 +25,7 @@ public class RevelationaryPackets {
 		}
 
 		@Override
-		public Id<? extends CustomPayload> getId() {
+		public Id<RevelationSync> getId() {
 			return ID;
 		}
 	}

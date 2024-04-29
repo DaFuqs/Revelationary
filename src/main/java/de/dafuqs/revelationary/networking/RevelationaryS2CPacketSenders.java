@@ -12,6 +12,7 @@ public class RevelationaryS2CPacketSenders {
 	public static void sendRevelations(ServerPlayerEntity player) {
 		PacketByteBuf packetByteBuf = PacketByteBufs.create();
 		RevelationRegistry.write(packetByteBuf);
+		// silly packet handling workaround
 		ServerPlayNetworking.send(player, new RevelationaryPackets.RevelationSync(new RegistryByteBuf(packetByteBuf, null)));
 	}
 	
