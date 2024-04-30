@@ -1,12 +1,10 @@
 package de.dafuqs.revelationary.api.advancements;
 
 import de.dafuqs.revelationary.advancement_criteria.AdvancementGottenCriterion;
-import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.PlayerAdvancementTracker;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
-
 import java.util.function.BiConsumer;
 
 public class AdvancementUtils {

@@ -15,7 +15,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 import java.util.Collection;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class Commands {

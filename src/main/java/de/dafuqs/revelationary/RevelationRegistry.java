@@ -14,6 +14,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.*;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.Language;
@@ -315,6 +316,14 @@ public class RevelationRegistry {
 	public static List<Item> getItemEntries(Identifier advancement) {
 		return ADVANCEMENT_ITEM_REGISTRY.getOrDefault(advancement, Collections.EMPTY_LIST);
 	}
+
+	private static void writeText(PacketByteBuf buf, Text text) {
+		TextCodecs.PACKET_CODEC.encode(buf, text);
+	}
+
+	private static Text readText(PacketByteBuf buf) {
+		return TextCodecs.PACKET_CODEC.decode(buf);
+	}
 	
 	public static void write(PacketByteBuf buf) {
 		// Block States
@@ -343,14 +352,14 @@ public class RevelationRegistry {
 		buf.writeInt(ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.size());
 		for (Map.Entry<Block, MutableText> blockTranslation : ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.entrySet()) {
 			buf.writeIdentifier(Registries.BLOCK.getId(blockTranslation.getKey()));
-			buf.writeText(blockTranslation.getValue());
+			writeText(buf, blockTranslation.getValue());
 		}
 		
 		// Item Translations
 		buf.writeInt(ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.size());
 		for (Map.Entry<Item, MutableText> itemTranslation : ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.entrySet()) {
 			buf.writeIdentifier(Registries.ITEM.getId(itemTranslation.getKey()));
-			buf.writeText(itemTranslation.getValue());
+			writeText(buf, itemTranslation.getValue());
 		}
 		
 	}
@@ -410,7 +419,7 @@ public class RevelationRegistry {
 		int blockTranslations = buf.readInt();
 		for (int i = 0; i < blockTranslations; i++) {
 			Block block = Registries.BLOCK.get(buf.readIdentifier());
-			MutableText text = (MutableText) buf.readText();
+			MutableText text = (MutableText) readText(buf);
 			ALTERNATE_BLOCK_TRANSLATION_STRING_REGISTRY.put(block, text);
 		}
 		
@@ -418,7 +427,7 @@ public class RevelationRegistry {
 		int itemTranslations = buf.readInt();
 		for (int i = 0; i < itemTranslations; i++) {
 			Item item = Registries.ITEM.get(buf.readIdentifier());
-			MutableText text = (MutableText) buf.readText();
+			MutableText text = (MutableText) readText(buf);
 			ALTERNATE_ITEM_TRANSLATION_STRING_REGISTRY.put(item, text);
 		}
 	}

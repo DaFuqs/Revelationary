@@ -4,7 +4,6 @@ import de.dafuqs.revelationary.ClientAdvancements;
 import de.dafuqs.revelationary.Revelationary;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;

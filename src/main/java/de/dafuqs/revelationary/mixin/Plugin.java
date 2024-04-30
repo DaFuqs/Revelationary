@@ -1,7 +1,6 @@
 package de.dafuqs.revelationary.mixin;
 
 import de.dafuqs.revelationary.config.*;
-import net.fabricmc.loader.api.*;
 import org.objectweb.asm.tree.*;
 import org.spongepowered.asm.mixin.extensibility.*;
 

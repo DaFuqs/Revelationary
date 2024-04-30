@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "de.dafuqs.revelationary.mixin",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "plugin": "de.dafuqs.revelationary.mixin.Plugin",
   "mixins": [
     "AbstractBlockMixin",

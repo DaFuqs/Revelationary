@@ -6,11 +6,10 @@ import de.dafuqs.revelationary.Revelationary;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
 public class RevelationaryS2CPacketReceivers {
-	
 	public static void register() {
-		ClientPlayNetworking.registerGlobalReceiver(RevelationaryPackets.REVELATION_SYNC, (client, handler, buf, responseSender) -> {
+		ClientPlayNetworking.registerGlobalReceiver(RevelationaryPackets.RevelationSync.ID, (payload, context) -> {
 			try {
-				RevelationRegistry.fromPacket(buf);
+				RevelationRegistry.fromPacket(payload.bufCopy());
 			} catch (Exception e) {
 				Revelationary.logError("Error fetching results from sync packet");
 				e.printStackTrace();
@@ -18,5 +17,4 @@ public class RevelationaryS2CPacketReceivers {
 			ClientRevelationHolder.cloakAll();
 		});
 	}
-	
 }
