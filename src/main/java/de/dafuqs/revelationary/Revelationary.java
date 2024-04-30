@@ -32,12 +32,7 @@ public class Revelationary implements ModInitializer {
     public void onInitialize() {
         logInfo("Starting Common Startup");
 
-        // note: guarantee serverside initialization
-        // PayloadTypeRegistryImpl throws an IllegalArgumentException if the packet has already been registered;
-        // this error is explicitly ignored (other errors are allowed to pass through for proper handling by mod dev)
-        try {
-            PayloadTypeRegistry.playS2C().register(RevelationaryPackets.RevelationSync.ID, RevelationaryPackets.RevelationSync.CODEC);
-        } catch(IllegalArgumentException ignored) {}
+        PayloadTypeRegistry.playS2C().register(RevelationaryPackets.RevelationSync.ID, RevelationaryPackets.RevelationSync.CODEC);
 
         AdvancementCriteria.register();
         CommandRegistrationCallback.EVENT.register(Commands::register);
