@@ -17,7 +17,11 @@ public class RevelationaryPackets {
 		public static final CustomPayload.Id<RevelationSync> ID = new Id<>(REVELATION_SYNC);
 
 		private static RevelationSync read(RegistryByteBuf buf) {
-			return new RevelationSync(new RegistryByteBuf(buf.copy(), buf.getRegistryManager()));
+			// copy buffer to retain it for RevelationRegistry reading
+			RegistryByteBuf copy = new RegistryByteBuf(buf.copy(), buf.getRegistryManager());
+			// skip all the readable bytes in the original buffer to prevent decoder exception
+			buf.skipBytes(buf.readableBytes());
+			return new RevelationSync(copy);
 		}
 
 		private void write(RegistryByteBuf buf) {
