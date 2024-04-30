@@ -1,7 +1,7 @@
 {
   "advancement": "minecraft:adventure/root",
   "block_states": {
-    "minecraft:grass": "minecraft:beacon",
+    "minecraft:short_grass": "minecraft:beacon",
     "minecraft:tall_grass": "minecraft:obsidian",
     "minecraft:tall_grass[half=upper]": "minecraft:netherite_block"
   },
@@ -16,6 +16,6 @@
     "minecraft:gold_ore": "Since Gold Ore is not in the items tag above, you should never see this"
   },
   "block_name_replacements": {
-    "minecraft:grass": "block.minecraft.dandelion"
+    "minecraft:short_grass": "block.minecraft.dandelion"
   }
 }
