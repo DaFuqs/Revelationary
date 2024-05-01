@@ -91,15 +91,15 @@ public class ClientRevelationHolder {
 			if (!concealedBlockStates.isEmpty()) {
 				// uncloak the blocks
 				for (BlockState concealedBlockState : concealedBlockStates) {
-                    activeBlockStateSwaps.add(concealedBlockState);
+					activeBlockStateSwaps.add(concealedBlockState);
 					Item blockItem = concealedBlockState.getBlock().asItem();
 					if (blockItem != null) {
-                        activeItemSwaps.add(blockItem);
+						activeItemSwaps.add(blockItem);
 					}
 				}
 				rebuildAllChunks();
 			}
-			
+
 			activeItemSwaps.addAll(concealedItems);
 			
 			for (Block concealedBlock : concealedBlocks) {
