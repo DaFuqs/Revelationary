@@ -1,11 +1,8 @@
 package de.dafuqs.revelationary.mixin;
 
 import de.dafuqs.revelationary.*;
-import de.dafuqs.revelationary.api.revelations.*;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.*;
-import net.minecraft.loot.context.*;
-import net.minecraft.util.*;
 import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 import org.spongepowered.asm.mixin.*;

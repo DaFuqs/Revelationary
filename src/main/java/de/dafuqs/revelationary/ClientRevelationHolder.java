@@ -40,7 +40,7 @@ public class ClientRevelationHolder {
 				}
 			}
 			
-			if (revealedBlockStates.size() > 0) {
+			if (!revealedBlockStates.isEmpty()) {
 				// uncloak the blocks
 				for (BlockState revealedBlockState : revealedBlockStates) {
 					activeBlockStateSwaps.remove(revealedBlockState);
@@ -88,17 +88,13 @@ public class ClientRevelationHolder {
 				}
 			}
 			
-			if (concealedBlockStates.size() > 0) {
+			if (!concealedBlockStates.isEmpty()) {
 				// uncloak the blocks
 				for (BlockState concealedBlockState : concealedBlockStates) {
-					if (!activeBlockStateSwaps.contains(concealedBlockState)) {
-						activeBlockStateSwaps.add(concealedBlockState);
-					}
+                    activeBlockStateSwaps.add(concealedBlockState);
 					Item blockItem = concealedBlockState.getBlock().asItem();
 					if (blockItem != null) {
-						if (!activeItemSwaps.contains(blockItem)) {
-							activeItemSwaps.add(blockItem);
-						}
+                        activeItemSwaps.add(blockItem);
 					}
 				}
 				rebuildAllChunks();
