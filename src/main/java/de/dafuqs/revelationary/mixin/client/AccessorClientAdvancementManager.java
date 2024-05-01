@@ -1,6 +1,6 @@
 package de.dafuqs.revelationary.mixin.client;
 
-import net.minecraft.advancement.Advancement;
+import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.client.network.ClientAdvancementManager;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,6 +12,6 @@ import java.util.Map;
 public interface AccessorClientAdvancementManager {
 	
 	@Accessor
-	Map<Advancement, AdvancementProgress> getAdvancementProgresses();
+	Map<AdvancementEntry, AdvancementProgress> getAdvancementProgresses();
 	
 }
