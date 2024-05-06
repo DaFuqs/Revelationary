@@ -1,5 +1,7 @@
 package de.dafuqs.revelationary;
 
+import com.google.common.collect.Sets;
+import de.dafuqs.revelationary.api.revelations.CloakSetChanged;
 import de.dafuqs.revelationary.api.revelations.RevealingCallback;
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
 import de.dafuqs.revelationary.api.revelations.WorldRendererAccessor;
@@ -24,8 +26,21 @@ public class ClientRevelationHolder {
 	public static List<RevealingCallback> callbacks = new ArrayList<>();
 	
 	private static final Set<BlockState> activeBlockStateSwaps = new HashSet<>();
+	// used for creating diffs for CloakSetChanged event
+	private static Set<Item> previousActiveItemSwaps = new HashSet<>();
 	private static final Set<Item> activeItemSwaps = new HashSet<>();
-	
+
+	private static void onItemSwap(boolean cloak) {
+		var diff = cloak ? Sets.difference(activeItemSwaps, previousActiveItemSwaps) : Sets.difference(previousActiveItemSwaps, activeItemSwaps);
+		var copy = Set.copyOf(activeItemSwaps);
+		var emptySet = Set.<Item>of();
+		// that is a legal expression, apparently
+        if (cloak)
+             CloakSetChanged.EVENT.invoker().onChange(diff, emptySet, copy);
+        else CloakSetChanged.EVENT.invoker().onChange(emptySet, diff, copy);
+        previousActiveItemSwaps = copy;
+	}
+
 	public static void processNewAdvancements(Set<Identifier> doneAdvancements, boolean isJoinPacket) {
 		if (!doneAdvancements.isEmpty()) {
 			Set<Item> revealedItems = new HashSet<>();
@@ -39,15 +54,13 @@ public class ClientRevelationHolder {
 					revealedBlocks.add(block);
 				}
 			}
-			
-			if (revealedBlockStates.size() > 0) {
+			activeBlockStateSwaps.removeAll(revealedBlockStates);
+
+			if (!revealedBlocks.isEmpty()) {
 				// uncloak the blocks
-				for (BlockState revealedBlockState : revealedBlockStates) {
-					activeBlockStateSwaps.remove(revealedBlockState);
-					Item blockItem = revealedBlockState.getBlock().asItem();
-					if (blockItem != null) {
-						activeItemSwaps.remove(blockItem);
-					}
+				for (Block revealedBlock: revealedBlocks) {
+					Item blockItem = revealedBlock.asItem();
+					if (blockItem != null) activeItemSwaps.remove(blockItem);
 				}
 				rebuildAllChunks();
 			}
@@ -68,6 +81,7 @@ public class ClientRevelationHolder {
 				for (RevealingCallback callback : callbacks) {
 					callback.trigger(doneAdvancements, revealedBlocks, revealedItems, isJoinPacket);
 				}
+				onItemSwap(false);
 			}
 		}
 	}
@@ -87,19 +101,13 @@ public class ClientRevelationHolder {
 					}
 				}
 			}
-			
-			if (concealedBlockStates.size() > 0) {
+
+			activeBlockStateSwaps.addAll(concealedBlockStates);
+			if (!concealedBlocks.isEmpty()) {
 				// uncloak the blocks
-				for (BlockState concealedBlockState : concealedBlockStates) {
-					if (!activeBlockStateSwaps.contains(concealedBlockState)) {
-						activeBlockStateSwaps.add(concealedBlockState);
-					}
-					Item blockItem = concealedBlockState.getBlock().asItem();
-					if (blockItem != null) {
-						if (!activeItemSwaps.contains(blockItem)) {
-							activeItemSwaps.add(blockItem);
-						}
-					}
+				for (Block concealedBlock : concealedBlocks) {
+					Item blockItem = concealedBlock.asItem();
+					if (blockItem != null) activeItemSwaps.add(blockItem);
 				}
 				rebuildAllChunks();
 			}
@@ -116,6 +124,7 @@ public class ClientRevelationHolder {
 					revelationAware.onCloak();
 				}
 			}
+			if (!concealedBlocks.isEmpty() || !concealedItems.isEmpty()) onItemSwap(true);
 		}
 	}
 	
@@ -183,6 +192,7 @@ public class ClientRevelationHolder {
 				cloak(registeredRevelation);
 			}
 		}
+		onItemSwap(true);
 	}
 	
 }

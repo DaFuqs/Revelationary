@@ -1,0 +1,36 @@
+package de.dafuqs.revelationary.compat.rei;
+
+import de.dafuqs.revelationary.api.revelations.CloakSetChanged;
+import me.shedaniel.rei.api.client.entry.filtering.base.BasicFilteringRule;
+import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
+import me.shedaniel.rei.api.common.util.EntryStacks;
+import net.minecraft.item.Item;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+
+
+public class RevelationaryREIPlugin implements REIClientPlugin {
+    @SuppressWarnings("UnstableApiUsage")
+    private BasicFilteringRule.MarkDirty filteringRule;
+    private static Set<Item> hiddenStacks = Set.of();
+
+    public RevelationaryREIPlugin() {
+        CloakSetChanged.EVENT.register((added, removed, newStacks) -> {
+            hiddenStacks = newStacks;
+            //noinspection UnstableApiUsage
+            filteringRule.markDirty();
+        });
+    }
+
+    @Override
+    public void registerBasicEntryFiltering(@SuppressWarnings("UnstableApiUsage") BasicFilteringRule<?> rule) {
+        // not using .show to not interfere with other filtering rules
+        //noinspection UnstableApiUsage
+        filteringRule = rule.hide(() ->
+            hiddenStacks.stream()
+                    .map(EntryStacks::of)
+                    .collect(Collectors.toList())
+        );
+    }
+}
