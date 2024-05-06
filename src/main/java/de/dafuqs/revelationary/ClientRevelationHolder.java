@@ -35,10 +35,10 @@ public class ClientRevelationHolder {
 		var copy = Set.copyOf(activeItemSwaps);
 		var emptySet = Set.<Item>of();
 		// that is a legal expression, apparently
-        if (cloak)
+		if (cloak)
 			 CloakSetChanged.EVENT.invoker().onChange(diff, emptySet, copy);
 		else CloakSetChanged.EVENT.invoker().onChange(emptySet, diff, copy);
-        previousActiveItemSwaps = copy;
+		previousActiveItemSwaps = copy;
 	}
 
 	public static void processNewAdvancements(Set<Identifier> doneAdvancements, boolean isJoinPacket) {
