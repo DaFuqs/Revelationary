@@ -1,6 +1,7 @@
 package de.dafuqs.revelationary.compat.rei;
 
 import de.dafuqs.revelationary.api.revelations.CloakSetChanged;
+import de.dafuqs.revelationary.config.RevelationaryConfig;
 import me.shedaniel.rei.api.client.entry.filtering.base.BasicFilteringRule;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.common.util.EntryStacks;
@@ -16,6 +17,7 @@ public class RevelationaryREIPlugin implements REIClientPlugin {
     private static Set<Item> hiddenStacks = Set.of();
 
     public RevelationaryREIPlugin() {
+        if (!RevelationaryConfig.get().HideCloakedEntriesFromRecipeViewers) return;
         CloakSetChanged.EVENT.register((added, removed, newStacks) -> {
             hiddenStacks = newStacks;
             //noinspection UnstableApiUsage
@@ -27,6 +29,7 @@ public class RevelationaryREIPlugin implements REIClientPlugin {
     public void registerBasicEntryFiltering(@SuppressWarnings("UnstableApiUsage") BasicFilteringRule<?> rule) {
         // not using .show to not interfere with other filtering rules
         //noinspection UnstableApiUsage
+        if (!RevelationaryConfig.get().HideCloakedEntriesFromRecipeViewers) return;
         filteringRule = rule.hide(() ->
             hiddenStacks.stream()
                     .map(EntryStacks::of)

@@ -2,6 +2,7 @@ package de.dafuqs.revelationary.compat.jei;
 
 import de.dafuqs.revelationary.Revelationary;
 import de.dafuqs.revelationary.api.revelations.CloakSetChanged;
+import de.dafuqs.revelationary.config.RevelationaryConfig;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.runtime.IJeiRuntime;
@@ -18,6 +19,7 @@ public class RevelationaryJEIPlugin implements IModPlugin {
     private Set<Item> stacksCache;
 
     public RevelationaryJEIPlugin() {
+        if (!RevelationaryConfig.get().HideCloakedEntriesFromRecipeViewers) return;
         CloakSetChanged.EVENT.register((added, removed, newStacks) -> {
             stacksCache = newStacks;
             if (runtime != null) {
@@ -38,6 +40,7 @@ public class RevelationaryJEIPlugin implements IModPlugin {
     @Override
     public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
         runtime = jeiRuntime;
+        if (!RevelationaryConfig.get().HideCloakedEntriesFromRecipeViewers) return;
         if (stacksCache != null) runtime.getIngredientManager()
                 .removeIngredientsAtRuntime(VanillaTypes.ITEM_STACK,
                         stacksCache.stream().map(ItemStack::new).collect(Collectors.toList()));
