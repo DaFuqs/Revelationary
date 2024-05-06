@@ -32,7 +32,7 @@ public class RevelationaryJEIPlugin implements IModPlugin {
 
     @Override
     public @NotNull Identifier getPluginUid() {
-        return new Identifier(Revelationary.MOD_ID);
+        return new Identifier(Revelationary.MOD_ID, "jei_plugin");
     }
 
     @Override
