@@ -11,8 +11,7 @@ public interface CloakSetChanged {
     Event<CloakSetChanged> EVENT = EventFactory.createArrayBacked(CloakSetChanged.class,
             (listeners) -> (addedCloaks, removedCloaks, newCloaks) -> {
                 for (CloakSetChanged listener : listeners) listener.onChange(addedCloaks, removedCloaks, newCloaks);
-            }
-            );
+            });
     // the diffs matter for JEI, the new cloaks set matters for REI
     void onChange(Set<Item> addedCloaks, Set<Item> removedCloaks, Set<Item> newCloaks);
 }

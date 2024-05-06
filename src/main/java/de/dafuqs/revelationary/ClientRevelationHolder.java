@@ -36,8 +36,8 @@ public class ClientRevelationHolder {
 		var emptySet = Set.<Item>of();
 		// that is a legal expression, apparently
         if (cloak)
-             CloakSetChanged.EVENT.invoker().onChange(diff, emptySet, copy);
-        else CloakSetChanged.EVENT.invoker().onChange(emptySet, diff, copy);
+			 CloakSetChanged.EVENT.invoker().onChange(diff, emptySet, copy);
+		else CloakSetChanged.EVENT.invoker().onChange(emptySet, diff, copy);
         previousActiveItemSwaps = copy;
 	}
 
