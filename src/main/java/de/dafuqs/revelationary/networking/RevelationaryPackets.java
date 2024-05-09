@@ -23,8 +23,6 @@ public class RevelationaryPackets {
 	
 	public static final Identifier REVELATION_SYNC = new Identifier(Revelationary.MOD_ID, "revelation_sync");
 
-	// 1.20.5 port note: this whole buf-juggling thing is an obvious workaround for the fact that RevelationRegistry
-	// relies heavily on reading the buffer straight up
 	public record RevelationSync(Object2ObjectOpenHashMap<Identifier, ObjectArrayList<BlockState>> advToBlockStates,
                                  Object2ObjectOpenHashMap<BlockState, Identifier> blockStateToAdv,
                                  Object2ObjectOpenHashMap<BlockState, BlockState> blockStateCloaks,
