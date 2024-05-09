@@ -9,7 +9,7 @@ public class RevelationaryS2CPacketReceivers {
 	public static void register() {
 		ClientPlayNetworking.registerGlobalReceiver(RevelationaryPackets.RevelationSync.ID, (payload, context) -> {
 			try {
-				RevelationRegistry.fromPacket(payload.bufCopy());
+				RevelationRegistry.fromPacket(payload);
 			} catch (Exception e) {
 				Revelationary.logError("Error fetching results from sync packet");
 				e.printStackTrace();

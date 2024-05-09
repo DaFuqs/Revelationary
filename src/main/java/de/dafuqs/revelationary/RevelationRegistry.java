@@ -2,20 +2,19 @@ package de.dafuqs.revelationary;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import de.dafuqs.revelationary.api.advancements.AdvancementHelper;
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
 import de.dafuqs.revelationary.config.RevelationaryConfig;
+import de.dafuqs.revelationary.networking.RevelationaryPackets;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.*;
 import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.*;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.Language;
@@ -27,17 +26,17 @@ import java.util.*;
 
 public class RevelationRegistry {
 	
-	private static final Object2ObjectOpenHashMap<Identifier, List<BlockState>> advToBlockStates = new Object2ObjectOpenHashMap<>();
-	private static final Object2ObjectOpenHashMap<BlockState, Identifier> blockStateToAdv = new Object2ObjectOpenHashMap<>();
-	private static final Object2ObjectOpenHashMap<BlockState, BlockState> blockStateCloaks = new Object2ObjectOpenHashMap<>();
-	private static final Object2ObjectOpenHashMap<Block, Block> blockCloaks = new Object2ObjectOpenHashMap<>();
+	private static Object2ObjectOpenHashMap<Identifier, ObjectArrayList<BlockState>> advToBlockStates = new Object2ObjectOpenHashMap<>();
+	private static Object2ObjectOpenHashMap<BlockState, Identifier> blockStateToAdv = new Object2ObjectOpenHashMap<>();
+	private static Object2ObjectOpenHashMap<BlockState, BlockState> blockStateCloaks = new Object2ObjectOpenHashMap<>();
+	private static Object2ObjectOpenHashMap<Block, Block> blockCloaks = new Object2ObjectOpenHashMap<>();
 
-	private static final Object2ObjectOpenHashMap<Identifier, List<Item>> advToItems = new Object2ObjectOpenHashMap<>();
-	private static final Object2ObjectOpenHashMap<Item, Identifier> itemToAdv = new Object2ObjectOpenHashMap<>();
-	private static final Object2ObjectOpenHashMap<Item, Item> itemCloaks = new Object2ObjectOpenHashMap<>();
+	private static Object2ObjectOpenHashMap<Identifier, ObjectArrayList<Item>> advToItems = new Object2ObjectOpenHashMap<>();
+	private static Object2ObjectOpenHashMap<Item, Identifier> itemToAdv = new Object2ObjectOpenHashMap<>();
+	private static Object2ObjectOpenHashMap<Item, Item> itemCloaks = new Object2ObjectOpenHashMap<>();
 	
-	private static final Object2ObjectOpenHashMap<Block, MutableText> cloakedBlockNameTranslations = new Object2ObjectOpenHashMap<>();
-	private static final Object2ObjectOpenHashMap<Item, MutableText> cloakedItemNameTranslations = new Object2ObjectOpenHashMap<>();
+	private static Object2ObjectOpenHashMap<Block, MutableText> cloakedBlockNameTranslations = new Object2ObjectOpenHashMap<>();
+	private static Object2ObjectOpenHashMap<Item, MutableText> cloakedItemNameTranslations = new Object2ObjectOpenHashMap<>();
 	
 	public static MutableText getTranslationString(Item item) {
 		if (cloakedItemNameTranslations.containsKey(item)) {
@@ -79,19 +78,59 @@ public class RevelationRegistry {
 		cloakedBlockNameTranslations.clear();
 		cloakedItemNameTranslations.clear();
 	}
+
+	public static void trim() {
+		advToBlockStates.trim();
+		advToItems.trim();
+		blockStateCloaks.trim();
+		itemCloaks.trim();
+		cloakedBlockNameTranslations.trim();
+		cloakedItemNameTranslations.trim();
+	}
+
+	public static void deepTrim() {
+		trim();
+		for (ObjectArrayList<BlockState> blockList : advToBlockStates.values()) blockList.trim();
+		for (ObjectArrayList<Item> itemList : advToItems.values()) itemList.trim();
+	}
 	
 	private static final Set<RevelationAware> revelationAwares = new HashSet<>();
 	
 	public static void registerRevelationAware(RevelationAware revelationAware) {
 		revelationAwares.add(revelationAware);
 	}
-	
+
+	private static void prepareForRevelationAwaresRegistration(int amount) {
+		// Items
+		advToItems.ensureCapacity(advToItems.size() + amount);
+		itemToAdv.ensureCapacity(itemToAdv.size() + amount);
+		itemCloaks.ensureCapacity(itemCloaks.size() + amount);
+		// Translations
+		cloakedBlockNameTranslations.ensureCapacity(cloakedBlockNameTranslations.size() + amount);
+		cloakedItemNameTranslations.ensureCapacity(cloakedItemNameTranslations.size() + amount);
+	}
+
 	public static void addRevelationAwares() {
+		prepareForRevelationAwaresRegistration(revelationAwares.size());
 		for (RevelationAware revelationAware : revelationAwares) {
 			Identifier advancementIdentifier = revelationAware.getCloakAdvancementIdentifier();
-			for (Map.Entry<BlockState, BlockState> states : revelationAware.getBlockStateCloaks().entrySet()) {
-				registerBlockState(advancementIdentifier, states.getKey(), states.getValue());
+
+			Map<BlockState, BlockState> blockStateCloaks = revelationAware.getBlockStateCloaks();
+			ObjectArrayList<BlockState> sourceBlockStates = new ObjectArrayList<>(blockStateCloaks.size());
+			ObjectArrayList<BlockState> targetBlockStates = new ObjectArrayList<>(blockStateCloaks.size());
+			for (Map.Entry<BlockState, BlockState> states : blockStateCloaks.entrySet()) {
+				BlockState sourceBlockState = states.getKey();
+				if (!sourceBlockState.isAir()) {
+					sourceBlockStates.add(sourceBlockState);
+					targetBlockStates.add(states.getValue());
+				} else {
+					Revelationary.logError("Trying to register invalid block cloak. Advancement: " + advancementIdentifier
+							+ " Source Block: " + Registries.BLOCK.getId(sourceBlockState.getBlock())
+							+ " Target Block: " + Registries.BLOCK.getId(states.getValue().getBlock()));
+				}
 			}
+			registerBlockStatesForIdentifier(advancementIdentifier, sourceBlockStates, targetBlockStates);
+
 			Pair<Item, Item> item = revelationAware.getItemCloak();
 			if (item != null) {
 				registerItem(advancementIdentifier, item.getLeft(), item.getRight());
@@ -112,16 +151,26 @@ public class RevelationRegistry {
 		Identifier advancementIdentifier = Identifier.tryParse(JsonHelper.getString(jsonObject, "advancement"));
 		
 		if (jsonObject.has("block_states")) {
+			JsonObject blockStates = jsonObject.get("block_states").getAsJsonObject();
+			ObjectArrayList<BlockState> sourceBlockStates = new ObjectArrayList<>(blockStates.size());
+			ObjectArrayList<BlockState> targetBlockStates = new ObjectArrayList<>(blockStates.size());
 			for (Map.Entry<String, JsonElement> stateEntry : jsonObject.get("block_states").getAsJsonObject().entrySet()) {
 				try {
 					BlockState sourceBlockState = BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), stateEntry.getKey(), true).blockState();
 					BlockState targetBlockState = BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), stateEntry.getValue().getAsString(), true).blockState();
-					
-					registerBlockState(advancementIdentifier, sourceBlockState, targetBlockState);
+					if (!sourceBlockState.isAir()) {
+						sourceBlockStates.add(sourceBlockState);
+						targetBlockStates.add(targetBlockState);
+					} else {
+						Revelationary.logError("Trying to register invalid block cloak. Advancement: " + advancementIdentifier
+								+ " Source Block: " + Registries.BLOCK.getId(sourceBlockState.getBlock())
+								+ " Target Block: " + Registries.BLOCK.getId(targetBlockState.getBlock()));
+					}
 				} catch (Exception e) {
 					Revelationary.logError("Error parsing block state: " + e);
 				}
 			}
+			registerBlockStatesForIdentifier(advancementIdentifier, sourceBlockStates, targetBlockStates);
 		}
 		if (jsonObject.has("items")) {
 			for (Map.Entry<String, JsonElement> itemEntry : jsonObject.get("items").getAsJsonObject().entrySet()) {
@@ -168,12 +217,12 @@ public class RevelationRegistry {
 			return;
 		}
 		
-		List<BlockState> list;
+		ObjectArrayList<BlockState> list;
 		if (advToBlockStates.containsKey(advancementIdentifier)) {
 			list = advToBlockStates.get(advancementIdentifier);
 			list.add(sourceBlockState);
 		} else {
-			list = new ArrayList<>();
+			list = new ObjectArrayList<>();
 			list.add(sourceBlockState);
 			advToBlockStates.put(advancementIdentifier, list);
 		}
@@ -189,6 +238,38 @@ public class RevelationRegistry {
 		blockStateCloaks.put(sourceBlockState, targetBlockState);
 		blockCloaks.putIfAbsent(sourceBlockState.getBlock(), targetBlockState.getBlock());
 		blockStateToAdv.put(sourceBlockState, advancementIdentifier);
+	}
+
+	private static void registerBlockStatesForIdentifier(Identifier advancementIdentifier, ObjectArrayList<BlockState> sourceBlockStates, ObjectArrayList<BlockState> targetBlockStates) {
+		if (sourceBlockStates.size() != targetBlockStates.size()) throw new IllegalArgumentException("Unequal sizes of sourceBlockStates and targetBlockStates arrays");
+		int sz = sourceBlockStates.size();
+		if(advToBlockStates.containsKey(advancementIdentifier)) {
+			ObjectArrayList<BlockState> blockStates = advToBlockStates.get(advancementIdentifier);
+			blockStates.ensureCapacity(blockStates.size() + sz); // preallocate
+			blockStates.addAll(sourceBlockStates);
+		} else advToBlockStates.put(advancementIdentifier, sourceBlockStates);
+
+		blockStateCloaks.ensureCapacity(blockStateCloaks.size() + sz);
+		blockStateToAdv.ensureCapacity(blockStateToAdv.size() + sz);
+		// assume amount of blocks is roughly equal to amount of blockstates (in real case scenario)
+		blockCloaks.ensureCapacity(blockCloaks.size() + sz);
+		// assume amount of items is roughly equal to amount of blockstates (in real case scenario)
+		ObjectArrayList<Item> sourceItems = new ObjectArrayList<>(sz);
+		ObjectArrayList<Item> targetItems = new ObjectArrayList<>(sz);
+		for (int i = 0; i < sz; i++) {
+			BlockState sourceBlockState = sourceBlockStates.get(i);
+			BlockState targetBlockState = targetBlockStates.get(i);
+			blockStateCloaks.put(sourceBlockState, targetBlockState);
+			blockStateToAdv.put(sourceBlockState, advancementIdentifier);
+			blockCloaks.put(sourceBlockState.getBlock(), targetBlockState.getBlock());
+			Item sourceBlockItem = sourceBlockState.getBlock().asItem();
+			Item targetBlockItem = targetBlockState.getBlock().asItem();
+			if (sourceBlockItem != Items.AIR && targetBlockItem != Items.AIR) {
+				sourceItems.add(sourceBlockItem);
+				targetItems.add(targetBlockItem);
+			}
+		}
+		registerItemsForIdentifier(advancementIdentifier, sourceItems, targetItems);
 	}
 	
 	private static void registerBlockTranslation(Block sourceBlock, MutableText targetTranslation) {
@@ -216,11 +297,13 @@ public class RevelationRegistry {
 	}
 	
 	public static Map<Identifier, List<BlockState>> getBlockStateEntries() {
-		return advToBlockStates;
+		// fighting invariance of java generic types
+        //noinspection unchecked
+        return (Map<Identifier, List<BlockState>>) (Map<?, ?>) advToBlockStates;
 	}
 	
 	public static List<BlockState> getBlockStateEntries(Identifier advancement) {
-		return advToBlockStates.getOrDefault(advancement, Collections.EMPTY_LIST);
+		return advToBlockStates.getOrDefault(advancement, ObjectArrayList.of());
 	}
 	
 	public static List<Block> getBlockEntries() {
@@ -262,18 +345,36 @@ public class RevelationRegistry {
 		}
 		
 		if (advToItems.containsKey(advancementIdentifier)) {
-			List<Item> list = advToItems.get(advancementIdentifier);
+			ObjectArrayList<Item> list = advToItems.get(advancementIdentifier);
 			if (list.contains(sourceItem)) {
 				return;
 			}
 			list.add(sourceItem);
 		} else {
-			List<Item> list = new ArrayList<>();
+			ObjectArrayList<Item> list = new ObjectArrayList<>();
 			list.add(sourceItem);
 			advToItems.put(advancementIdentifier, list);
 		}
 		itemCloaks.put(sourceItem, targetItem);
 		itemToAdv.put(sourceItem, advancementIdentifier);
+	}
+
+	private static void registerItemsForIdentifier(Identifier advancementIdentifier, ObjectArrayList<Item> sourceItems, ObjectArrayList<Item> targetItems) {
+		if (sourceItems.size() != targetItems.size()) throw new IllegalArgumentException("Unequal sizes of sourceItems and targetItems arrays");
+		int sz = sourceItems.size();
+		if (advToItems.containsKey(advancementIdentifier)) {
+			ObjectArrayList<Item> items = advToItems.get(advancementIdentifier);
+			items.ensureCapacity(items.size() + sz);
+			items.addAll(sourceItems);
+		} else advToItems.put(advancementIdentifier, sourceItems);
+
+		itemCloaks.ensureCapacity(itemCloaks.size() + sz);
+		itemToAdv.ensureCapacity(itemToAdv.size() + sz);
+		for (int i = 0; i < sz; i++) {
+			Item sourceItem = sourceItems.get(i);
+			itemCloaks.put(sourceItem, targetItems.get(i));
+			itemToAdv.put(sourceItem, advancementIdentifier);
+		}
 	}
 	
 	private static void registerItemTranslation(Item sourceItem, MutableText targetTranslation) {
@@ -299,138 +400,44 @@ public class RevelationRegistry {
 	}
 	
 	public static @NotNull Collection<Item> getRevealedItems(Identifier advancement) {
-		List<Item> items = new ArrayList<>();
-		if (advToItems.containsKey(advancement)) {
-			for (Object entry : advToItems.get(advancement)) {
-				if (entry instanceof Item item) {
-					items.add(item);
-				}
-			}
-		}
-		return items;
+		if (advToItems.containsKey(advancement)) return advToItems.get(advancement).clone();
+		return ObjectArrayList.of();
 	}
 	
 	public static Map<Identifier, List<Item>> getItemEntries() {
-		return advToItems;
+		// fighting invariance of java generic types
+		//noinspection unchecked
+		return (Map<Identifier, List<Item>>) (Map<?,?>) advToItems;
 	}
 	
 	public static List<Item> getItemEntries(Identifier advancement) {
-		return advToItems.getOrDefault(advancement, Collections.EMPTY_LIST);
+		return advToItems.getOrDefault(advancement, ObjectArrayList.of());
 	}
 
-	private static void writeText(PacketByteBuf buf, Text text) {
-		TextCodecs.PACKET_CODEC.encode(buf, text);
-	}
+	public static void fromPacket(RevelationaryPackets.RevelationSync syncPacket) {
+		advToBlockStates = syncPacket.advToBlockStates();
+		blockStateToAdv = syncPacket.blockStateToAdv();
+		blockStateCloaks = syncPacket.blockStateCloaks();
+		blockCloaks = syncPacket.blockCloaks();
+		advToItems = syncPacket.advToItems();
+		itemToAdv = syncPacket.itemToAdv();
+		itemCloaks = syncPacket.itemCloaks();
+		cloakedBlockNameTranslations = syncPacket.cloakedBlockNameTranslations();
+		cloakedItemNameTranslations = syncPacket.cloakedItemNameTranslations();
 
-	private static Text readText(PacketByteBuf buf) {
-		return TextCodecs.PACKET_CODEC.decode(buf);
-	}
-	
-	public static void write(PacketByteBuf buf) {
-		// Block States
-		buf.writeInt(advToBlockStates.size());
-		for (Map.Entry<Identifier, List<BlockState>> advancementBlocks : advToBlockStates.entrySet()) {
-			buf.writeIdentifier(advancementBlocks.getKey());
-			buf.writeInt(advancementBlocks.getValue().size());
-			for (BlockState blockState : advancementBlocks.getValue()) {
-				buf.writeString(BlockArgumentParser.stringifyBlockState(blockState));
-				buf.writeString(BlockArgumentParser.stringifyBlockState(blockStateCloaks.get(blockState)));
-			}
-		}
-		
-		// Items
-		buf.writeInt(advToItems.size());
-		for (Map.Entry<Identifier, List<Item>> advancementItems : advToItems.entrySet()) {
-			buf.writeIdentifier(advancementItems.getKey());
-			buf.writeInt(advancementItems.getValue().size());
-			for (Item item : advancementItems.getValue()) {
-				buf.writeString(Registries.ITEM.getId(item).toString());
-				buf.writeString(Registries.ITEM.getId(itemCloaks.get(item)).toString());
-			}
-		}
-		
-		// Block Translations
-		buf.writeInt(cloakedBlockNameTranslations.size());
-		for (Map.Entry<Block, MutableText> blockTranslation : cloakedBlockNameTranslations.entrySet()) {
-			buf.writeIdentifier(Registries.BLOCK.getId(blockTranslation.getKey()));
-			writeText(buf, blockTranslation.getValue());
-		}
-		
-		// Item Translations
-		buf.writeInt(cloakedItemNameTranslations.size());
-		for (Map.Entry<Item, MutableText> itemTranslation : cloakedItemNameTranslations.entrySet()) {
-			buf.writeIdentifier(Registries.ITEM.getId(itemTranslation.getKey()));
-			writeText(buf, itemTranslation.getValue());
-		}
-		
-	}
-	
-	public static void fromPacket(PacketByteBuf buf) throws CommandSyntaxException {
-		RevelationRegistry.clear();
 		RevelationRegistry.addRevelationAwares();
-		
-		// Block States
-		int blockEntries = buf.readInt();
-		for (int i = 0; i < blockEntries; i++) {
-			Identifier advancementIdentifier = buf.readIdentifier();
-			int blockStateCount = buf.readInt();
-			for (int j = 0; j < blockStateCount; j++) {
-				BlockState sourceState = BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), buf.readString(), true).blockState();
-				BlockState targetState = BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), buf.readString(), true).blockState();
-				
-				if (advToBlockStates.containsKey(advancementIdentifier)) {
-					List<BlockState> advancementStates = advToBlockStates.get(advancementIdentifier);
-					advancementStates.add(sourceState);
-				} else {
-					List<BlockState> advancementStates = new ArrayList<>();
-					advancementStates.add(sourceState);
-					advToBlockStates.put(advancementIdentifier, advancementStates);
-				}
-				blockStateToAdv.put(sourceState, advancementIdentifier);
-				blockStateCloaks.put(sourceState, targetState);
-				blockCloaks.putIfAbsent(sourceState.getBlock(), targetState.getBlock());
-			}
-		}
-		
-		// Items
-		int itemEntries = buf.readInt();
-		for (int i = 0; i < itemEntries; i++) {
-			Identifier advancementIdentifier = buf.readIdentifier();
-			int itemCount = buf.readInt();
-			for (int j = 0; j < itemCount; j++) {
-				Identifier sourceId = Identifier.tryParse(buf.readString());
-				Identifier targetId = Identifier.tryParse(buf.readString());
-				Item sourceItem = Registries.ITEM.get(sourceId);
-				Item targetItem = Registries.ITEM.get(targetId);
-				
-				if (advToItems.containsKey(advancementIdentifier)) {
-					List<Item> advancementItems = advToItems.get(advancementIdentifier);
-					advancementItems.add(sourceItem);
-				} else {
-					List<Item> advancementItems = new ArrayList<>();
-					advancementItems.add(sourceItem);
-					advToItems.put(advancementIdentifier, advancementItems);
-				}
-				itemToAdv.put(sourceItem, advancementIdentifier);
-				itemCloaks.put(sourceItem, targetItem);
-			}
-		}
-		
-		// Block Translations
-		int blockTranslations = buf.readInt();
-		for (int i = 0; i < blockTranslations; i++) {
-			Block block = Registries.BLOCK.get(buf.readIdentifier());
-			MutableText text = (MutableText) readText(buf);
-			cloakedBlockNameTranslations.put(block, text);
-		}
-		
-		// Item Translations
-		int itemTranslations = buf.readInt();
-		for (int i = 0; i < itemTranslations; i++) {
-			Item item = Registries.ITEM.get(buf.readIdentifier());
-			MutableText text = (MutableText) readText(buf);
-			cloakedItemNameTranslations.put(item, text);
-		}
+		RevelationRegistry.deepTrim();
 	}
-	
+
+	public static RevelationaryPackets.RevelationSync intoPacket() {
+		return new RevelationaryPackets.RevelationSync(advToBlockStates,
+													   blockStateToAdv,
+													   blockStateCloaks,
+													   blockCloaks,
+													   advToItems,
+													   itemToAdv,
+													   itemCloaks,
+													   cloakedBlockNameTranslations,
+													   cloakedItemNameTranslations);
+	}
 }

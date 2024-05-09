@@ -38,8 +38,10 @@ public class Revelationary implements ModInitializer {
         CommandRegistrationCallback.EVENT.register(Commands::register);
         ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(RevelationDataLoader.INSTANCE);
 
-        ServerLifecycleEvents.SERVER_STARTED.register(server -> RevelationRegistry.addRevelationAwares());
-
+        ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+            RevelationRegistry.addRevelationAwares();
+            RevelationRegistry.deepTrim();
+        });
         if (FabricLoader.getInstance().isModLoaded("sodium")) {
             logWarning("Sodium detected. Chunk rebuilding will be done in cursed mode.");
         }
