@@ -17,12 +17,11 @@ import java.util.List;
 
 @Mixin(PlayerAdvancementTracker.class)
 public abstract class PlayerAdvancementTrackerMixin {
-	
 	@Shadow
 	private ServerPlayerEntity owner;
 	
 	@Inject(at = @At("RETURN"), method = "grantCriterion(Lnet/minecraft/advancement/AdvancementEntry;Ljava/lang/String;)Z")
-	public void triggerAdvancementCriteria(AdvancementEntry advancement, String criterionName, CallbackInfoReturnable<Boolean> cir) {
+	public void revelationary$triggerAdvancementCriteria(AdvancementEntry advancement, String criterionName, CallbackInfoReturnable<Boolean> cir) {
 		AdvancementProgress advancementProgress = ((PlayerAdvancementTracker) (Object) this).getProgress(advancement);
 		if (advancementProgress.isDone()) {
 			AdvancementCriteria.ADVANCEMENT_GOTTEN.trigger(owner, advancement);
@@ -34,5 +33,4 @@ public abstract class PlayerAdvancementTrackerMixin {
 			}
 		}
 	}
-	
 }

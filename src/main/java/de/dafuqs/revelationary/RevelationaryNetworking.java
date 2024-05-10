@@ -1,9 +1,14 @@
-package de.dafuqs.revelationary.networking;
+package de.dafuqs.revelationary;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import de.dafuqs.revelationary.Revelationary;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.argument.BlockArgumentParser;
@@ -12,6 +17,7 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
@@ -19,9 +25,29 @@ import net.minecraft.util.Identifier;
 
 import java.util.Map;
 
-public class RevelationaryPackets {
-	
-	public static final Identifier REVELATION_SYNC = new Identifier(Revelationary.MOD_ID, "revelation_sync");
+public class RevelationaryNetworking {
+	public static void register() {
+		PayloadTypeRegistry.playS2C().register(RevelationSync.ID, RevelationSync.CODEC);
+		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) registerPacketReceivers();
+	}
+
+	@Environment(EnvType.CLIENT)
+	public static void registerPacketReceivers() {
+		ClientPlayNetworking.registerGlobalReceiver(RevelationaryNetworking.RevelationSync.ID, (payload, context) -> {
+			try {
+				RevelationRegistry.fromPacket(payload);
+			} catch (Exception e) {
+				Revelationary.logError("Error fetching results from sync packet");
+				Revelationary.logException(e);
+			}
+			ClientRevelationHolder.cloakAll();
+		});
+	}
+
+	@Environment(EnvType.SERVER)
+	public static void sendRevelations(ServerPlayerEntity player) {
+		ServerPlayNetworking.send(player, RevelationRegistry.intoPacket());
+	}
 
 	public record RevelationSync(Object2ObjectOpenHashMap<Identifier, ObjectArrayList<BlockState>> advToBlockStates,
                                  Object2ObjectOpenHashMap<BlockState, Identifier> blockStateToAdv,
@@ -33,7 +59,7 @@ public class RevelationaryPackets {
                                  Object2ObjectOpenHashMap<Block, MutableText> cloakedBlockNameTranslations,
                                  Object2ObjectOpenHashMap<Item, MutableText> cloakedItemNameTranslations) implements CustomPayload {
 		public static final PacketCodec<RegistryByteBuf, RevelationSync> CODEC = CustomPayload.codecOf(RevelationSync::write, RevelationSync::read);
-		public static final CustomPayload.Id<RevelationSync> ID = new Id<>(REVELATION_SYNC);
+		public static final CustomPayload.Id<RevelationSync> ID = new Id<>(new Identifier(Revelationary.MOD_ID, "revelation_sync"));
 
 		private static void writeText(RegistryByteBuf buf, Text text) {
 			TextCodecs.REGISTRY_PACKET_CODEC.encode(buf, text);
@@ -66,7 +92,7 @@ public class RevelationaryPackets {
 						blockCloaks.putIfAbsent(sourceState.getBlock(), targetState.getBlock());
 					} catch (CommandSyntaxException e) {
 						Revelationary.logError(e.getMessage());
-					};
+					}
 				}
 				advToBlockStates.put(advancementIdentifier, advancementStates);
 			}

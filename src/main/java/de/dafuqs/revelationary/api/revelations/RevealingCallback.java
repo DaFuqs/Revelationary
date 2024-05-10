@@ -11,7 +11,6 @@ import java.util.Set;
  * Interface to react to the event of blocks/items getting revealed after getting advancements
  */
 public interface RevealingCallback {
-	
 	/**
 	 * Gets called every time blocks or items get revealed.
 	 * The block and item lists are complete and do contain all entries from all mods
@@ -45,5 +44,4 @@ public interface RevealingCallback {
 	static void unregister(RevealingCallback callback) {
 		ClientRevelationHolder.callbacks.remove(callback);
 	}
-	
 }

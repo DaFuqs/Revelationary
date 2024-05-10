@@ -4,7 +4,6 @@ import de.dafuqs.revelationary.advancement_criteria.*;
 import net.minecraft.advancement.criterion.Criteria;
 
 public class AdvancementCriteria {
-	
 	/**
 	 * Triggered every time a player gets a new advancement
 	 */
@@ -24,5 +23,4 @@ public class AdvancementCriteria {
 		HAD_REVELATION = Criteria.register("revelationary:had_revelation", new HadRevelationCriterion());
 		ADVANCEMENT_GOTTEN = Criteria.register("revelationary:advancement_gotten", new AdvancementGottenCriterion());
 	}
-	
 }

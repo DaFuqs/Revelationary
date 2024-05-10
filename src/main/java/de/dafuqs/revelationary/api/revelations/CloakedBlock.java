@@ -9,7 +9,6 @@ import java.util.Hashtable;
 import java.util.Map;
 
 public abstract class CloakedBlock extends Block implements RevelationAware {
-	
 	final Block cloakedBlock;
 	
 	public CloakedBlock(Settings settings, Block cloakedBlock) {
@@ -29,5 +28,4 @@ public abstract class CloakedBlock extends Block implements RevelationAware {
 	public Pair<Item, Item> getItemCloak() {
 		return null;
 	}
-	
 }

@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import de.dafuqs.revelationary.api.advancements.AdvancementHelper;
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
 import de.dafuqs.revelationary.config.RevelationaryConfig;
-import de.dafuqs.revelationary.networking.RevelationaryPackets;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.block.*;
@@ -25,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class RevelationRegistry {
-	
 	private static Object2ObjectOpenHashMap<Identifier, ObjectArrayList<BlockState>> advToBlockStates = new Object2ObjectOpenHashMap<>();
 	private static Object2ObjectOpenHashMap<BlockState, Identifier> blockStateToAdv = new Object2ObjectOpenHashMap<>();
 	private static Object2ObjectOpenHashMap<BlockState, BlockState> blockStateCloaks = new Object2ObjectOpenHashMap<>();
@@ -68,15 +66,6 @@ public class RevelationRegistry {
 		}
 		// Get the localized name of the block and scatter it using §k to make it unreadable
 		return Text.literal("§k" + Language.getInstance().get(block.getTranslationKey()));
-	}
-	
-	public static void clear() {
-		advToBlockStates.clear();
-		advToItems.clear();
-		blockStateCloaks.clear();
-		itemCloaks.clear();
-		cloakedBlockNameTranslations.clear();
-		cloakedItemNameTranslations.clear();
 	}
 
 	public static void trim() {
@@ -209,37 +198,6 @@ public class RevelationRegistry {
 	}
 	
 	// BLOCKS
-	private static void registerBlockState(Identifier advancementIdentifier, BlockState sourceBlockState, BlockState targetBlockState) {
-		if(sourceBlockState.isAir()) {
-			Revelationary.logError("Trying to register invalid block cloak. Advancement: " + advancementIdentifier
-					+ " Source Block: " + Registries.BLOCK.getId(sourceBlockState.getBlock())
-					+ " Target Block: " + Registries.BLOCK.getId(targetBlockState.getBlock()));
-			return;
-		}
-		
-		ObjectArrayList<BlockState> list;
-		if (advToBlockStates.containsKey(advancementIdentifier)) {
-			list = advToBlockStates.get(advancementIdentifier);
-			list.add(sourceBlockState);
-		} else {
-			list = new ObjectArrayList<>();
-			list.add(sourceBlockState);
-			advToBlockStates.put(advancementIdentifier, list);
-		}
-		
-		Item sourceBlockItem = sourceBlockState.getBlock().asItem();
-		if (sourceBlockItem != Items.AIR) {
-			Item targetBlockItem = targetBlockState.getBlock().asItem();
-			if (targetBlockItem != Items.AIR) {
-				registerItem(advancementIdentifier, sourceBlockItem, targetBlockItem);
-			}
-		}
-		
-		blockStateCloaks.put(sourceBlockState, targetBlockState);
-		blockCloaks.putIfAbsent(sourceBlockState.getBlock(), targetBlockState.getBlock());
-		blockStateToAdv.put(sourceBlockState, advancementIdentifier);
-	}
-
 	private static void registerBlockStatesForIdentifier(Identifier advancementIdentifier, ObjectArrayList<BlockState> sourceBlockStates, ObjectArrayList<BlockState> targetBlockStates) {
 		if (sourceBlockStates.size() != targetBlockStates.size()) throw new IllegalArgumentException("Unequal sizes of sourceBlockStates and targetBlockStates arrays");
 		int sz = sourceBlockStates.size();
@@ -414,7 +372,7 @@ public class RevelationRegistry {
 		return advToItems.getOrDefault(advancement, ObjectArrayList.of());
 	}
 
-	public static void fromPacket(RevelationaryPackets.RevelationSync syncPacket) {
+	public static void fromPacket(RevelationaryNetworking.RevelationSync syncPacket) {
 		advToBlockStates = syncPacket.advToBlockStates();
 		blockStateToAdv = syncPacket.blockStateToAdv();
 		blockStateCloaks = syncPacket.blockStateCloaks();
@@ -429,8 +387,8 @@ public class RevelationRegistry {
 		RevelationRegistry.deepTrim();
 	}
 
-	public static RevelationaryPackets.RevelationSync intoPacket() {
-		return new RevelationaryPackets.RevelationSync(advToBlockStates,
+	public static RevelationaryNetworking.RevelationSync intoPacket() {
+		return new RevelationaryNetworking.RevelationSync(advToBlockStates,
 													   blockStateToAdv,
 													   blockStateCloaks,
 													   blockCloaks,

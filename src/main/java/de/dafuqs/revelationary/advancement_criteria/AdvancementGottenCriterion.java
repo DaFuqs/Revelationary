@@ -11,7 +11,6 @@ import net.minecraft.util.Identifier;
 import java.util.Optional;
 
 public class AdvancementGottenCriterion extends AbstractCriterion<AdvancementGottenCriterion.Conditions> {
-	
 	public void trigger(ServerPlayerEntity player, AdvancementEntry advancement) {
 		this.trigger(player, (conditions) -> conditions.matches(advancement));
 	}
@@ -35,5 +34,4 @@ public class AdvancementGottenCriterion extends AbstractCriterion<AdvancementGot
 			return advancementIdentifier;
 		}
 	}
-	
 }

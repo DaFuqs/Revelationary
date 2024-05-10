@@ -9,7 +9,6 @@ import java.util.Hashtable;
 import java.util.Map;
 
 public class CloakedItem extends Item implements RevelationAware {
-	
 	Identifier cloakAdvancementIdentifier;
 	Item cloakItem;
 	
@@ -35,5 +34,4 @@ public class CloakedItem extends Item implements RevelationAware {
 	public Pair<Item, Item> getItemCloak() {
 		return new Pair<>(this, cloakItem);
 	}
-	
 }

@@ -11,7 +11,6 @@ import net.minecraft.util.profiler.Profiler;
 import java.util.Map;
 
 public class RevelationDataLoader extends JsonDataLoader implements IdentifiableResourceReloadListener {
-	
 	public static final RevelationDataLoader INSTANCE = new RevelationDataLoader();
 	
 	private RevelationDataLoader() {
@@ -28,5 +27,4 @@ public class RevelationDataLoader extends JsonDataLoader implements Identifiable
 	public Identifier getFabricId() {
 		return new Identifier(Revelationary.MOD_ID, "revelations");
 	}
-	
 }

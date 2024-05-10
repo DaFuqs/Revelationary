@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.Unique;
 @Environment(EnvType.CLIENT)
 @Mixin(value = WorldRenderer.class, priority = 900)
 public abstract class WorldRendererMixin implements WorldRendererAccessor {
-	
 	@Shadow
 	private BuiltChunkStorage chunks;
 	
@@ -30,7 +29,7 @@ public abstract class WorldRendererMixin implements WorldRendererAccessor {
 	 * When triggered on client side lets the client redraw ALL chunks
 	 * Warning: Costly + LagSpike!
 	 */
-	public void rebuildAllChunks() {
+	public void revelationary$rebuildAllChunks() {
 		if (FabricLoader.getInstance().isModLoaded("sodium")) {
 			rebuildAllChunksSodium();
 			return;
@@ -77,5 +76,4 @@ public abstract class WorldRendererMixin implements WorldRendererAccessor {
 			}
 		}
 	}
-	
 }

@@ -10,7 +10,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 public class AdvancementHelper {
-	
 	/**
 	 * Checks if any player has the advancement. Can be used both server- and clientside
 	 * Special cases:
@@ -57,5 +56,4 @@ public class AdvancementHelper {
 	public static boolean hasAdvancementClient(Identifier advancementIdentifier) {
 		return ClientAdvancements.hasDone(advancementIdentifier);
 	}
-	
 }

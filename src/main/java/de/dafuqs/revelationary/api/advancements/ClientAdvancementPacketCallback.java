@@ -15,7 +15,6 @@ import java.util.Set;
 
 @Environment(EnvType.CLIENT)
 public interface ClientAdvancementPacketCallback {
-	
 	/**
 	 * Gets called every time advancements get synched from server- to client side
 	 *
@@ -32,5 +31,4 @@ public interface ClientAdvancementPacketCallback {
 	static void registerCallback(ClientAdvancementPacketCallback callback) {
 		ClientAdvancements.callbacks.add(callback);
 	}
-	
 }

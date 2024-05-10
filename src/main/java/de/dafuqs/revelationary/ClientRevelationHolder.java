@@ -116,7 +116,7 @@ public class ClientRevelationHolder {
 	// rerender chunks to show newly swapped blocks
 	static void rebuildAllChunks() {
 		WorldRenderer renderer = MinecraftClient.getInstance().worldRenderer;
-		((WorldRendererAccessor) renderer).rebuildAllChunks();
+		((WorldRendererAccessor) renderer).revelationary$rebuildAllChunks();
 	}
 	
 	// BLOCKS
