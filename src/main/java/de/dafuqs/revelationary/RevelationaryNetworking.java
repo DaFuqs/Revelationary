@@ -28,7 +28,6 @@ import java.util.Map;
 public class RevelationaryNetworking {
 	public static void register() {
 		PayloadTypeRegistry.playS2C().register(RevelationSync.ID, RevelationSync.CODEC);
-		if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) registerPacketReceivers();
 	}
 
 	@Environment(EnvType.CLIENT)
@@ -44,7 +43,6 @@ public class RevelationaryNetworking {
 		});
 	}
 
-	@Environment(EnvType.SERVER)
 	public static void sendRevelations(ServerPlayerEntity player) {
 		ServerPlayNetworking.send(player, RevelationRegistry.intoPacket());
 	}

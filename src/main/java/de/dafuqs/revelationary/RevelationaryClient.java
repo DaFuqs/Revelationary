@@ -6,6 +6,7 @@ public class RevelationaryClient implements ClientModInitializer {
 	
 	@Override
 	public void onInitializeClient() {
+		RevelationaryNetworking.registerPacketReceivers();
 	}
 	
 }
