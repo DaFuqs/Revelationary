@@ -6,7 +6,5 @@ package de.dafuqs.revelationary.api.revelations;
  * to apply your changes to all visible chunks
  */
 public interface WorldRendererAccessor {
-	
-	void rebuildAllChunks();
-	
+	void revelationary$rebuildAllChunks();
 }

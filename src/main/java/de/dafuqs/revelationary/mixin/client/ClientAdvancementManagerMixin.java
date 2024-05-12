@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientAdvancementManager.class)
 public abstract class ClientAdvancementManagerMixin {
-	
 	/**
 	 * Intercepts advancement packets sent from server to client
 	 * When new advancements are added ClientAdvancements is triggered
@@ -20,8 +19,7 @@ public abstract class ClientAdvancementManagerMixin {
 	 * @param info   Mixin callback info
 	 */
 	@Inject(at = @At("RETURN"), method = "onAdvancements")
-	public void onAdvancementSync(AdvancementUpdateS2CPacket packet, CallbackInfo info) {
+	public void revelationary$onAdvancementSync(AdvancementUpdateS2CPacket packet, CallbackInfo info) {
 		ClientAdvancements.onClientPacket(packet);
 	}
-	
 }

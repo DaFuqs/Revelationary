@@ -27,7 +27,6 @@ import java.util.Map;
  * Disguised blocks will drop item stacks as if they were the block they are disguised as
  */
 public interface RevelationAware {
-	
 	/**
 	 * The advancement identifier that the player must have to see this block/item
 	 */
@@ -127,5 +126,4 @@ public interface RevelationAware {
 		}
 		return null;
 	}
-	
 }

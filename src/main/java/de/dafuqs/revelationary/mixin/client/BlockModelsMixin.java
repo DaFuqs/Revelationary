@@ -16,7 +16,6 @@ import java.util.Map;
 
 @Mixin(BlockModels.class)
 public class BlockModelsMixin {
-	
 	@Shadow
 	private Map<BlockState, BakedModel> models;
 	
@@ -25,12 +24,11 @@ public class BlockModelsMixin {
 	private BakedModelManager modelManager;
 	
 	@Inject(at = @At("HEAD"), method = "getModel", cancellable = true)
-	private void getModel(BlockState blockState, CallbackInfoReturnable<BakedModel> callbackInfoReturnable) {
+	private void revelationary$getModel(BlockState blockState, CallbackInfoReturnable<BakedModel> callbackInfoReturnable) {
 		if (ClientRevelationHolder.isCloaked(blockState)) {
 			BlockState destinationBlockState = ClientRevelationHolder.getCloakTarget(blockState);
 			BakedModel overriddenModel = this.models.getOrDefault(destinationBlockState, modelManager.getMissingModel());
 			callbackInfoReturnable.setReturnValue(overriddenModel);
 		}
 	}
-	
 }

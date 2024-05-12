@@ -17,7 +17,6 @@ import java.util.*;
 
 @Environment(EnvType.CLIENT)
 public class ClientAdvancements {
-	
 	protected static boolean receivedFirstAdvancementPacket = false;
 	public static List<ClientAdvancementPacketCallback> callbacks = new ArrayList<>();
 	
@@ -77,5 +76,4 @@ public class ClientAdvancements {
 	public static void playerLogout() {
 		receivedFirstAdvancementPacket = false;
 	}
-	
 }

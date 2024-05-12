@@ -15,13 +15,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Environment(EnvType.CLIENT)
 @Mixin(Item.class)
 public abstract class ItemMixin {
-	
 	@Inject(at = @At("HEAD"), method = "getName(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/text/Text;", cancellable = true)
-	public void getCloakedName(ItemStack stack, CallbackInfoReturnable<Text> callbackInfoReturnable) {
+	public void revelationary$getCloakedName(ItemStack stack, CallbackInfoReturnable<Text> callbackInfoReturnable) {
 		Item thisItem = (Item) (Object) this;
 		if (ClientRevelationHolder.isCloaked(thisItem)) {
 			callbackInfoReturnable.setReturnValue(RevelationRegistry.getTranslationString(thisItem));
 		}
 	}
-	
 }

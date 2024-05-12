@@ -10,7 +10,6 @@ import net.minecraft.util.Pair;
 import java.util.Map;
 
 public class CloakedBlockItem extends BlockItem implements RevelationAware {
-	
 	Identifier cloakAdvancementIdentifier;
 	BlockItem cloakItem;
 	
@@ -36,5 +35,4 @@ public class CloakedBlockItem extends BlockItem implements RevelationAware {
 	public Pair<Item, Item> getItemCloak() {
 		return new Pair<>(this, cloakItem);
 	}
-	
 }

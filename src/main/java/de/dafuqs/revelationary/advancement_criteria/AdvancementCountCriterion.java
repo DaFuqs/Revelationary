@@ -13,7 +13,6 @@ import net.minecraft.util.*;
 import java.util.*;
 
 public class AdvancementCountCriterion extends AbstractCriterion<AdvancementCountCriterion.Conditions> {
-
 	public void trigger(ServerPlayerEntity player) {
 		this.trigger(player, (conditions) -> conditions.matches(player));
 	}
@@ -55,5 +54,4 @@ public class AdvancementCountCriterion extends AbstractCriterion<AdvancementCoun
 			return this.range == null ? allMatched : this.range.test(matchingAdvancements);
 		}
 	}
-	
 }

@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemModels.class)
 public abstract class ItemModelsMixin {
-
     @Shadow
     public abstract BakedModel getModel(ItemStack stack);
 
@@ -25,5 +24,4 @@ public abstract class ItemModelsMixin {
             callbackInfoReturnable.setReturnValue(overriddenModel);
         }
     }
-
 }

@@ -1,6 +1,6 @@
 package de.dafuqs.revelationary.mixin;
 
-import de.dafuqs.revelationary.networking.RevelationaryS2CPacketSenders;
+import de.dafuqs.revelationary.RevelationaryNetworking;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.server.PlayerManager;
 import net.minecraft.server.network.ConnectedClientData;
@@ -12,10 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerManager.class)
 public class MixinPlayerManager {
-	
 	@Inject(method = "onPlayerConnect", at = @At(value = "RETURN"))
-	private void onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci) {
-		RevelationaryS2CPacketSenders.sendRevelations(player);
+	private void revelationary$onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci) {
+		RevelationaryNetworking.sendRevelations(player);
 	}
-	
 }

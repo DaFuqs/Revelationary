@@ -7,7 +7,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import java.io.*;
 
 public class RevelationaryConfig {
-
 	private static final File CONFIG_FILE_PATH = new File(FabricLoader.getInstance().getConfigDir().toFile(), "Revelationary.json");
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 	private static Config CONFIG = null;
@@ -59,5 +58,4 @@ public class RevelationaryConfig {
 		}
 
 	}
-
 }

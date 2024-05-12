@@ -13,14 +13,13 @@ import org.spongepowered.asm.mixin.injection.*;
 
 @Mixin(AbstractBlock.class)
 public abstract class AbstractBlockMixin {
-
 	@Shadow public abstract RegistryKey<LootTable> getLootTableKey();
 
 	@Redirect(
 			method = "getDroppedStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/loot/context/LootContextParameterSet$Builder;)Ljava/util/List;",
 			at = @At(value = "INVOKE", target = "Lnet/minecraft/block/AbstractBlock;getLootTableKey()Lnet/minecraft/registry/RegistryKey;")
 	)
-	private RegistryKey<LootTable> spectrum$switchLootTableForCloakedBlock(AbstractBlock instance, BlockState state, LootContextParameterSet.Builder builder) {
+	private RegistryKey<LootTable> revelationary$switchLootTableForCloakedBlock(AbstractBlock instance, BlockState state, LootContextParameterSet.Builder builder) {
 		BlockState cloakState = RevelationRegistry.getCloak(state);
 		if (cloakState != null) {
 			PlayerEntity lootPlayerEntity = RevelationAware.getLootPlayerEntity(builder);
@@ -30,5 +29,4 @@ public abstract class AbstractBlockMixin {
 		}
 		return getLootTableKey();
 	}
-
 }

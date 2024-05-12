@@ -14,11 +14,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
 @Environment(EnvType.CLIENT)
 @Mixin(value = WorldRenderer.class, priority = 900)
 public abstract class WorldRendererMixin implements WorldRendererAccessor {
-	
 	@Shadow
 	private BuiltChunkStorage chunks;
 	
@@ -29,7 +29,7 @@ public abstract class WorldRendererMixin implements WorldRendererAccessor {
 	 * When triggered on client side lets the client redraw ALL chunks
 	 * Warning: Costly + LagSpike!
 	 */
-	public void rebuildAllChunks() {
+	public void revelationary$rebuildAllChunks() {
 		if (FabricLoader.getInstance().isModLoaded("sodium")) {
 			rebuildAllChunksSodium();
 			return;
@@ -45,6 +45,7 @@ public abstract class WorldRendererMixin implements WorldRendererAccessor {
 		}
 	}
 	
+	@Unique
 	private static void rebuildAllChunksSodium() {
 		World world = MinecraftClient.getInstance().world;
 		if (world == null) {
@@ -75,5 +76,4 @@ public abstract class WorldRendererMixin implements WorldRendererAccessor {
 			}
 		}
 	}
-	
 }

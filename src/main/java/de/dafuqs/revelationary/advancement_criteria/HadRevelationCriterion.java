@@ -13,7 +13,6 @@ import net.minecraft.util.Identifier;
 import java.util.Optional;
 
 public class HadRevelationCriterion extends AbstractCriterion<HadRevelationCriterion.Conditions> {
-	
 	public void trigger(ServerPlayerEntity player, Block block) {
 		this.trigger(player, (conditions) -> conditions.matches(block));
 	}
@@ -42,5 +41,4 @@ public class HadRevelationCriterion extends AbstractCriterion<HadRevelationCrite
 			}
 		}
 	}
-	
 }
