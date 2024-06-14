@@ -256,7 +256,6 @@ public class RevelationRegistry {
 	
 	public static Map<Identifier, List<BlockState>> getBlockStateEntries() {
 		// fighting invariance of java generic types
-        //noinspection unchecked
         return (Map<Identifier, List<BlockState>>) (Map<?, ?>) advToBlockStates;
 	}
 	
@@ -364,7 +363,6 @@ public class RevelationRegistry {
 	
 	public static Map<Identifier, List<Item>> getItemEntries() {
 		// fighting invariance of java generic types
-		//noinspection unchecked
 		return (Map<Identifier, List<Item>>) (Map<?,?>) advToItems;
 	}
 	

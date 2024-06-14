@@ -8,7 +8,6 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.command.argument.BlockArgumentParser;
@@ -57,7 +56,7 @@ public class RevelationaryNetworking {
                                  Object2ObjectOpenHashMap<Block, MutableText> cloakedBlockNameTranslations,
                                  Object2ObjectOpenHashMap<Item, MutableText> cloakedItemNameTranslations) implements CustomPayload {
 		public static final PacketCodec<RegistryByteBuf, RevelationSync> CODEC = CustomPayload.codecOf(RevelationSync::write, RevelationSync::read);
-		public static final CustomPayload.Id<RevelationSync> ID = new Id<>(new Identifier(Revelationary.MOD_ID, "revelation_sync"));
+		public static final CustomPayload.Id<RevelationSync> ID = new Id<>(Identifier.of(Revelationary.MOD_ID, "revelation_sync"));
 
 		private static void writeText(RegistryByteBuf buf, Text text) {
 			TextCodecs.REGISTRY_PACKET_CODEC.encode(buf, text);
