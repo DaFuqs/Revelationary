@@ -6,6 +6,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
+import net.minecraft.advancement.PlacedAdvancement;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientAdvancementManager;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -47,10 +48,10 @@ public class ClientAdvancements {
 			ClientPlayNetworkHandler conn = MinecraftClient.getInstance().getNetworkHandler();
 			if (conn != null) {
 				ClientAdvancementManager cm = conn.getAdvancementHandler();
-				AdvancementEntry adv = cm.getManager().get(identifier).getAdvancementEntry();
+				PlacedAdvancement adv = cm.getManager().get(identifier);
 				if (adv != null) {
 					Map<AdvancementEntry, AdvancementProgress> progressMap = ((AccessorClientAdvancementManager) cm).getAdvancementProgresses();
-					AdvancementProgress progress = progressMap.get(adv);
+					AdvancementProgress progress = progressMap.get(adv.getAdvancementEntry());
 					return progress != null && progress.isDone();
 				}
 			}

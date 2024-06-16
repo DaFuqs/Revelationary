@@ -25,6 +25,6 @@ public class RevelationDataLoader extends JsonDataLoader implements Identifiable
 	
 	@Override
 	public Identifier getFabricId() {
-		return new Identifier(Revelationary.MOD_ID, "revelations");
+		return Identifier.of(Revelationary.MOD_ID, "revelations");
 	}
 }
