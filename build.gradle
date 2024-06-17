@@ -34,6 +34,7 @@ dependencies {
 	modCompileOnly "maven.modrinth:jade:${project.jade_version}"
 	modCompileOnly "mcp.mobius.waila:wthit-api:fabric-${project.wthit_version}"
 
+	modApi "dev.architectury:architectury-fabric:${project.architectury_version}"
 	modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
 
 	// modCompileOnlyApi "mezz.jei:jei-${project.minecraft_version}-common-api:${project.jei_version}"
