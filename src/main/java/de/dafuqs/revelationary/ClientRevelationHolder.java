@@ -1,5 +1,7 @@
 package de.dafuqs.revelationary;
 
+import com.google.common.collect.Sets;
+import de.dafuqs.revelationary.api.revelations.CloakSetChanged;
 import de.dafuqs.revelationary.api.revelations.RevealingCallback;
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
 import de.dafuqs.revelationary.api.revelations.WorldRendererAccessor;
@@ -24,7 +26,20 @@ public class ClientRevelationHolder {
 	public static List<RevealingCallback> callbacks = new ArrayList<>();
 	
 	private static final Set<BlockState> activeBlockStateSwaps = new HashSet<>();
+	// used for creating diffs for CloakSetChanged event
+	private static Set<Item> previousActiveItemSwaps = new HashSet<>();
 	private static final Set<Item> activeItemSwaps = new HashSet<>();
+
+	private static void onItemSwap(boolean cloak) {
+		var diff = cloak ? Sets.difference(activeItemSwaps, previousActiveItemSwaps) : Sets.difference(previousActiveItemSwaps, activeItemSwaps);
+		var copy = Set.copyOf(activeItemSwaps);
+		var emptySet = Set.<Item>of();
+		// that is a legal expression, apparently
+		if (cloak)
+			CloakSetChanged.EVENT.invoker().onChange(diff, emptySet, copy);
+		else CloakSetChanged.EVENT.invoker().onChange(emptySet, diff, copy);
+		previousActiveItemSwaps = copy;
+	}
 	
 	public static void processNewAdvancements(Set<Identifier> doneAdvancements, boolean isJoinPacket) {
 		if (!doneAdvancements.isEmpty()) {
@@ -39,24 +54,22 @@ public class ClientRevelationHolder {
 					revealedBlocks.add(block);
 				}
 			}
+
+			// Handle edge case of block states revealed but not blocks;
+			// Checking for revealed blocks isn't necessary as they're derived from revealed block states.
+			final boolean blocksRevealed = activeBlockStateSwaps.removeAll(revealedBlockStates);
 			
-			if (!revealedBlockStates.isEmpty()) {
+			if (!revealedBlocks.isEmpty()) {
 				// uncloak the blocks
-				for (BlockState revealedBlockState : revealedBlockStates) {
-					activeBlockStateSwaps.remove(revealedBlockState);
-					Item blockItem = revealedBlockState.getBlock().asItem();
-					if (blockItem != null) {
-						activeItemSwaps.remove(blockItem);
-					}
-				}
-				rebuildAllChunks();
-			}
-			
-			for (Block revealedBlock : revealedBlocks) {
-				if (revealedBlock instanceof RevelationAware revelationAware) {
-					revelationAware.onUncloak();
+				for (Block revealedBlock: revealedBlocks) {
+					Item blockItem = revealedBlock.asItem();
+					if (blockItem != null) activeItemSwaps.remove(blockItem);
+					if (revealedBlock instanceof RevelationAware revelationAware) revelationAware.onUncloak();
 				}
 			}
+
+			if (blocksRevealed) rebuildAllChunks();
+
 			for (Item revealedItem : revealedItems) {
 				activeItemSwaps.remove(revealedItem);
 				if (revealedItem instanceof RevelationAware revelationAware) {
@@ -68,6 +81,7 @@ public class ClientRevelationHolder {
 				for (RevealingCallback callback : callbacks) {
 					callback.trigger(doneAdvancements, revealedBlocks, revealedItems, isJoinPacket);
 				}
+				onItemSwap(false);
 			}
 		}
 	}
@@ -87,16 +101,20 @@ public class ClientRevelationHolder {
 					}
 				}
 			}
-			
-			if (!concealedBlockStates.isEmpty()) {
+
+			// Handle edge case of block states concealed but not blocks;
+			// Checking for concealed blocks isn't necessary as they're derived from concealed block states.
+			final boolean blocksConcealed = activeBlockStateSwaps.addAll(concealedBlockStates);
+
+			if (!concealedBlocks.isEmpty()) {
 				// uncloak the blocks
-				for (BlockState concealedBlockState : concealedBlockStates) {
-					activeBlockStateSwaps.add(concealedBlockState);
-					Item blockItem = concealedBlockState.getBlock().asItem();
+				for (Block concealedBlock : concealedBlocks) {
+					Item blockItem = concealedBlock.asItem();
 					if (blockItem != null) activeItemSwaps.add(blockItem);
 				}
-				rebuildAllChunks();
 			}
+
+			if (blocksConcealed) rebuildAllChunks();
 			
 			activeItemSwaps.addAll(concealedItems);
 			
@@ -110,6 +128,7 @@ public class ClientRevelationHolder {
 					revelationAware.onCloak();
 				}
 			}
+			if (!concealedBlocks.isEmpty() || !concealedItems.isEmpty()) onItemSwap(true);
 		}
 	}
 	
@@ -177,6 +196,7 @@ public class ClientRevelationHolder {
 				cloak(registeredRevelation);
 			}
 		}
+		onItemSwap(true);
 	}
 	
 }
