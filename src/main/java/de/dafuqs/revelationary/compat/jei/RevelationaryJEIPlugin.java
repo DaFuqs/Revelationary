@@ -24,10 +24,12 @@ public class RevelationaryJEIPlugin implements IModPlugin {
             stacksCache = newStacks;
             if (runtime != null) {
                 var manager = runtime.getIngredientManager();
-                manager.removeIngredientsAtRuntime(VanillaTypes.ITEM_STACK,
-                        added.stream().map(ItemStack::new).collect(Collectors.toList()));
-                manager.addIngredientsAtRuntime(VanillaTypes.ITEM_STACK,
-                        removed.stream().map(ItemStack::new).collect(Collectors.toList()));
+                if(added != null && !added.isEmpty())
+                    manager.removeIngredientsAtRuntime(VanillaTypes.ITEM_STACK,
+                            added.stream().map(ItemStack::new).collect(Collectors.toList()));
+                if(removed != null && !removed.isEmpty())
+                    manager.addIngredientsAtRuntime(VanillaTypes.ITEM_STACK,
+                            removed.stream().map(ItemStack::new).collect(Collectors.toList()));
             }
         });
     }
@@ -41,7 +43,7 @@ public class RevelationaryJEIPlugin implements IModPlugin {
     public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
         runtime = jeiRuntime;
         if (!RevelationaryConfig.get().HideCloakedEntriesFromRecipeViewers) return;
-        if (stacksCache != null) runtime.getIngredientManager()
+        if (stacksCache != null && !stacksCache.isEmpty()) runtime.getIngredientManager()
                 .removeIngredientsAtRuntime(VanillaTypes.ITEM_STACK,
                         stacksCache.stream().map(ItemStack::new).collect(Collectors.toList()));
     }

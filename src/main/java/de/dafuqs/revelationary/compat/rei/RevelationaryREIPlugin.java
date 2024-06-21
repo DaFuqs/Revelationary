@@ -28,8 +28,8 @@ public class RevelationaryREIPlugin implements REIClientPlugin {
     @Override
     public void registerBasicEntryFiltering(@SuppressWarnings("UnstableApiUsage") BasicFilteringRule<?> rule) {
         // not using .show to not interfere with other filtering rules
-        //noinspection UnstableApiUsage
         if (!RevelationaryConfig.get().HideCloakedEntriesFromRecipeViewers) return;
+        //noinspection UnstableApiUsage
         filteringRule = rule.hide(() ->
             hiddenStacks.stream()
                     .map(EntryStacks::of)
