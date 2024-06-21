@@ -23,6 +23,7 @@ public class RevelationaryConfig {
 		public boolean UseTargetBlockOrItemNameInsteadOfScatter = false;
 		public String NameForUnrevealedBlocks = "";
 		public String NameForUnrevealedItems = "";
+		public boolean HideCloakedEntriesFromRecipeViewers = false;
 
 		public Config() { }
 
