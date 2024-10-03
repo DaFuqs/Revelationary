@@ -120,10 +120,17 @@ public class ClientRevelationHolder {
 	}
 	
 	// BLOCKS
-	private static void cloak(BlockState blockState) {
+	public static void cloak(BlockState blockState) {
 		activeBlockStateSwaps.add(blockState);
 		if (blockState instanceof RevelationAware revelationAware) {
 			revelationAware.onCloak();
+		}
+	}
+
+	public static void uncloak(BlockState blockState) {
+		activeBlockStateSwaps.remove(blockState);
+		if (blockState instanceof RevelationAware revelationAware) {
+			revelationAware.onUncloak();
 		}
 	}
 	
@@ -142,12 +149,24 @@ public class ClientRevelationHolder {
 			return blockState;
 		}
 	}
+
+	public static Set<BlockState> getBlockCloaks() {
+		return activeBlockStateSwaps;
+	}
+
 	
 	// ITEMS
-	private static void cloak(Item item) {
+	public static void cloak(Item item) {
 		activeItemSwaps.add(item);
 		if (item instanceof RevelationAware revelationAware) {
 			revelationAware.onCloak();
+		}
+	}
+
+	public static void uncloak(Item item) {
+		activeItemSwaps.remove(item);
+		if (item instanceof RevelationAware revelationAware) {
+			revelationAware.onUncloak();
 		}
 	}
 	
@@ -161,6 +180,10 @@ public class ClientRevelationHolder {
 		} else {
 			return item;
 		}
+	}
+
+	public static Set<Item> getItemCloaks() {
+		return activeItemSwaps;
 	}
 	
 	public static void cloakAll() {
