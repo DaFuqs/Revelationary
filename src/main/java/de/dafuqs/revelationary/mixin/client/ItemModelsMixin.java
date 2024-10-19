@@ -22,7 +22,7 @@ public abstract class ItemModelsMixin {
 
     @Inject(at = @At("HEAD"), method = "getModel(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/client/render/model/BakedModel;", cancellable = true)
     private void revelationary$getModel(ItemStack itemStack, CallbackInfoReturnable<BakedModel> callbackInfoReturnable) {
-        if (ClientRevelationHolder.isCloaked(itemStack.getItem())) {
+        if (ClientRevelationHolder.isCloaked(itemStack.getItem()) && !ClientRevelationHolder.getCloakTarget(itemStack.getItem()).equals(itemStack.getItem())) {
             Item destinationItem = ClientRevelationHolder.getCloakTarget(itemStack.getItem());
             BakedModel overriddenModel = getModel(destinationItem.getDefaultStack());
             callbackInfoReturnable.setReturnValue(overriddenModel);
