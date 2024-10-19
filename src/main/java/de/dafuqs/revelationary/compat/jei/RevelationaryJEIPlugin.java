@@ -6,6 +6,7 @@ import de.dafuqs.revelationary.config.RevelationaryConfig;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.runtime.IJeiRuntime;
+import net.fabricmc.loader.api.*;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -20,6 +21,15 @@ public class RevelationaryJEIPlugin implements IModPlugin {
 
     public RevelationaryJEIPlugin() {
         if (!RevelationaryConfig.get().HideCloakedEntriesFromRecipeViewers) return;
+        
+        // While EMI does implement the JEIModPlugin
+        // It only handles addIngredientsAtRuntime / removeIngredientsAtRuntime
+        // Once on join, making uncloaked items not show up at all, unless
+        // the player leaves & rejoins the world
+        if(FabricLoader.getInstance().isModLoaded("emi")) {
+            return;
+        }
+        
         CloakSetChanged.EVENT.register((added, removed, newStacks) -> {
             stacksCache = newStacks;
             if (runtime != null) {
