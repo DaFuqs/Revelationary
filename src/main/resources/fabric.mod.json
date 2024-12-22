@@ -25,9 +25,6 @@
     "jade": [
       "de.dafuqs.revelationary.compat.jade.RevelationaryJadePlugin"
     ],
-    "jei_mod_plugin": [
-      "de.dafuqs.revelationary.compat.jei.RevelationaryJEIPlugin"
-    ],
     "rei_client": [
       "de.dafuqs.revelationary.compat.rei.RevelationaryREIPlugin"
     ]
@@ -36,10 +33,9 @@
     "revelationary.mixins.json"
   ],
   "depends": {
+    "minecraft": ">=${minecraft_version}",
     "fabricloader": "*",
-    "fabric": "*",
-    "minecraft": ">=1.21.1",
-    "java": ">=21"
+    "fabric-api": "*"
   },
   "suggests": {
     "spectrum": "*"

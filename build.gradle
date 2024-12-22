@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.7-SNAPSHOT'
+	id 'fabric-loom' version '1.9-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -15,7 +15,7 @@ repositories {
 	maven { url "https://maven.shedaniel.me/" }
 	maven { url "https://maven.terraformersmc.com" }
 	maven { url "https://api.modrinth.com/maven/" }
-	maven { url "https://maven2.bai.lol" }
+	maven { url "https://maven2.bai.lol" } // WTHIT
 	maven { url = "https://maven.blamejared.com" } // JEI
 }
 
@@ -34,16 +34,24 @@ dependencies {
 	// mod compat
 	modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
 	modCompileOnly "maven.modrinth:jade:${project.jade_version}"
+	// https://maven4.bai.lol/mcp/mobius/waila/
 	modCompileOnly "mcp.mobius.waila:wthit-api:fabric-${project.wthit_version}"
-	modImplementation("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
-	modRuntimeOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
+
+	// not yet updated
+	// modImplementation("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
+	// modRuntimeOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
 }
 
 processResources {
 	inputs.property "version", project.version
+	inputs.property "minecraft_version", project.minecraft_version
+	inputs.property "loader_version", project.loader_version
+	filteringCharset "UTF-8"
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": project.version,
+				"minecraft_version": project.minecraft_version,
+				"loader_version": project.loader_version
 	}
 }
 
