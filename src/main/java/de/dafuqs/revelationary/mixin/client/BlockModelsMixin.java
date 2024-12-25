@@ -27,7 +27,7 @@ public class BlockModelsMixin {
 	private void revelationary$getModel(BlockState blockState, CallbackInfoReturnable<BakedModel> callbackInfoReturnable) {
 		if (ClientRevelationHolder.isCloaked(blockState)) {
 			BlockState destinationBlockState = ClientRevelationHolder.getCloakTarget(blockState);
-			BakedModel overriddenModel = this.models.getOrDefault(destinationBlockState, modelManager.getMissingModel());
+			BakedModel overriddenModel = this.models.getOrDefault(destinationBlockState, modelManager.getMissingBlockModel());
 			callbackInfoReturnable.setReturnValue(overriddenModel);
 		}
 	}

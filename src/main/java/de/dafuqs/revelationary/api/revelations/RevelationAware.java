@@ -9,8 +9,7 @@ import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.loot.context.LootContextParameterSet;
-import net.minecraft.loot.context.LootContextParameters;
+import net.minecraft.loot.context.*;
 import net.minecraft.text.MutableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
@@ -23,7 +22,7 @@ import java.util.Map;
  * Using this interface will allow more functionality than using Revelationary's json api
  * <p>
  * Blocks and items with this interface will disguise themselves as other blocks/items
- * until the player gets a specific advancement. It's name will get obfuscated.
+ * until the player gets a specific advancement. Its name will get obfuscated.
  * Disguised blocks will drop item stacks as if they were the block they are disguised as
  */
 public interface RevelationAware {
@@ -57,7 +56,7 @@ public interface RevelationAware {
 	@Nullable Pair<Item, Item> getItemCloak();
 	
 	/**
-	 * Optionally return a mapping of a revelation aware item and the text that should be used as translation
+	 * Optionally, return a mapping of a revelation aware item and the text that should be used as translation
 	 * If you return null (the default) it's name will be scattered unreadable instead
 	 *
 	 * @return the matching of the item and the text it will use when not revealed
@@ -68,7 +67,7 @@ public interface RevelationAware {
 	}
 	
 	/**
-	 * Optionally return a mapping of a revelation aware block and the text that should be used as translation
+	 * Optionally, return a mapping of a revelation aware block and the text that should be used as translation
 	 * If you return null (the default) it's name will be scattered unreadable instead
 	 *
 	 * @return the matching of the block and the text it will use when not revealed
@@ -103,7 +102,7 @@ public interface RevelationAware {
 	}
 	
 	/**
-	 * Helper method that checks, if the player has the matching advancement
+	 * Helper method that checks if the player has the matching advancement
 	 *
 	 * @param player the player to check
 	 */
@@ -119,7 +118,7 @@ public interface RevelationAware {
 	 * @return the player of that loot context builder. null if there is no player in that context
 	 */
 	@Nullable
-	static PlayerEntity getLootPlayerEntity(LootContextParameterSet.Builder lootContextBuilderSet) {
+	static PlayerEntity getLootPlayerEntity(LootWorldContext.Builder lootContextBuilderSet) {
 		Entity entity = lootContextBuilderSet.getOptional(LootContextParameters.THIS_ENTITY);
 		if (entity instanceof PlayerEntity player) {
 			return player;

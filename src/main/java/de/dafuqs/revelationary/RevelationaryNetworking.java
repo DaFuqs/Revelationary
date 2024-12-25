@@ -10,12 +10,13 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.command.*;
 import net.minecraft.command.argument.BlockArgumentParser;
 import net.minecraft.item.Item;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.Registries;
+import net.minecraft.registry.*;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -68,7 +69,8 @@ public class RevelationaryNetworking {
 
 		public static RevelationSync read(RegistryByteBuf buf) {
 			/* Block States */
-
+			
+			final RegistryWrapper<Block> blockRegistryWrapper = BuiltinRegistries.createWrapperLookup().getOrThrow(RegistryKeys.BLOCK);
 			final Object2ObjectOpenHashMap<Block, Block> blockCloaks = new Object2ObjectOpenHashMap<>(buf.readInt());
 			final Object2ObjectOpenHashMap<BlockState, Identifier> blockStateToAdv = new Object2ObjectOpenHashMap<>(buf.readInt());
 			final Object2ObjectOpenHashMap<BlockState, BlockState> blockStateCloaks = new Object2ObjectOpenHashMap<>(buf.readInt());
@@ -80,8 +82,8 @@ public class RevelationaryNetworking {
 				ObjectArrayList<BlockState> advancementStates = new ObjectArrayList<>(blockStateCount);
 				for (int j = 0; j < blockStateCount; j++) {
 					try {
-						BlockState sourceState = BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), buf.readString(), true).blockState();
-						BlockState targetState = BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), buf.readString(), true).blockState();
+						BlockState sourceState = BlockArgumentParser.block(blockRegistryWrapper, buf.readString(), true).blockState();
+						BlockState targetState = BlockArgumentParser.block(blockRegistryWrapper, buf.readString(), true).blockState();
 
 						advancementStates.add(sourceState);
 						blockStateToAdv.put(sourceState, advancementIdentifier);
