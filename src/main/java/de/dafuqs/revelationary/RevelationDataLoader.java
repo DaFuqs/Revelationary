@@ -1,16 +1,15 @@
 package de.dafuqs.revelationary;
 
-import com.google.gson.*;
 import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.*;
-import it.unimi.dsi.fastutil.objects.*;
 import net.fabricmc.fabric.api.resource.*;
 import net.minecraft.block.*;
+import net.minecraft.command.*;
 import net.minecraft.command.argument.*;
 import net.minecraft.item.*;
 import net.minecraft.registry.*;
 import net.minecraft.resource.*;
-import net.minecraft.server.command.*;
+import net.minecraft.resource.featuretoggle.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import net.minecraft.util.profiler.*;
@@ -29,9 +28,11 @@ public class RevelationDataLoader extends JsonDataLoader<RevelationDataLoader.Re
 	
 	@Override
 	protected void apply(Map<Identifier, RevelationEntry> prepared, ResourceManager manager, Profiler profiler) {
-		prepared.forEach((identifier, revelationEntry) -> registerFromJson(revelationEntry));
-		RevelationRegistry.deepTrim();
+		RegistryWrapper.WrapperLookup lookup = BuiltinRegistries.createWrapperLookup();
+		RegistryWrapper<Block> blockRegistryWrapper = CommandRegistryAccess.of(lookup, FeatureSet.empty()).getOrThrow(RegistryKeys.BLOCK);;
 		
+		prepared.forEach((identifier, revelationEntry) -> registerFromJson(blockRegistryWrapper, revelationEntry));
+		RevelationRegistry.deepTrim();
 	}
 	
 	@Override
@@ -51,9 +52,7 @@ public class RevelationDataLoader extends JsonDataLoader<RevelationDataLoader.Re
 		
 	}
 	
-	
-	public static void registerFromJson(RevelationEntry rev) {
-		RegistryWrapper<Block> blockRegistryWrapper = ;
+	public static void registerFromJson(RegistryWrapper<Block> blockRegistryWrapper, RevelationEntry rev) {
 		
 		for (Map.Entry<String, String> stateEntry : rev.blockStateSwaps.entrySet()) {
 			try {
