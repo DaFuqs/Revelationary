@@ -15,7 +15,6 @@
     "client.BlockModelsMixin",
     "client.ClientAdvancementManagerMixin",
     "client.ItemMixin",
-    "client.ItemModelsMixin",
     "client.MinecraftClientMixin",
     "client.WorldRendererMixin",
     "client.WorldRendererMixinAccessor"

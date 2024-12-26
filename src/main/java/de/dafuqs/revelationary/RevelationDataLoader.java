@@ -10,6 +10,7 @@ import net.minecraft.item.*;
 import net.minecraft.registry.*;
 import net.minecraft.resource.*;
 import net.minecraft.resource.featuretoggle.*;
+import net.minecraft.server.command.*;
 import net.minecraft.text.*;
 import net.minecraft.util.*;
 import net.minecraft.util.profiler.*;
@@ -29,7 +30,7 @@ public class RevelationDataLoader extends JsonDataLoader<RevelationDataLoader.Re
 	@Override
 	protected void apply(Map<Identifier, RevelationEntry> prepared, ResourceManager manager, Profiler profiler) {
 		RegistryWrapper.WrapperLookup lookup = BuiltinRegistries.createWrapperLookup();
-		RegistryWrapper<Block> blockRegistryWrapper = CommandRegistryAccess.of(lookup, FeatureSet.empty()).getOrThrow(RegistryKeys.BLOCK);;
+		RegistryWrapper<Block> blockRegistryWrapper = CommandRegistryAccess.of(lookup, FeatureFlags.FEATURE_MANAGER.getFeatureSet()).getOrThrow(RegistryKeys.BLOCK);;
 		
 		prepared.forEach((identifier, revelationEntry) -> registerFromJson(blockRegistryWrapper, revelationEntry));
 		RevelationRegistry.deepTrim();
@@ -56,8 +57,8 @@ public class RevelationDataLoader extends JsonDataLoader<RevelationDataLoader.Re
 		
 		for (Map.Entry<String, String> stateEntry : rev.blockStateSwaps.entrySet()) {
 			try {
-				BlockState sourceBlockState = BlockArgumentParser.block(blockRegistryWrapper, stateEntry.getKey(), true).blockState();
-				BlockState targetBlockState = BlockArgumentParser.block(blockRegistryWrapper, stateEntry.getValue(), true).blockState();
+				BlockState sourceBlockState = BlockArgumentParser.block(blockRegistryWrapper, stateEntry.getKey(), false).blockState();
+				BlockState targetBlockState = BlockArgumentParser.block(blockRegistryWrapper, stateEntry.getValue(), false).blockState();
 				if (sourceBlockState.isAir()) {
 					Revelationary.logError("Trying to register invalid block cloak. Advancement: " + rev.advancementId
 							+ " Source Block: " + Registries.BLOCK.getId(sourceBlockState.getBlock())
