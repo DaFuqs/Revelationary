@@ -1,33 +1,32 @@
 package de.dafuqs.revelationary.mixin.client;
 
-import de.dafuqs.revelationary.ClientRevelationHolder;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.block.BlockModels;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedModelManager;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import de.dafuqs.revelationary.*;
+import net.fabricmc.fabric.api.renderer.v1.model.*;
+import net.minecraft.block.*;
+import net.minecraft.client.render.block.*;
+import net.minecraft.client.render.model.*;
+import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.*;
 
-import java.util.Map;
+import java.util.*;
 
 @Mixin(BlockModels.class)
-public class BlockModelsMixin {
+public class BlockModelsMixin implements FabricBlockModels {
+	
+	
 	@Shadow
-	private Map<BlockState, BakedModel> models;
+	private Map<BlockState, BlockStateModel> models;
 	
 	@Shadow
 	@Final
 	private BakedModelManager modelManager;
 	
 	@Inject(at = @At("HEAD"), method = "getModel", cancellable = true)
-	private void revelationary$getModel(BlockState blockState, CallbackInfoReturnable<BakedModel> callbackInfoReturnable) {
+	private void revelationary$getModel(BlockState blockState, CallbackInfoReturnable<BlockStateModel> callbackInfoReturnable) {
 		if (ClientRevelationHolder.isCloaked(blockState)) {
 			BlockState destinationBlockState = ClientRevelationHolder.getCloakTarget(blockState);
-			BakedModel overriddenModel = this.models.getOrDefault(destinationBlockState, modelManager.getMissingBlockModel());
+			BlockStateModel overriddenModel = this.models.getOrDefault(destinationBlockState, this.modelManager.getMissingModel());
 			callbackInfoReturnable.setReturnValue(overriddenModel);
 		}
 	}

@@ -1,4 +1,4 @@
-package de.dafuqs.revelationary.compat.wthit;
+/*package de.dafuqs.revelationary.compat.wthit;
 
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
 import mcp.mobius.waila.api.IRegistrar;
@@ -10,3 +10,4 @@ public class RevelationaryWthitPlugin implements IWailaPlugin {
         registrar.addOverride(new CloakedBlockComponentProvider(), RevelationAware.class);
     }
 }
+*/

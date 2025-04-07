@@ -1,4 +1,4 @@
-package de.dafuqs.revelationary.compat.wthit;
+/*package de.dafuqs.revelationary.compat.wthit;
 
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
 import mcp.mobius.waila.api.IBlockAccessor;
@@ -21,3 +21,4 @@ public class CloakedBlockComponentProvider implements IBlockComponentProvider {
         return accessor.getBlockState();
     }
 }
+*/
