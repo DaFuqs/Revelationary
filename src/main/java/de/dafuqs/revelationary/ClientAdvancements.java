@@ -1,18 +1,14 @@
 package de.dafuqs.revelationary;
 
-import de.dafuqs.revelationary.api.advancements.ClientAdvancementPacketCallback;
-import de.dafuqs.revelationary.mixin.client.AccessorClientAdvancementManager;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.advancement.AdvancementEntry;
-import net.minecraft.advancement.AdvancementProgress;
-import net.minecraft.advancement.PlacedAdvancement;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientAdvancementManager;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.s2c.play.AdvancementUpdateS2CPacket;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.NotNull;
+import de.dafuqs.revelationary.api.advancements.*;
+import de.dafuqs.revelationary.mixin.client.*;
+import net.fabricmc.api.*;
+import net.minecraft.advancement.*;
+import net.minecraft.client.*;
+import net.minecraft.client.network.*;
+import net.minecraft.network.packet.s2c.play.*;
+import net.minecraft.util.*;
+import org.jetbrains.annotations.*;
 
 import java.util.*;
 
@@ -62,9 +58,6 @@ public class ClientAdvancements {
 	public static @NotNull Set<Identifier> getDoneAdvancements(@NotNull AdvancementUpdateS2CPacket packet) {
 		Set<Identifier> doneAdvancements = new HashSet<>();
 		
-		for (AdvancementEntry earnedAdvancementEntry : packet.getAdvancementsToEarn()) {
-			doneAdvancements.add(earnedAdvancementEntry.id());
-		}
 		for (Map.Entry<Identifier, AdvancementProgress> progressedAdvancement : packet.getAdvancementsToProgress().entrySet()) {
 			if (progressedAdvancement.getValue().isDone()) {
 				doneAdvancements.add(progressedAdvancement.getKey());
