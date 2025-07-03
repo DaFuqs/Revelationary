@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.7-SNAPSHOT'
+	id 'net.neoforged.moddev' version '2.0.96'
 	id 'maven-publish'
 }
 
@@ -18,9 +18,61 @@ repositories {
 	maven { url "https://maven2.bai.lol" }
 }
 
+neoForge {
+	version = project.neoforge_version
+	parchment {
+		minecraftVersion = project.parchment_minecraft_version
+		mappingsVersion = project.parchment_mappings_version
+	}
+
+	// Default run configurations.
+	// These can be tweaked, removed, or duplicated as needed.
+	runs {
+		client {
+			client()
+		}
+
+		server {
+			server()
+			programArgument '--nogui'
+		}
+
+//		data {
+//			data()
+//
+//			// example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
+//			// gameDirectory = project.file('run-data')
+//
+//			// Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+//			programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+//		}
+
+		// applies to all the run configs above
+		configureEach {
+			// Recommended logging data for a userdev environment
+			// The markers can be added/remove as needed separated by commas.
+			// "SCAN": For mods scan.
+			// "REGISTRIES": For firing of registry events.
+			// "REGISTRYDUMP": For getting the contents of all registries.
+			systemProperty 'forge.logging.markers', 'REGISTRIES'
+
+			// Recommended logging level for the console
+			// You can set various levels here.
+			// Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
+			logLevel = org.slf4j.event.Level.DEBUG
+		}
+	}
+
+	mods {
+		spectrum {
+			sourceSet sourceSets.main
+		}
+	}
+}
+
 dependencies {
 	// jetbrains annotations @Nullabe @NotNull
-	implementation 'org.jetbrains:annotations:23.1.0'
+	/*implementation 'org.jetbrains:annotations:23.1.0'
 
 	// fabric
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -33,16 +85,28 @@ dependencies {
 	// mod compat
 	modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
 	modCompileOnly "maven.modrinth:jade:${project.jade_version}"
-	modCompileOnly "mcp.mobius.waila:wthit-api:fabric-${project.wthit_version}"
+	modCompileOnly "mcp.mobius.waila:wthit-api:fabric-${project.wthit_version}"*/
 }
 
-processResources {
-	inputs.property "version", project.version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
+// This block of code expands all declared replace properties in the specified resource targets.
+// A missing property will result in an error. Properties are expanded using ${} Groovy notation.
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+	var replaceProperties = [
+			version               : version,
+			minecraft_version     : minecraft_version,
+			neoforge_version_range: neoforge_version_range,
+	]
+	inputs.properties replaceProperties
+	expand replaceProperties
+	from "src/main/templates"
+	into "build/generated/sources/modMetadata"
 }
+// Include the output of "generateModMetadata" as an input directory for the build
+// this works with both building through Gradle and the IDE.
+sourceSets.main.resources.srcDir generateModMetadata
+// To avoid having to run "generateModMetadata" manually, make it run on every project reload
+neoForge.ideSyncTask generateModMetadata
+
 
 // ensure that the encoding is set to UTF-8, no matter what the system default is
 // this fixes some edge cases with special characters not displaying correctly
