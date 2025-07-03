@@ -1,22 +1,21 @@
 package de.dafuqs.revelationary.api.revelations;
 
-import de.dafuqs.revelationary.RevelationRegistry;
-import de.dafuqs.revelationary.api.advancements.AdvancementHelper;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.EntityShapeContext;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.loot.context.LootContextParameterSet;
-import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.text.MutableText;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
-import org.jetbrains.annotations.Nullable;
+import de.dafuqs.revelationary.*;
+import de.dafuqs.revelationary.api.advancements.*;
+import net.minecraft.network.chat.*;
+import net.minecraft.resources.*;
+import net.minecraft.util.*;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.*;
+import net.minecraft.world.level.storage.loot.*;
+import net.minecraft.world.level.storage.loot.parameters.*;
+import net.minecraft.world.phys.shapes.*;
+import org.jetbrains.annotations.*;
 
-import java.util.Map;
+import java.util.*;
 
 /**
  * Interface for defining a block/item/blockitem/... as revealable.
@@ -30,7 +29,7 @@ public interface RevelationAware {
 	/**
 	 * The advancement identifier that the player must have to see this block/item
 	 */
-	Identifier getCloakAdvancementIdentifier();
+	ResourceLocation getCloakAdvancementIdentifier();
 	
 	/**
 	 * Register this object as revealable
@@ -54,7 +53,7 @@ public interface RevelationAware {
 	 * If you are implementing a BlockItem something like "new Pair<>(this.asItem(), Blocks.OAK_LOG.asItem())"
 	 * If you use this interace on a block without item representation (like vanilla end portal) return null
 	 */
-	@Nullable Pair<Item, Item> getItemCloak();
+	@Nullable Tuple<Item, Item> getItemCloak();
 	
 	/**
 	 * Optionally return a mapping of a revelation aware item and the text that should be used as translation
@@ -63,7 +62,7 @@ public interface RevelationAware {
 	 * @return the matching of the item and the text it will use when not revealed
 	 */
 	@Nullable
-	default Pair<Item, MutableText> getCloakedItemTranslation() {
+	default Tuple<Item, MutableComponent> getCloakedItemTranslation() {
 		return null;
 	}
 	
@@ -74,7 +73,7 @@ public interface RevelationAware {
 	 * @return the matching of the block and the text it will use when not revealed
 	 */
 	@Nullable
-	default Pair<Block, MutableText> getCloakedBlockTranslation() {
+	default Tuple<Block, MutableComponent> getCloakedBlockTranslation() {
 		return null;
 	}
 	
@@ -95,8 +94,8 @@ public interface RevelationAware {
 	 *
 	 * @param context the ShapeContext to check
 	 */
-	default boolean isVisibleTo(ShapeContext context) {
-		if (context instanceof EntityShapeContext entityShapeContext && entityShapeContext.getEntity() instanceof PlayerEntity player) {
+	default boolean isVisibleTo(CollisionContext context) {
+		if (context instanceof EntityCollisionContext entityShapeContext && entityShapeContext.getEntity() instanceof Player player) {
 			return this.isVisibleTo(player);
 		}
 		return false;
@@ -107,7 +106,7 @@ public interface RevelationAware {
 	 *
 	 * @param player the player to check
 	 */
-	default boolean isVisibleTo(@Nullable PlayerEntity player) {
+	default boolean isVisibleTo(@Nullable Player player) {
 		return AdvancementHelper.hasAdvancement(player, getCloakAdvancementIdentifier());
 	}
 	
@@ -119,9 +118,9 @@ public interface RevelationAware {
 	 * @return the player of that loot context builder. null if there is no player in that context
 	 */
 	@Nullable
-	static PlayerEntity getLootPlayerEntity(LootContextParameterSet.Builder lootContextBuilderSet) {
-		Entity entity = lootContextBuilderSet.getOptional(LootContextParameters.THIS_ENTITY);
-		if (entity instanceof PlayerEntity player) {
+	static Player getLootPlayerEntity(LootParams.Builder lootContextBuilderSet) {
+		Entity entity = lootContextBuilderSet.getOptionalParameter(LootContextParams.THIS_ENTITY);
+		if (entity instanceof Player player) {
 			return player;
 		}
 		return null;

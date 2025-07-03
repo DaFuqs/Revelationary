@@ -1,32 +1,31 @@
 package de.dafuqs.revelationary.mixin;
 
 import de.dafuqs.revelationary.*;
-import de.dafuqs.revelationary.api.revelations.RevelationAware;
-import net.minecraft.block.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.loot.LootTable;
-import net.minecraft.loot.context.LootContextParameterSet;
-import net.minecraft.registry.RegistryKey;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
+import de.dafuqs.revelationary.api.revelations.*;
+import net.minecraft.resources.*;
+import net.minecraft.world.entity.player.*;
+import net.minecraft.world.level.block.state.*;
+import net.minecraft.world.level.storage.loot.*;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 
-@Mixin(AbstractBlock.class)
+@Mixin(BlockBehaviour.class)
 public abstract class AbstractBlockMixin {
-	@Shadow public abstract RegistryKey<LootTable> getLootTableKey();
+	@Shadow
+	public abstract ResourceKey<LootTable> getLootTable();
 
 	@Redirect(
-			method = "getDroppedStacks(Lnet/minecraft/block/BlockState;Lnet/minecraft/loot/context/LootContextParameterSet$Builder;)Ljava/util/List;",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/block/AbstractBlock;getLootTableKey()Lnet/minecraft/registry/RegistryKey;")
+			method = "getDrops(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/storage/loot/LootParams$Builder;)Ljava/util/List;",
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockBehaviour;getLootTable()Lnet/minecraft/resources/ResourceKey;")
 	)
-	private RegistryKey<LootTable> revelationary$switchLootTableForCloakedBlock(AbstractBlock instance, BlockState state, LootContextParameterSet.Builder builder) {
+	private ResourceKey<LootTable> revelationary$switchLootTableForCloakedBlock(BlockBehaviour instance, BlockState state, LootParams.Builder builder) {
 		BlockState cloakState = RevelationRegistry.getCloak(state);
 		if (cloakState != null) {
-			PlayerEntity lootPlayerEntity = RevelationAware.getLootPlayerEntity(builder);
+			Player lootPlayerEntity = RevelationAware.getLootPlayerEntity(builder);
 			if (!RevelationRegistry.isVisibleTo(state, lootPlayerEntity)) {
-				return cloakState.getBlock().getLootTableKey();
+				return cloakState.getBlock().getLootTable();
 			}
 		}
-		return getLootTableKey();
+		return getLootTable();
 	}
 }

@@ -1,16 +1,13 @@
 package de.dafuqs.revelationary;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
-import net.minecraft.resource.JsonDataLoader;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
+import com.google.gson.*;
+import net.minecraft.resources.*;
+import net.minecraft.server.packs.resources.*;
+import net.minecraft.util.profiling.*;
 
-import java.util.Map;
+import java.util.*;
 
-public class RevelationDataLoader extends JsonDataLoader implements IdentifiableResourceReloadListener {
+public class RevelationDataLoader extends SimpleJsonResourceReloadListener {
 	public static final RevelationDataLoader INSTANCE = new RevelationDataLoader();
 	
 	private RevelationDataLoader() {
@@ -18,13 +15,9 @@ public class RevelationDataLoader extends JsonDataLoader implements Identifiable
 	}
 	
 	@Override
-	protected void apply(Map<Identifier, JsonElement> prepared, ResourceManager manager, Profiler profiler) {
+	protected void apply(Map<ResourceLocation, JsonElement> prepared, ResourceManager manager, ProfilerFiller profiler) {
 		prepared.forEach((identifier, jsonElement) -> RevelationRegistry.registerFromJson(jsonElement.getAsJsonObject()));
 		RevelationRegistry.deepTrim();
 	}
 	
-	@Override
-	public Identifier getFabricId() {
-		return Identifier.of(Revelationary.MOD_ID, "revelations");
-	}
 }

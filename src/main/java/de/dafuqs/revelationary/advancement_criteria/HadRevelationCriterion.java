@@ -1,31 +1,31 @@
 package de.dafuqs.revelationary.advancement_criteria;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancement.criterion.AbstractCriterion;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.predicate.entity.LootContextPredicate;
-import net.minecraft.registry.*;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+import com.mojang.serialization.*;
+import com.mojang.serialization.codecs.*;
+import net.minecraft.advancements.critereon.*;
+import net.minecraft.core.registries.*;
+import net.minecraft.resources.*;
+import net.minecraft.server.level.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.*;
 
-import java.util.Optional;
+import java.util.*;
 
-public class HadRevelationCriterion extends AbstractCriterion<HadRevelationCriterion.Conditions> {
-	public void trigger(ServerPlayerEntity player, Block block) {
+public class HadRevelationCriterion extends SimpleCriterionTrigger<HadRevelationCriterion.Conditions> {
+	public void trigger(ServerPlayer player, Block block) {
 		this.trigger(player, (conditions) -> conditions.matches(block));
 	}
 
 	@Override
-	public Codec<Conditions> getConditionsCodec() {
+	public Codec<Conditions> codec() {
 		return Conditions.CODEC;
 	}
-
-	public record Conditions(Optional<LootContextPredicate> player, Identifier identifier) implements AbstractCriterion.Conditions {
+	
+	public record Conditions(Optional<ContextAwarePredicate> player,
+							 ResourceLocation identifier) implements SimpleInstance {
 		public static final Codec<Conditions> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-				LootContextPredicate.CODEC.optionalFieldOf("player").forGetter(Conditions::player),
-				Identifier.CODEC.fieldOf("revelation_identifier").forGetter(Conditions::identifier))
+						ContextAwarePredicate.CODEC.optionalFieldOf("player").forGetter(Conditions::player),
+						ResourceLocation.CODEC.fieldOf("revelation_identifier").forGetter(Conditions::identifier))
 			.apply(inst, Conditions::new));
 		
 		public boolean matches(Object object) {
@@ -33,9 +33,9 @@ public class HadRevelationCriterion extends AbstractCriterion<HadRevelationCrite
 				// if "revelation_identifier": "" => trigger with any revelation
 				return true;
 			} else if (object instanceof Block cloakableBlock) {
-				return Registries.BLOCK.getId(cloakableBlock).equals(identifier);
+				return BuiltInRegistries.BLOCK.getKey(cloakableBlock).equals(identifier);
 			} else if (object instanceof Item cloakableItem) {
-				return Registries.ITEM.getId(cloakableItem).equals(identifier);
+				return BuiltInRegistries.ITEM.getKey(cloakableItem).equals(identifier);
 			} else {
 				return false;
 			}

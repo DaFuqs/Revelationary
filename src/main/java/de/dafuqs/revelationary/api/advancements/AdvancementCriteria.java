@@ -1,7 +1,7 @@
 package de.dafuqs.revelationary.api.advancements;
 
 import de.dafuqs.revelationary.advancement_criteria.*;
-import net.minecraft.advancement.criterion.Criteria;
+import net.minecraft.advancements.*;
 
 public class AdvancementCriteria {
 	/**
@@ -19,8 +19,8 @@ public class AdvancementCriteria {
 	public static HadRevelationCriterion HAD_REVELATION;
 	
 	public static void register() {
-		ADVANCEMENT_COUNT = Criteria.register("revelationary:advancement_count", new AdvancementCountCriterion());
-		HAD_REVELATION = Criteria.register("revelationary:had_revelation", new HadRevelationCriterion());
-		ADVANCEMENT_GOTTEN = Criteria.register("revelationary:advancement_gotten", new AdvancementGottenCriterion());
+		ADVANCEMENT_COUNT = CriteriaTriggers.register("revelationary:advancement_count", new AdvancementCountCriterion());
+		HAD_REVELATION = CriteriaTriggers.register("revelationary:had_revelation", new HadRevelationCriterion());
+		ADVANCEMENT_GOTTEN = CriteriaTriggers.register("revelationary:advancement_gotten", new AdvancementGottenCriterion());
 	}
 }

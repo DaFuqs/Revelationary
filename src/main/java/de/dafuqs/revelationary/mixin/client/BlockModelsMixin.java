@@ -1,33 +1,29 @@
 package de.dafuqs.revelationary.mixin.client;
 
-import de.dafuqs.revelationary.ClientRevelationHolder;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.block.BlockModels;
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.BakedModelManager;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import de.dafuqs.revelationary.*;
+import net.minecraft.client.renderer.block.*;
+import net.minecraft.client.resources.model.*;
+import net.minecraft.world.level.block.state.*;
+import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.*;
 
-import java.util.Map;
+import java.util.*;
 
-@Mixin(BlockModels.class)
+@Mixin(BlockModelShaper.class)
 public class BlockModelsMixin {
 	@Shadow
-	private Map<BlockState, BakedModel> models;
+	private Map<BlockState, BakedModel> modelByStateCache;
 	
 	@Shadow
 	@Final
-	private BakedModelManager modelManager;
+	private ModelManager modelManager;
 	
-	@Inject(at = @At("HEAD"), method = "getModel", cancellable = true)
+	@Inject(at = @At("HEAD"), method = "getBlockModel(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/resources/model/BakedModel;", cancellable = true)
 	private void revelationary$getModel(BlockState blockState, CallbackInfoReturnable<BakedModel> callbackInfoReturnable) {
 		if (ClientRevelationHolder.isCloaked(blockState)) {
 			BlockState destinationBlockState = ClientRevelationHolder.getCloakTarget(blockState);
-			BakedModel overriddenModel = this.models.getOrDefault(destinationBlockState, modelManager.getMissingModel());
+			BakedModel overriddenModel = this.modelByStateCache.getOrDefault(destinationBlockState, modelManager.getMissingModel());
 			callbackInfoReturnable.setReturnValue(overriddenModel);
 		}
 	}

@@ -1,19 +1,18 @@
 package de.dafuqs.revelationary.mixin;
 
-import de.dafuqs.revelationary.RevelationaryNetworking;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ConnectedClientData;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import de.dafuqs.revelationary.*;
+import net.minecraft.network.*;
+import net.minecraft.server.level.*;
+import net.minecraft.server.network.*;
+import net.minecraft.server.players.*;
+import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.*;
 
-@Mixin(PlayerManager.class)
+@Mixin(PlayerList.class)
 public class MixinPlayerManager {
-	@Inject(method = "onPlayerConnect", at = @At(value = "RETURN"))
-	private void revelationary$onPlayerConnect(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci) {
+	@Inject(method = "placeNewPlayer(Lnet/minecraft/network/Connection;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/network/CommonListenerCookie;)V", at = @At(value = "RETURN"))
+	private void revelationary$onPlayerConnect(Connection connection, ServerPlayer player, CommonListenerCookie clientData, CallbackInfo ci) {
 		RevelationaryNetworking.sendRevelations(player);
 	}
 }

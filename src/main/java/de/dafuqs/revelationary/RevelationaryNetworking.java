@@ -1,37 +1,29 @@
 package de.dafuqs.revelationary;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.command.argument.BlockArgumentParser;
-import net.minecraft.item.Item;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.registry.Registries;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.util.Identifier;
+import com.mojang.brigadier.exceptions.*;
+import it.unimi.dsi.fastutil.objects.*;
+import net.minecraft.commands.arguments.blocks.*;
+import net.minecraft.core.registries.*;
+import net.minecraft.network.*;
+import net.minecraft.network.chat.*;
+import net.minecraft.network.codec.*;
+import net.minecraft.network.protocol.common.custom.*;
+import net.minecraft.resources.*;
+import net.minecraft.server.level.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.*;
 
-import java.util.Map;
+import java.util.*;
 
 public class RevelationaryNetworking {
+	
 	public static void register() {
 		PayloadTypeRegistry.playS2C().register(RevelationSync.ID, RevelationSync.CODEC);
 	}
 
-	@Environment(EnvType.CLIENT)
 	public static void registerPacketReceivers() {
-		ClientPlayNetworking.registerGlobalReceiver(RevelationaryNetworking.RevelationSync.ID, (payload, context) -> {
+		ClientPlayNetworking.registerGlobalReceiver(RevelationSync.ID, (payload, context) -> {
 			try {
 				RevelationRegistry.fromPacket(payload);
 			} catch (Exception e) {
@@ -41,47 +33,48 @@ public class RevelationaryNetworking {
 			ClientRevelationHolder.cloakAll();
 		});
 	}
-
-	public static void sendRevelations(ServerPlayerEntity player) {
+	
+	public static void sendRevelations(ServerPlayer player) {
 		ServerPlayNetworking.send(player, RevelationRegistry.intoPacket());
 	}
-
-	public record RevelationSync(Object2ObjectOpenHashMap<Identifier, ObjectArrayList<BlockState>> advToBlockStates,
-                                 Object2ObjectOpenHashMap<BlockState, Identifier> blockStateToAdv,
+	
+	public record RevelationSync(
+			Object2ObjectOpenHashMap<ResourceLocation, ObjectArrayList<BlockState>> advToBlockStates,
+			Object2ObjectOpenHashMap<BlockState, ResourceLocation> blockStateToAdv,
                                  Object2ObjectOpenHashMap<BlockState, BlockState> blockStateCloaks,
                                  Object2ObjectOpenHashMap<Block, Block> blockCloaks,
-                                 Object2ObjectOpenHashMap<Identifier, ObjectArrayList<Item>> advToItems,
-                                 Object2ObjectOpenHashMap<Item, Identifier> itemToAdv,
+			Object2ObjectOpenHashMap<ResourceLocation, ObjectArrayList<Item>> advToItems,
+			Object2ObjectOpenHashMap<Item, ResourceLocation> itemToAdv,
                                  Object2ObjectOpenHashMap<Item, Item> itemCloaks,
-                                 Object2ObjectOpenHashMap<Block, MutableText> cloakedBlockNameTranslations,
-                                 Object2ObjectOpenHashMap<Item, MutableText> cloakedItemNameTranslations) implements CustomPayload {
-		public static final PacketCodec<RegistryByteBuf, RevelationSync> CODEC = CustomPayload.codecOf(RevelationSync::write, RevelationSync::read);
-		public static final CustomPayload.Id<RevelationSync> ID = new Id<>(Identifier.of(Revelationary.MOD_ID, "revelation_sync"));
-
-		private static void writeText(RegistryByteBuf buf, Text text) {
-			TextCodecs.REGISTRY_PACKET_CODEC.encode(buf, text);
+			Object2ObjectOpenHashMap<Block, MutableComponent> cloakedBlockNameTranslations,
+			Object2ObjectOpenHashMap<Item, MutableComponent> cloakedItemNameTranslations) implements CustomPacketPayload {
+		public static final StreamCodec<RegistryFriendlyByteBuf, RevelationSync> CODEC = CustomPacketPayload.codec(RevelationSync::write, RevelationSync::read);
+		public static final Type<RevelationSync> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(Revelationary.MOD_ID, "revelation_sync"));
+		
+		private static void writeText(RegistryFriendlyByteBuf buf, Component text) {
+			ComponentSerialization.STREAM_CODEC.encode(buf, text);
 		}
-
-		private static Text readText(RegistryByteBuf buf) {
-			return TextCodecs.REGISTRY_PACKET_CODEC.decode(buf);
+		
+		private static Component readText(RegistryFriendlyByteBuf buf) {
+			return ComponentSerialization.STREAM_CODEC.decode(buf);
 		}
-
-		public static RevelationSync read(RegistryByteBuf buf) {
+		
+		public static RevelationSync read(RegistryFriendlyByteBuf buf) {
 			/* Block States */
 
 			final Object2ObjectOpenHashMap<Block, Block> blockCloaks = new Object2ObjectOpenHashMap<>(buf.readInt());
-			final Object2ObjectOpenHashMap<BlockState, Identifier> blockStateToAdv = new Object2ObjectOpenHashMap<>(buf.readInt());
+			final Object2ObjectOpenHashMap<BlockState, ResourceLocation> blockStateToAdv = new Object2ObjectOpenHashMap<>(buf.readInt());
 			final Object2ObjectOpenHashMap<BlockState, BlockState> blockStateCloaks = new Object2ObjectOpenHashMap<>(buf.readInt());
 			int blockEntries = buf.readInt();
-			final Object2ObjectOpenHashMap<Identifier, ObjectArrayList<BlockState>> advToBlockStates = new Object2ObjectOpenHashMap<>(blockEntries);
+			final Object2ObjectOpenHashMap<ResourceLocation, ObjectArrayList<BlockState>> advToBlockStates = new Object2ObjectOpenHashMap<>(blockEntries);
 			for (int i = 0; i < blockEntries; i++) {
-				Identifier advancementIdentifier = buf.readIdentifier();
+				ResourceLocation advancementIdentifier = buf.readResourceLocation();
 				int blockStateCount = buf.readInt();
 				ObjectArrayList<BlockState> advancementStates = new ObjectArrayList<>(blockStateCount);
 				for (int j = 0; j < blockStateCount; j++) {
 					try {
-						BlockState sourceState = BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), buf.readString(), true).blockState();
-						BlockState targetState = BlockArgumentParser.block(Registries.BLOCK.getReadOnlyWrapper(), buf.readString(), true).blockState();
+						BlockState sourceState = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), buf.readUtf(), true).blockState();
+						BlockState targetState = BlockStateParser.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), buf.readUtf(), true).blockState();
 
 						advancementStates.add(sourceState);
 						blockStateToAdv.put(sourceState, advancementIdentifier);
@@ -95,20 +88,20 @@ public class RevelationaryNetworking {
 			}
 
 			/* Items */
-
-			final Object2ObjectOpenHashMap<Item, Identifier> itemToAdv = new Object2ObjectOpenHashMap<>(buf.readInt());
+			
+			final Object2ObjectOpenHashMap<Item, ResourceLocation> itemToAdv = new Object2ObjectOpenHashMap<>(buf.readInt());
 			Object2ObjectOpenHashMap<Item, Item> itemCloaks = new Object2ObjectOpenHashMap<>(buf.readInt());
 			int itemEntries = buf.readInt();
-			final Object2ObjectOpenHashMap<Identifier, ObjectArrayList<Item>> advToItems = new Object2ObjectOpenHashMap<>(itemEntries); // preallocate this map too
+			final Object2ObjectOpenHashMap<ResourceLocation, ObjectArrayList<Item>> advToItems = new Object2ObjectOpenHashMap<>(itemEntries); // preallocate this map too
 			for (int i = 0; i < itemEntries; i++) {
-				Identifier advancementIdentifier = buf.readIdentifier();
+				ResourceLocation advancementIdentifier = buf.readResourceLocation();
 				int itemCount = buf.readInt();
 				ObjectArrayList<Item> advancementItems = new ObjectArrayList<>(itemCount);
 				for (int j = 0; j < itemCount; j++) {
-					Identifier sourceId = Identifier.tryParse(buf.readString());
-					Identifier targetId = Identifier.tryParse(buf.readString());
-					Item sourceItem = Registries.ITEM.get(sourceId);
-					Item targetItem = Registries.ITEM.get(targetId);
+					ResourceLocation sourceId = ResourceLocation.tryParse(buf.readUtf());
+					ResourceLocation targetId = ResourceLocation.tryParse(buf.readUtf());
+					Item sourceItem = BuiltInRegistries.ITEM.get(sourceId);
+					Item targetItem = BuiltInRegistries.ITEM.get(targetId);
 
 					advancementItems.add(sourceItem);
 					itemToAdv.put(sourceItem, advancementIdentifier);
@@ -119,19 +112,19 @@ public class RevelationaryNetworking {
 
 			/* Block Translations */
 			int blockTranslations = buf.readInt();
-			final Object2ObjectOpenHashMap<Block, MutableText> cloakedBlockNameTranslations = new Object2ObjectOpenHashMap<>(blockTranslations); // preallocate translations
+			final Object2ObjectOpenHashMap<Block, MutableComponent> cloakedBlockNameTranslations = new Object2ObjectOpenHashMap<>(blockTranslations); // preallocate translations
 			for (int i = 0; i < blockTranslations; i++) {
-				Block block = Registries.BLOCK.get(buf.readIdentifier());
-				MutableText text = (MutableText) readText(buf);
+				Block block = BuiltInRegistries.BLOCK.get(buf.readResourceLocation());
+				MutableComponent text = (MutableComponent) readText(buf);
 				cloakedBlockNameTranslations.put(block, text);
 			}
 
 			/* Item Translations */
 			int itemTranslations = buf.readInt();
-			final Object2ObjectOpenHashMap<Item, MutableText> cloakedItemNameTranslations = new Object2ObjectOpenHashMap<>(itemTranslations); // preallocate translations
+			final Object2ObjectOpenHashMap<Item, MutableComponent> cloakedItemNameTranslations = new Object2ObjectOpenHashMap<>(itemTranslations); // preallocate translations
 			for (int i = 0; i < itemTranslations; i++) {
-				Item item = Registries.ITEM.get(buf.readIdentifier());
-				MutableText text = (MutableText) readText(buf);
+				Item item = BuiltInRegistries.ITEM.get(buf.readResourceLocation());
+				MutableComponent text = (MutableComponent) readText(buf);
 				cloakedItemNameTranslations.put(item, text);
 			}
 			return new RevelationSync(advToBlockStates,
@@ -144,19 +137,19 @@ public class RevelationaryNetworking {
 									  cloakedBlockNameTranslations,
 									  cloakedItemNameTranslations);
 		}
-
-		public void write(RegistryByteBuf buf) {
+		
+		public void write(RegistryFriendlyByteBuf buf) {
 			// Block States
 			buf.writeInt(blockCloaks.size());      // for preallocation on packet read
 			buf.writeInt(blockStateToAdv.size());  // for preallocation on packet read
 			buf.writeInt(blockStateCloaks.size()); // for preallocation on packet read
 			buf.writeInt(advToBlockStates.size());
-			for (Map.Entry<Identifier, ObjectArrayList<BlockState>> advancementBlocks : advToBlockStates.entrySet()) {
-				buf.writeIdentifier(advancementBlocks.getKey());
+			for (Map.Entry<ResourceLocation, ObjectArrayList<BlockState>> advancementBlocks : advToBlockStates.entrySet()) {
+				buf.writeResourceLocation(advancementBlocks.getKey());
 				buf.writeInt(advancementBlocks.getValue().size());
 				for (BlockState blockState : advancementBlocks.getValue()) {
-					buf.writeString(BlockArgumentParser.stringifyBlockState(blockState));
-					buf.writeString(BlockArgumentParser.stringifyBlockState(blockStateCloaks.get(blockState)));
+					buf.writeUtf(BlockStateParser.serialize(blockState));
+					buf.writeUtf(BlockStateParser.serialize(blockStateCloaks.get(blockState)));
 				}
 			}
 
@@ -164,32 +157,32 @@ public class RevelationaryNetworking {
 			buf.writeInt(itemToAdv.size());  // for preallocation on packet read
 			buf.writeInt(itemCloaks.size()); // for preallocation on packet read
 			buf.writeInt(advToItems.size());
-			for (Map.Entry<Identifier, ObjectArrayList<Item>> advancementItems : advToItems.entrySet()) {
-				buf.writeIdentifier(advancementItems.getKey());
+			for (Map.Entry<ResourceLocation, ObjectArrayList<Item>> advancementItems : advToItems.entrySet()) {
+				buf.writeResourceLocation(advancementItems.getKey());
 				buf.writeInt(advancementItems.getValue().size());
 				for (Item item : advancementItems.getValue()) {
-					buf.writeString(Registries.ITEM.getId(item).toString());
-					buf.writeString(Registries.ITEM.getId(itemCloaks.get(item)).toString());
+					buf.writeUtf(BuiltInRegistries.ITEM.getKey(item).toString());
+					buf.writeUtf(BuiltInRegistries.ITEM.getKey(itemCloaks.get(item)).toString());
 				}
 			}
 
 			// Block Translations
 			buf.writeInt(cloakedBlockNameTranslations.size());
-			for (Map.Entry<Block, MutableText> blockTranslation : cloakedBlockNameTranslations.entrySet()) {
-				buf.writeIdentifier(Registries.BLOCK.getId(blockTranslation.getKey()));
+			for (Map.Entry<Block, MutableComponent> blockTranslation : cloakedBlockNameTranslations.entrySet()) {
+				buf.writeResourceLocation(BuiltInRegistries.BLOCK.getKey(blockTranslation.getKey()));
 				writeText(buf, blockTranslation.getValue());
 			}
 
 			// Item Translations
 			buf.writeInt(cloakedItemNameTranslations.size());
-			for (Map.Entry<Item, MutableText> itemTranslation : cloakedItemNameTranslations.entrySet()) {
-				buf.writeIdentifier(Registries.ITEM.getId(itemTranslation.getKey()));
+			for (Map.Entry<Item, MutableComponent> itemTranslation : cloakedItemNameTranslations.entrySet()) {
+				buf.writeResourceLocation(BuiltInRegistries.ITEM.getKey(itemTranslation.getKey()));
 				writeText(buf, itemTranslation.getValue());
 			}
 		}
 
 		@Override
-		public Id<RevelationSync> getId() {
+		public Type<RevelationSync> type() {
 			return ID;
 		}
 	}

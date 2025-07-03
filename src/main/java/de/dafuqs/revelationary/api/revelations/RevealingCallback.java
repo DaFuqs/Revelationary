@@ -1,11 +1,11 @@
 package de.dafuqs.revelationary.api.revelations;
 
-import de.dafuqs.revelationary.ClientRevelationHolder;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.util.Identifier;
+import de.dafuqs.revelationary.*;
+import net.minecraft.resources.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.*;
 
-import java.util.Set;
+import java.util.*;
 
 /**
  * Interface to react to the event of blocks/items getting revealed after getting advancements
@@ -23,7 +23,7 @@ public interface RevealingCallback {
 	 * @param isJoinPacket true if the trigger is because of the revelation happens right at world join
 	 *                     (when revealing all the blocks and items mapped to advancements gotten in previous play sessions)
 	 */
-	void trigger(Set<Identifier> advancements, Set<Block> blocks, Set<Item> items, boolean isJoinPacket);
+	void trigger(Set<ResourceLocation> advancements, Set<Block> blocks, Set<Item> items, boolean isJoinPacket);
 	
 	/**
 	 * Register this RevealingCallback

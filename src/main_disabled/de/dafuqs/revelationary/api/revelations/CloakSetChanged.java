@@ -1,20 +1,15 @@
 package de.dafuqs.revelationary.api.revelations;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.item.Item;
+import net.minecraft.client.*;
+import net.minecraft.world.item.*;
 
-import java.util.Set;
+import java.util.*;
 
-@Environment(EnvType.CLIENT)
 @FunctionalInterface
 public interface CloakSetChanged {
     Event<CloakSetChanged> EVENT = EventFactory.createArrayBacked(CloakSetChanged.class,
             (listeners) -> (addedCloaks, removedCloaks, newCloaks) -> {
-                MinecraftClient.getInstance().execute(() -> {
+                Minecraft.getInstance().execute(() -> {
                     for (CloakSetChanged listener : listeners) listener.onChange(addedCloaks, removedCloaks, newCloaks);
                 });
             });

@@ -1,15 +1,15 @@
 package de.dafuqs.revelationary.mixin.client;
 
-import net.minecraft.advancement.AdvancementEntry;
-import net.minecraft.advancement.AdvancementProgress;
-import net.minecraft.client.network.ClientAdvancementManager;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import net.minecraft.advancements.*;
+import net.minecraft.client.multiplayer.*;
+import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.gen.*;
 
-import java.util.Map;
+import java.util.*;
 
-@Mixin(ClientAdvancementManager.class)
+@Mixin(ClientAdvancements.class)
 public interface AccessorClientAdvancementManager {
 	@Accessor
-	Map<AdvancementEntry, AdvancementProgress> getAdvancementProgresses();
+	Map<AdvancementHolder, AdvancementProgress> getProgress();
+	
 }

@@ -1,73 +1,62 @@
 package de.dafuqs.revelationary.mixin.client;
 
-import de.dafuqs.revelationary.api.revelations.WorldRendererAccessor;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.BuiltChunkStorage;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.chunk.ChunkBuilder;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
+import de.dafuqs.revelationary.*;
+import de.dafuqs.revelationary.api.revelations.*;
+import net.minecraft.client.*;
+import net.minecraft.client.player.*;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.chunk.*;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.chunk.*;
+import org.spongepowered.asm.mixin.*;
 
-@Environment(EnvType.CLIENT)
-@Mixin(value = WorldRenderer.class, priority = 900)
+@Mixin(value = LevelRenderer.class, priority = 900)
 public abstract class WorldRendererMixin implements WorldRendererAccessor {
 	@Shadow
-	private BuiltChunkStorage chunks;
+	private ViewArea viewArea;
 	
 	@Shadow
-	public abstract void scheduleTerrainUpdate();
+	public abstract void allChanged();
 	
 	/**
 	 * When triggered on client side lets the client redraw ALL chunks
 	 * Warning: Costly + LagSpike!
 	 */
 	public void revelationary$rebuildAllChunks() {
-		if (FabricLoader.getInstance().isModLoaded("sodium")) {
-			rebuildAllChunksSodium();
+		if (Revelationary.cursedChunkBuildingActive()) {
+			revelationary$rebuildAllChunksSodium();
 			return;
 		}
 		
-		if (MinecraftClient.getInstance().world != null) {
-			if (MinecraftClient.getInstance().worldRenderer != null && MinecraftClient.getInstance().player != null) {
-				for (ChunkBuilder.BuiltChunk chunk : this.chunks.chunks) {
-					chunk.scheduleRebuild(true);
-				}
-				scheduleTerrainUpdate();
+		if (Minecraft.getInstance().level != null && Minecraft.getInstance().player != null) {
+			for (SectionRenderDispatcher.RenderSection chunk : this.viewArea.sections) {
+				chunk.setDirty(true);
 			}
+			
+			allChanged();
 		}
 	}
 	
 	@Unique
-	private static void rebuildAllChunksSodium() {
-		World world = MinecraftClient.getInstance().world;
+	private static void revelationary$rebuildAllChunksSodium() {
+		Level world = Minecraft.getInstance().level;
 		if (world == null) {
 			return;
 		}
 		
-		WorldRenderer worldRenderer = MinecraftClient.getInstance().worldRenderer;
-		if (worldRenderer == null) {
-			return;
-		}
+		LevelRenderer worldRenderer = Minecraft.getInstance().levelRenderer;
 		
-		WorldRendererMixinAccessor wra = (de.dafuqs.revelationary.mixin.client.WorldRendererMixinAccessor) worldRenderer;
-		ClientPlayerEntity clientPlayerEntity = MinecraftClient.getInstance().player;
-		ChunkPos chunkPos = clientPlayerEntity.getChunkPos();
-		int viewDistance = MinecraftClient.getInstance().options.getViewDistance().getValue();
+		WorldRendererMixinAccessor wra = (WorldRendererMixinAccessor) worldRenderer;
+		LocalPlayer clientPlayerEntity = Minecraft.getInstance().player;
+		ChunkPos chunkPos = clientPlayerEntity.chunkPosition();
+		int viewDistance = Minecraft.getInstance().options.renderDistance().get();
 		
-		int startY = world.getBottomSectionCoord();
-		int endY = world.getTopSectionCoord();
+		int startY = world.getMinSection();
+		int endY = world.getMaxSection();
 		
 		for (int x = -viewDistance; x < viewDistance; x++) {
 			for (int z = -viewDistance; z < viewDistance; z++) {
-				WorldChunk chunk = MinecraftClient.getInstance().world.getChunkManager().getWorldChunk(chunkPos.x + x, chunkPos.z + z, false);
+				LevelChunk chunk = Minecraft.getInstance().level.getChunkSource().getChunk(chunkPos.x + x, chunkPos.z + z, false);
 				if (chunk != null) {
 					for (int y = startY; y <= endY; y++) {
 						wra.invokeScheduleChunkRender(chunk.getPos().x, y, chunk.getPos().z, false);

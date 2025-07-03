@@ -1,24 +1,16 @@
 package de.dafuqs.revelationary;
 
-import de.dafuqs.revelationary.api.revelations.RevealingCallback;
-import de.dafuqs.revelationary.api.revelations.RevelationAware;
-import de.dafuqs.revelationary.api.revelations.WorldRendererAccessor;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.item.Item;
-import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.NotNull;
+import de.dafuqs.revelationary.api.revelations.*;
+import net.minecraft.client.*;
+import net.minecraft.client.renderer.*;
+import net.minecraft.resources.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.*;
+import org.jetbrains.annotations.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-@Environment(EnvType.CLIENT)
 public class ClientRevelationHolder {
 	
 	public static List<RevealingCallback> callbacks = new ArrayList<>();
@@ -26,12 +18,12 @@ public class ClientRevelationHolder {
 	private static final Set<BlockState> activeBlockStateSwaps = new HashSet<>();
 	private static final Set<Item> activeItemSwaps = new HashSet<>();
 	
-	public static void processNewAdvancements(Set<Identifier> doneAdvancements, boolean isJoinPacket) {
+	public static void processNewAdvancements(Set<ResourceLocation> doneAdvancements, boolean isJoinPacket) {
 		if (!doneAdvancements.isEmpty()) {
 			Set<Item> revealedItems = new HashSet<>();
 			Set<BlockState> revealedBlockStates = new HashSet<>();
 			Set<Block> revealedBlocks = new HashSet<>();
-			for (Identifier doneAdvancement : doneAdvancements) {
+			for (ResourceLocation doneAdvancement : doneAdvancements) {
 				revealedItems.addAll(RevelationRegistry.getRevealedItems(doneAdvancement));
 				revealedBlockStates.addAll(RevelationRegistry.getRevealedBlockStates(doneAdvancement));
 				for (BlockState state : revealedBlockStates) {
@@ -72,12 +64,12 @@ public class ClientRevelationHolder {
 		}
 	}
 	
-	public static void processRemovedAdvancements(@NotNull Set<Identifier> removedAdvancements) {
+	public static void processRemovedAdvancements(@NotNull Set<ResourceLocation> removedAdvancements) {
 		if (!removedAdvancements.isEmpty()) {
 			List<Item> concealedItems = new ArrayList<>();
 			List<BlockState> concealedBlockStates = new ArrayList<>();
 			List<Block> concealedBlocks = new ArrayList<>();
-			for (Identifier removedAdvancement : removedAdvancements) {
+			for (ResourceLocation removedAdvancement : removedAdvancements) {
 				concealedItems.addAll(RevelationRegistry.getRevealedItems(removedAdvancement));
 				concealedBlockStates.addAll(RevelationRegistry.getRevealedBlockStates(removedAdvancement));
 				for (BlockState state : concealedBlockStates) {
@@ -115,7 +107,7 @@ public class ClientRevelationHolder {
 	
 	// rerender chunks to show newly swapped blocks
 	static void rebuildAllChunks() {
-		WorldRenderer renderer = MinecraftClient.getInstance().worldRenderer;
+		LevelRenderer renderer = Minecraft.getInstance().levelRenderer;
 		((WorldRendererAccessor) renderer).revelationary$rebuildAllChunks();
 	}
 	
@@ -135,7 +127,7 @@ public class ClientRevelationHolder {
 	}
 	
 	public static boolean isCloaked(Block block) {
-		return activeBlockStateSwaps.contains(block.getDefaultState());
+		return activeBlockStateSwaps.contains(block.defaultBlockState());
 	}
 	
 	public static boolean isCloaked(BlockState blockState) {

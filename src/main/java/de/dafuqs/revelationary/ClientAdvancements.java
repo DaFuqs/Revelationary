@@ -2,29 +2,27 @@ package de.dafuqs.revelationary;
 
 import de.dafuqs.revelationary.api.advancements.*;
 import de.dafuqs.revelationary.mixin.client.*;
-import net.fabricmc.api.*;
-import net.minecraft.advancement.*;
+import net.minecraft.advancements.*;
 import net.minecraft.client.*;
-import net.minecraft.client.network.*;
-import net.minecraft.network.packet.s2c.play.*;
-import net.minecraft.util.*;
+import net.minecraft.client.multiplayer.*;
+import net.minecraft.network.protocol.game.*;
+import net.minecraft.resources.*;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
 
-@Environment(EnvType.CLIENT)
 public class ClientAdvancements {
 	protected static boolean receivedFirstAdvancementPacket = false;
 	public static List<ClientAdvancementPacketCallback> callbacks = new ArrayList<>();
 	
-	public static void onClientPacket(@NotNull AdvancementUpdateS2CPacket packet) {
+	public static void onClientPacket(@NotNull ClientboundUpdateAdvancementsPacket packet) {
 		boolean hadPacketBefore = receivedFirstAdvancementPacket;
 		receivedFirstAdvancementPacket = true;
-		boolean isReset = packet.shouldClearCurrent();
+		boolean isReset = packet.shouldReset();
 		boolean isFirstPacket = !hadPacketBefore || isReset;
 		
-		Set<Identifier> doneAdvancements = getDoneAdvancements(packet);
-		Set<Identifier> removedAdvancements = packet.getAdvancementIdsToRemove();
+		Set<ResourceLocation> doneAdvancements = getDoneAdvancements(packet);
+		Set<ResourceLocation> removedAdvancements = packet.getRemoved();
 		
 		ClientRevelationHolder.processRemovedAdvancements(removedAdvancements);
 		ClientRevelationHolder.processNewAdvancements(doneAdvancements, isFirstPacket);
@@ -34,20 +32,20 @@ public class ClientAdvancements {
 		}
 	}
 	
-	public static boolean hasDone(Identifier identifier) {
+	public static boolean hasDone(ResourceLocation identifier) {
 		// If we never received the initial packet: assume false
 		if (!receivedFirstAdvancementPacket) {
 			return false;
 		}
 		
 		if (identifier != null) {
-			ClientPlayNetworkHandler conn = MinecraftClient.getInstance().getNetworkHandler();
+			ClientPacketListener conn = Minecraft.getInstance().getConnection();
 			if (conn != null) {
-				ClientAdvancementManager cm = conn.getAdvancementHandler();
-				PlacedAdvancement adv = cm.getManager().get(identifier);
+				net.minecraft.client.multiplayer.ClientAdvancements cm = conn.getAdvancements();
+				AdvancementNode adv = cm.getTree().get(identifier);
 				if (adv != null) {
-					Map<AdvancementEntry, AdvancementProgress> progressMap = ((AccessorClientAdvancementManager) cm).getAdvancementProgresses();
-					AdvancementProgress progress = progressMap.get(adv.getAdvancementEntry());
+					Map<AdvancementHolder, AdvancementProgress> progressMap = ((AccessorClientAdvancementManager) cm).getProgress();
+					AdvancementProgress progress = progressMap.get(adv.holder());
 					return progress != null && progress.isDone();
 				}
 			}
@@ -55,10 +53,10 @@ public class ClientAdvancements {
 		return false;
 	}
 	
-	public static @NotNull Set<Identifier> getDoneAdvancements(@NotNull AdvancementUpdateS2CPacket packet) {
-		Set<Identifier> doneAdvancements = new HashSet<>();
+	public static @NotNull Set<ResourceLocation> getDoneAdvancements(@NotNull ClientboundUpdateAdvancementsPacket packet) {
+		Set<ResourceLocation> doneAdvancements = new HashSet<>();
 		
-		for (Map.Entry<Identifier, AdvancementProgress> progressedAdvancement : packet.getAdvancementsToProgress().entrySet()) {
+		for (Map.Entry<ResourceLocation, AdvancementProgress> progressedAdvancement : packet.getProgress().entrySet()) {
 			if (progressedAdvancement.getValue().isDone()) {
 				doneAdvancements.add(progressedAdvancement.getKey());
 			}

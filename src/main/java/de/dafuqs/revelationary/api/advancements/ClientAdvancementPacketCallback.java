@@ -1,11 +1,9 @@
 package de.dafuqs.revelationary.api.advancements;
 
-import de.dafuqs.revelationary.ClientAdvancements;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.util.Identifier;
+import de.dafuqs.revelationary.*;
+import net.minecraft.resources.*;
 
-import java.util.Set;
+import java.util.*;
 
 /**
  * Utility interface for listening to advancement sync packets
@@ -13,7 +11,6 @@ import java.util.Set;
  * simple full featured lists of advancements that were gotten and removed
  */
 
-@Environment(EnvType.CLIENT)
 public interface ClientAdvancementPacketCallback {
 	/**
 	 * Gets called every time advancements get synched from server- to client side
@@ -23,7 +20,7 @@ public interface ClientAdvancementPacketCallback {
 	 * @param isJoinPacket        True if the trigger is because of the first advancement packet after world join
 	 *                            (synching from all the advancements of previous play sessions)
 	 */
-	void onClientAdvancementPacket(Set<Identifier> gottenAdvancements, Set<Identifier> removedAdvancements, boolean isJoinPacket);
+	void onClientAdvancementPacket(Set<ResourceLocation> gottenAdvancements, Set<ResourceLocation> removedAdvancements, boolean isJoinPacket);
 	
 	/**
 	 * Register a ClientAdvancementPacketCallback so it will receive triggers
