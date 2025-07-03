@@ -6,6 +6,6 @@ import org.spongepowered.asm.mixin.gen.*;
 
 @Mixin(LevelRenderer.class)
 public interface WorldRendererMixinAccessor {
-	@Invoker("scheduleChunkRender")
-	void invokeScheduleChunkRender(int x, int y, int z, boolean important);
+	@Invoker("Lnet/minecraft/client/renderer/LevelRenderer;setSectionDirty(IIIZ)V")
+	void invokeSetSectionDirty(int x, int y, int z, boolean important);
 }

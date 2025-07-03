@@ -13,29 +13,14 @@ import net.minecraft.server.level.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.*;
+import net.neoforged.neoforge.network.*;
 
 import java.util.*;
 
 public class RevelationaryNetworking {
 	
-	public static void register() {
-		PayloadTypeRegistry.playS2C().register(RevelationSync.ID, RevelationSync.CODEC);
-	}
-
-	public static void registerPacketReceivers() {
-		ClientPlayNetworking.registerGlobalReceiver(RevelationSync.ID, (payload, context) -> {
-			try {
-				RevelationRegistry.fromPacket(payload);
-			} catch (Exception e) {
-				Revelationary.logError("Error fetching results from sync packet");
-				Revelationary.logException(e);
-			}
-			ClientRevelationHolder.cloakAll();
-		});
-	}
-	
 	public static void sendRevelations(ServerPlayer player) {
-		ServerPlayNetworking.send(player, RevelationRegistry.intoPacket());
+		PacketDistributor.sendToPlayer(player, RevelationRegistry.intoPacket());
 	}
 	
 	public record RevelationSync(
@@ -48,8 +33,9 @@ public class RevelationaryNetworking {
                                  Object2ObjectOpenHashMap<Item, Item> itemCloaks,
 			Object2ObjectOpenHashMap<Block, MutableComponent> cloakedBlockNameTranslations,
 			Object2ObjectOpenHashMap<Item, MutableComponent> cloakedItemNameTranslations) implements CustomPacketPayload {
+		
 		public static final StreamCodec<RegistryFriendlyByteBuf, RevelationSync> CODEC = CustomPacketPayload.codec(RevelationSync::write, RevelationSync::read);
-		public static final Type<RevelationSync> ID = new Type<>(ResourceLocation.fromNamespaceAndPath(Revelationary.MOD_ID, "revelation_sync"));
+		public static final CustomPacketPayload.Type<RevelationSync> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Revelationary.MOD_ID, "revelation_sync"));
 		
 		private static void writeText(RegistryFriendlyByteBuf buf, Component text) {
 			ComponentSerialization.STREAM_CODEC.encode(buf, text);
@@ -183,7 +169,7 @@ public class RevelationaryNetworking {
 
 		@Override
 		public Type<RevelationSync> type() {
-			return ID;
+			return TYPE;
 		}
 	}
 }

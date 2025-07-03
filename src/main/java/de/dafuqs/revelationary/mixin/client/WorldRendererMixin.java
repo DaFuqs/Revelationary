@@ -59,7 +59,7 @@ public abstract class WorldRendererMixin implements WorldRendererAccessor {
 				LevelChunk chunk = Minecraft.getInstance().level.getChunkSource().getChunk(chunkPos.x + x, chunkPos.z + z, false);
 				if (chunk != null) {
 					for (int y = startY; y <= endY; y++) {
-						wra.invokeScheduleChunkRender(chunk.getPos().x, y, chunk.getPos().z, false);
+						wra.invokeSetSectionDirty(chunk.getPos().x, y, chunk.getPos().z, false);
 					}
 				}
 			}

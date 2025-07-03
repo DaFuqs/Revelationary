@@ -9,6 +9,8 @@ import net.neoforged.neoforge.common.*;
 import net.neoforged.neoforge.event.*;
 import net.neoforged.neoforge.event.entity.player.*;
 import net.neoforged.neoforge.event.server.*;
+import net.neoforged.neoforge.network.event.*;
+import net.neoforged.neoforge.network.registration.*;
 import org.jetbrains.annotations.*;
 import org.slf4j.*;
 
@@ -36,15 +38,11 @@ public class Revelationary {
     public Revelationary() {
         AdvancementCriteria.register();
         NeoForge.EVENT_BUS.register(this);
-        RevelationaryNetworking.registerPacketReceivers();
     }
     
     @SubscribeEvent
     public void onInitialize() {
         logInfo("Starting Common Startup");
-
-        RevelationaryNetworking.register();
-
         AdvancementCriteria.register();
         
         if (cursedChunkBuildingActive()) {
@@ -83,6 +81,17 @@ public class Revelationary {
         if (event.getEntity() instanceof ServerPlayer serverPlayerEntity) {
             RevelationaryNetworking.sendRevelations(serverPlayerEntity);
         }
+    }
+    
+    @SubscribeEvent
+    public static void register(final RegisterPayloadHandlersEvent event) {
+        // Sets the current network version
+        final PayloadRegistrar registrar = event.registrar("1");
+        registrar.playToClient(
+                RevelationaryNetworking.RevelationSync.TYPE,
+                RevelationaryNetworking.RevelationSync.CODEC,
+                ClientPayloadHandler::handleDataOnMain
+        );
     }
     
 }
