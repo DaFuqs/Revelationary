@@ -78,24 +78,6 @@ public class CloakedItem extends Item implements RevelationAware {
 }
 ```
 
-## Registering a Callback when Revelations happen
-
-```java
-RevelationHolder.registerRevelationCallback(new RevelationHolder.UncloakCallback() {
-    @Override
-    public void trigger(List<Identifier> advancements, List<Block> blocks, List<Item> items) {
-        for(Block block : blocks) {
-            if(Registry.BLOCK.getId(block).getNamespace().equals(MOD_ID)) {
-                ...
-                <I dunno. Like show a popup or something. You tell me>
-                ...
-                break
-            }
-        }
-    }
-});
-```
-
 # Discord
 You will find a lot of helpful people on Spectrum's Discord. There always are friendly and helpful people around. Swing around too, if you like!
 
