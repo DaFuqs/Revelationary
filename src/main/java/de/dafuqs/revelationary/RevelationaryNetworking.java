@@ -13,11 +13,26 @@ import net.minecraft.server.level.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.*;
+import net.neoforged.bus.api.*;
 import net.neoforged.neoforge.network.*;
+import net.neoforged.neoforge.network.event.*;
+import net.neoforged.neoforge.network.registration.*;
 
 import java.util.*;
 
 public class RevelationaryNetworking {
+	
+	@SubscribeEvent
+	public static void register(final RegisterPayloadHandlersEvent event) {
+		PayloadRegistrar registrar = event.registrar("1");
+		
+		// Sets the current network version
+		registrar.playToClient(
+				RevelationaryNetworking.RevelationSync.TYPE,
+				RevelationaryNetworking.RevelationSync.CODEC,
+				ClientPayloadHandler::handleDataOnMain
+		);
+	}
 	
 	public static void sendRevelations(ServerPlayer player) {
 		PacketDistributor.sendToPlayer(player, RevelationRegistry.intoPacket());

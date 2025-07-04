@@ -3,6 +3,7 @@ package de.dafuqs.revelationary;
 import de.dafuqs.revelationary.api.advancements.*;
 import net.minecraft.server.level.*;
 import net.neoforged.bus.api.*;
+import net.neoforged.fml.*;
 import net.neoforged.fml.common.*;
 import net.neoforged.fml.loading.*;
 import net.neoforged.neoforge.common.*;
@@ -10,7 +11,6 @@ import net.neoforged.neoforge.event.*;
 import net.neoforged.neoforge.event.entity.player.*;
 import net.neoforged.neoforge.event.server.*;
 import net.neoforged.neoforge.network.event.*;
-import net.neoforged.neoforge.network.registration.*;
 import org.jetbrains.annotations.*;
 import org.slf4j.*;
 
@@ -20,14 +20,6 @@ public class Revelationary {
     public static final String MOD_ID = "revelationary";
     private static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-    public static void logInfo(String message) {
-        LOGGER.info("[Revelationary] {}", message);
-    }
-
-    public static void logWarning(String message) {
-        LOGGER.warn("[Revelationary] {}", message);
-    }
-
     public static void logError(String message) {
         LOGGER.error("[Revelationary] {}", message);
     }
@@ -35,24 +27,17 @@ public class Revelationary {
         LOGGER.error("[Revelationary] ", t);
     }
     
-    public Revelationary() {
-        AdvancementCriteria.register();
+    public Revelationary(IEventBus eventBus, ModContainer container) {
         NeoForge.EVENT_BUS.register(this);
-    }
-    
-    @SubscribeEvent
-    public void onInitialize() {
-        logInfo("Starting Common Startup");
-        AdvancementCriteria.register();
+        AdvancementCriteria.register(eventBus);
+        eventBus.addListener(RegisterPayloadHandlersEvent.class, RevelationaryNetworking::register);
         
-        if (cursedChunkBuildingActive()) {
-            logWarning("Sodium/Rubidium detected. Chunk rebuilding will be done in cursed mode.");
+        if (isCursedChunkRebuildingActive()) {
+            LOGGER.warn("Sodium/Rubidium detected. Chunk rebuilding will be done in cursed mode.");
         }
-        
-        logInfo("Common startup completed!");
     }
     
-    public static boolean cursedChunkBuildingActive() {
+    public static boolean isCursedChunkRebuildingActive() {
         LoadingModList modlist = LoadingModList.get();
         return modlist.getModFileById("sodium") != null || modlist.getModFileById("rubidium") != null;
     }
@@ -61,8 +46,6 @@ public class Revelationary {
     public void onAddReloadListener(@NotNull AddReloadListenerEvent event) {
         // TODO: is there a better location to trigger this?
         RevelationRegistry.addRevelationAwares();
-        RevelationRegistry.deepTrim();
-        
         event.addListener(RevelationDataLoader.INSTANCE);
     }
     
@@ -81,17 +64,6 @@ public class Revelationary {
         if (event.getEntity() instanceof ServerPlayer serverPlayerEntity) {
             RevelationaryNetworking.sendRevelations(serverPlayerEntity);
         }
-    }
-    
-    @SubscribeEvent
-    public static void register(final RegisterPayloadHandlersEvent event) {
-        // Sets the current network version
-        final PayloadRegistrar registrar = event.registrar("1");
-        registrar.playToClient(
-                RevelationaryNetworking.RevelationSync.TYPE,
-                RevelationaryNetworking.RevelationSync.CODEC,
-                ClientPayloadHandler::handleDataOnMain
-        );
     }
     
 }

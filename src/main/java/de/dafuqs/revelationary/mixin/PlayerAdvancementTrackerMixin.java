@@ -21,12 +21,12 @@ public abstract class PlayerAdvancementTrackerMixin {
 	public void revelationary$triggerAdvancementCriteria(AdvancementHolder advancement, String criterionName, CallbackInfoReturnable<Boolean> cir) {
 		AdvancementProgress advancementProgress = ((PlayerAdvancements) (Object) this).getOrStartProgress(advancement);
 		if (advancementProgress.isDone()) {
-			AdvancementCriteria.ADVANCEMENT_GOTTEN.trigger(player, advancement);
-			AdvancementCriteria.ADVANCEMENT_COUNT.trigger(player);
+			AdvancementCriteria.ADVANCEMENT_GOTTEN.get().trigger(player, advancement);
+			AdvancementCriteria.ADVANCEMENT_COUNT.get().trigger(player);
 			
 			List<Block> revelations = RevelationRegistry.getBlockEntries(advancement.id());
 			for (Block revelation : revelations) {
-				AdvancementCriteria.HAD_REVELATION.trigger(player, revelation);
+				AdvancementCriteria.HAD_REVELATION.get().trigger(player, revelation);
 			}
 		}
 	}

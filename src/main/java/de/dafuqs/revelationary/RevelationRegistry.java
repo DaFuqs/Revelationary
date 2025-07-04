@@ -130,6 +130,8 @@ public class RevelationRegistry {
 				registerItemTranslation(itemTranslation.getA(), itemTranslation.getB());
 			}
 		}
+		
+		RevelationRegistry.deepTrim();
 	}
 	
 	public static void registerFromJson(JsonObject jsonObject) {
@@ -378,7 +380,6 @@ public class RevelationRegistry {
 		cloakedItemNameTranslations = syncPacket.cloakedItemNameTranslations();
 
 		RevelationRegistry.addRevelationAwares();
-		RevelationRegistry.deepTrim();
 	}
 
 	public static RevelationaryNetworking.RevelationSync intoPacket() {

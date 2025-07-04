@@ -23,7 +23,7 @@ public abstract class WorldRendererMixin implements WorldRendererAccessor {
 	 * Warning: Costly + LagSpike!
 	 */
 	public void revelationary$rebuildAllChunks() {
-		if (Revelationary.cursedChunkBuildingActive()) {
+		if (Revelationary.isCursedChunkRebuildingActive()) {
 			revelationary$rebuildAllChunksSodium();
 			return;
 		}
