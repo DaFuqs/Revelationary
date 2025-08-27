@@ -1,13 +1,16 @@
-/*package de.dafuqs.revelationary.compat.wthit;
+package de.dafuqs.revelationary.compat.wthit;
 
 import de.dafuqs.revelationary.api.revelations.RevelationAware;
 import mcp.mobius.waila.api.IBlockAccessor;
 import mcp.mobius.waila.api.IBlockComponentProvider;
 import mcp.mobius.waila.api.IPluginConfig;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
+@Environment(EnvType.CLIENT)
 public class CloakedBlockComponentProvider implements IBlockComponentProvider {
     @Override
     public @Nullable BlockState getOverride(IBlockAccessor accessor, IPluginConfig config) {
@@ -21,4 +24,3 @@ public class CloakedBlockComponentProvider implements IBlockComponentProvider {
         return accessor.getBlockState();
     }
 }
-*/
