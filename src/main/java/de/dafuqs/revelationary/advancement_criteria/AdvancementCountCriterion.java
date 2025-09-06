@@ -31,7 +31,7 @@ public class AdvancementCountCriterion extends AbstractCriterion<AdvancementCoun
 			.apply(inst, Conditions::new));
 
 		public boolean matches(ServerPlayerEntity serverPlayerEntity) {
-			ServerAdvancementLoader loader = serverPlayerEntity.server.getAdvancementLoader();
+			ServerAdvancementLoader loader = serverPlayerEntity.getWorld().getServer().getAdvancementLoader();
 			if(loader == null) {
 				return false;
 			}

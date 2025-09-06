@@ -29,7 +29,7 @@ public class AdvancementHelper {
 		}
 		
 		if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
-			AdvancementEntry advancement = serverPlayerEntity.server.getAdvancementLoader().get(advancementIdentifier);
+			AdvancementEntry advancement = serverPlayerEntity.getWorld().getServer().getAdvancementLoader().get(advancementIdentifier);
 			if (advancement == null) {
 				Revelationary.logError("Player " + playerEntity.getName() + " was getting an advancement check for an advancement that does not exist: " + advancementIdentifier);
 				return false;
