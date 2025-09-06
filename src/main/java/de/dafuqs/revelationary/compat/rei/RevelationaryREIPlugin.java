@@ -1,4 +1,4 @@
-/*package de.dafuqs.revelationary.compat.rei;
+package de.dafuqs.revelationary.compat.rei;
 
 import de.dafuqs.revelationary.api.revelations.CloakSetChanged;
 import de.dafuqs.revelationary.config.RevelationaryConfig;
@@ -37,4 +37,3 @@ public class RevelationaryREIPlugin implements REIClientPlugin {
         );
     }
 }
-*/
