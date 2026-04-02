@@ -4,9 +4,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.item.Item;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.item.Item;
 import java.util.Set;
 
 @Environment(EnvType.CLIENT)
@@ -14,7 +13,7 @@ import java.util.Set;
 public interface CloakSetChanged {
     Event<CloakSetChanged> EVENT = EventFactory.createArrayBacked(CloakSetChanged.class,
             (listeners) -> (addedCloaks, removedCloaks, newCloaks) -> {
-                MinecraftClient.getInstance().execute(() -> {
+                Minecraft.getInstance().execute(() -> {
                     for (CloakSetChanged listener : listeners) listener.onChange(addedCloaks, removedCloaks, newCloaks);
                 });
             });

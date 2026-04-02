@@ -1,18 +1,17 @@
 package de.dafuqs.revelationary.api.revelations;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.item.Item;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
-
 import java.util.Hashtable;
 import java.util.Map;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class CloakedItem extends Item implements RevelationAware {
 	Identifier cloakAdvancementIdentifier;
 	Item cloakItem;
 	
-	public CloakedItem(Settings settings, Identifier cloakAdvancementIdentifier, Item cloakItem) {
+	public CloakedItem(Properties settings, Identifier cloakAdvancementIdentifier, Item cloakItem) {
 		super(settings);
 		this.cloakAdvancementIdentifier = cloakAdvancementIdentifier;
 		this.cloakItem = cloakItem;
@@ -31,7 +30,7 @@ public class CloakedItem extends Item implements RevelationAware {
 	}
 	
 	@Override
-	public Pair<Item, Item> getItemCloak() {
-		return new Pair<>(this, cloakItem);
+	public Tuple<Item, Item> getItemCloak() {
+		return new Tuple<>(this, cloakItem);
 	}
 }

@@ -5,15 +5,18 @@ import de.dafuqs.revelationary.api.revelations.RevelationAware;
 import de.dafuqs.revelationary.config.RevelationaryConfig;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.block.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
-import net.minecraft.registry.*;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Language;
-import net.minecraft.util.Pair;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,39 +32,39 @@ public class RevelationRegistry {
 	private static Object2ObjectOpenHashMap<Item, Identifier> itemToAdv = new Object2ObjectOpenHashMap<>();
 	private static Object2ObjectOpenHashMap<Item, Item> itemCloaks = new Object2ObjectOpenHashMap<>();
 	
-	private static Object2ObjectOpenHashMap<Block, MutableText> cloakedBlockNameTranslations = new Object2ObjectOpenHashMap<>();
-	private static Object2ObjectOpenHashMap<Item, MutableText> cloakedItemNameTranslations = new Object2ObjectOpenHashMap<>();
+	private static Object2ObjectOpenHashMap<Block, MutableComponent> cloakedBlockNameTranslations = new Object2ObjectOpenHashMap<>();
+	private static Object2ObjectOpenHashMap<Item, MutableComponent> cloakedItemNameTranslations = new Object2ObjectOpenHashMap<>();
 	
-	public static MutableText getTranslationString(Item item) {
+	public static MutableComponent getTranslationString(Item item) {
 		if (cloakedItemNameTranslations.containsKey(item)) {
 			return cloakedItemNameTranslations.get(item);
 		}
 		boolean isBlockItem = item instanceof BlockItem;
 		if(isBlockItem && !RevelationaryConfig.get().NameForUnrevealedBlocks.isEmpty()) {
-			return Text.translatable(RevelationaryConfig.get().NameForUnrevealedBlocks);
+			return Component.translatable(RevelationaryConfig.get().NameForUnrevealedBlocks);
 		}
 		if(!isBlockItem && !RevelationaryConfig.get().NameForUnrevealedItems.isEmpty()) {
-			return Text.translatable(RevelationaryConfig.get().NameForUnrevealedItems);
+			return Component.translatable(RevelationaryConfig.get().NameForUnrevealedItems);
 		}
 		if(RevelationaryConfig.get().UseTargetBlockOrItemNameInsteadOfScatter) {
-			return Text.translatable(itemCloaks.get(item).getTranslationKey());
+			return Component.translatable(itemCloaks.get(item).getDescriptionId());
 		}
 		// Get the localized name of the item and scatter it using §k to make it unreadable
-		return Text.literal("§k" + Language.getInstance().get(item.getTranslationKey()));
+		return Component.literal("§k" + Language.getInstance().getOrDefault(item.getDescriptionId()));
 	}
 	
-	public static MutableText getTranslationString(Block block) {
+	public static MutableComponent getTranslationString(Block block) {
 		if (cloakedBlockNameTranslations.containsKey(block)) {
 			return cloakedBlockNameTranslations.get(block);
 		}
 		if(!RevelationaryConfig.get().NameForUnrevealedBlocks.isEmpty()) {
-			return Text.translatable(RevelationaryConfig.get().NameForUnrevealedBlocks);
+			return Component.translatable(RevelationaryConfig.get().NameForUnrevealedBlocks);
 		}
 		if(RevelationaryConfig.get().UseTargetBlockOrItemNameInsteadOfScatter) {
 			return blockCloaks.get(block).getName();
 		}
 		// Get the localized name of the block and scatter it using §k to make it unreadable
-		return Text.literal("§k" + Language.getInstance().get(block.getTranslationKey()));
+		return Component.literal("§k" + Language.getInstance().getOrDefault(block.getDescriptionId()));
 	}
 
 	private static void trim() {
@@ -105,25 +108,25 @@ public class RevelationRegistry {
 				BlockState sourceBlockState = states.getKey();
 				if (sourceBlockState.isAir()) {
 					Revelationary.logError("Trying to register invalid block cloak. Advancement: " + advancementIdentifier
-							+ " Source Block: " + Registries.BLOCK.getId(sourceBlockState.getBlock())
-							+ " Target Block: " + Registries.BLOCK.getId(states.getValue().getBlock()));
+							+ " Source Block: " + BuiltInRegistries.BLOCK.getKey(sourceBlockState.getBlock())
+							+ " Target Block: " + BuiltInRegistries.BLOCK.getKey(states.getValue().getBlock()));
 					continue;
 				}
 				registerBlockState(advancementIdentifier, sourceBlockState, states.getValue());
 			}
 
-			Pair<Item, Item> item = revelationAware.getItemCloak();
+			Tuple<Item, Item> item = revelationAware.getItemCloak();
 			if (item != null) {
-				registerItem(advancementIdentifier, item.getLeft(), item.getRight());
+				registerItem(advancementIdentifier, item.getA(), item.getB());
 			}
 			
-			Pair<Block, MutableText> blockTranslation = revelationAware.getCloakedBlockTranslation();
+			Tuple<Block, MutableComponent> blockTranslation = revelationAware.getCloakedBlockTranslation();
 			if (blockTranslation != null) {
-				registerBlockTranslation(blockTranslation.getLeft(), blockTranslation.getRight());
+				registerBlockTranslation(blockTranslation.getA(), blockTranslation.getB());
 			}
-			Pair<Item, MutableText> itemTranslation = revelationAware.getCloakedItemTranslation();
+			Tuple<Item, MutableComponent> itemTranslation = revelationAware.getCloakedItemTranslation();
 			if (itemTranslation != null) {
-				registerItemTranslation(itemTranslation.getLeft(), itemTranslation.getRight());
+				registerItemTranslation(itemTranslation.getA(), itemTranslation.getB());
 			}
 		}
 	}
@@ -148,7 +151,7 @@ public class RevelationRegistry {
 		}
 	}
 	
-	public static void registerBlockTranslation(Block sourceBlock, MutableText targetTranslation) {
+	public static void registerBlockTranslation(Block sourceBlock, MutableComponent targetTranslation) {
 		cloakedBlockNameTranslations.put(sourceBlock, targetTranslation);
 	}
 	
@@ -156,7 +159,7 @@ public class RevelationRegistry {
 		return blockStateCloaks.containsKey(blockState);
 	}
 	
-	public static boolean isVisibleTo(BlockState state, PlayerEntity player) {
+	public static boolean isVisibleTo(BlockState state, Player player) {
 		return AdvancementHelper.hasAdvancement(player, blockStateToAdv.getOrDefault(state, null));
 	}
 	
@@ -213,8 +216,8 @@ public class RevelationRegistry {
 	public static void registerItem(Identifier advancementIdentifier, Item sourceItem, Item targetItem) {
 		if(sourceItem == Items.AIR || targetItem == Items.AIR) {
 			Revelationary.logError("Trying to register invalid item cloak. Advancement: " + advancementIdentifier
-					+ " Source Item: " + Registries.ITEM.getId(sourceItem)
-					+ " Target Item: " + Registries.ITEM.getId(targetItem));
+					+ " Source Item: " + BuiltInRegistries.ITEM.getKey(sourceItem)
+					+ " Target Item: " + BuiltInRegistries.ITEM.getKey(targetItem));
 			return;
 		}
 		
@@ -233,7 +236,7 @@ public class RevelationRegistry {
 		itemToAdv.put(sourceItem, advancementIdentifier);
 	}
 	
-	public static void registerItemTranslation(Item sourceItem, MutableText targetTranslation) {
+	public static void registerItemTranslation(Item sourceItem, MutableComponent targetTranslation) {
 		cloakedItemNameTranslations.put(sourceItem, targetTranslation);
 	}
 	
@@ -246,7 +249,7 @@ public class RevelationRegistry {
 		return itemCloaks.getOrDefault(item, null);
 	}
 	
-	public static boolean isVisibleTo(Item item, PlayerEntity player) {
+	public static boolean isVisibleTo(Item item, Player player) {
 		return AdvancementHelper.hasAdvancement(player, itemToAdv.getOrDefault(item, null));
 	}
 	

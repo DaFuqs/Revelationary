@@ -3,8 +3,7 @@ package de.dafuqs.revelationary.api.advancements;
 import de.dafuqs.revelationary.ClientAdvancements;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.resources.Identifier;
 import java.util.Set;
 
 /**

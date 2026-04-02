@@ -5,12 +5,12 @@ import de.dafuqs.revelationary.api.revelations.RevelationAware;
 import de.dafuqs.revelationary.api.revelations.WorldRendererAccessor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.item.Item;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -115,7 +115,7 @@ public class ClientRevelationHolder {
 	
 	// rerender chunks to show newly swapped blocks
 	static void rebuildAllChunks() {
-		WorldRenderer renderer = MinecraftClient.getInstance().worldRenderer;
+		LevelRenderer renderer = Minecraft.getInstance().levelRenderer;
 		((WorldRendererAccessor) renderer).revelationary$rebuildAllChunks();
 	}
 	
@@ -135,7 +135,7 @@ public class ClientRevelationHolder {
 	}
 	
 	public static boolean isCloaked(Block block) {
-		return activeBlockStateSwaps.contains(block.getDefaultState());
+		return activeBlockStateSwaps.contains(block.defaultBlockState());
 	}
 	
 	public static boolean isCloaked(BlockState blockState) {

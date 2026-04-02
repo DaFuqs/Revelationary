@@ -6,15 +6,15 @@ import mcp.mobius.waila.api.IBlockComponentProvider;
 import mcp.mobius.waila.api.IPluginConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
 public class CloakedBlockComponentProvider implements IBlockComponentProvider {
     @Override
     public @Nullable BlockState getOverride(IBlockAccessor accessor, IPluginConfig config) {
-        PlayerEntity player = accessor.getPlayer();
+        Player player = accessor.getPlayer();
 
         RevelationAware aware = (RevelationAware) accessor.getBlock();
         if (!aware.isVisibleTo(player)) {

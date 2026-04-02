@@ -1,19 +1,18 @@
 package de.dafuqs.revelationary.api.revelations;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
-
 import java.util.Map;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class CloakedBlockItem extends BlockItem implements RevelationAware {
 	Identifier cloakAdvancementIdentifier;
 	BlockItem cloakItem;
 	
-	public CloakedBlockItem(Block block, Settings settings, Identifier cloakAdvancementIdentifier, BlockItem cloakItem) {
+	public CloakedBlockItem(Block block, Properties settings, Identifier cloakAdvancementIdentifier, BlockItem cloakItem) {
 		super(block, settings);
 		this.cloakAdvancementIdentifier = cloakAdvancementIdentifier;
 		this.cloakItem = cloakItem;
@@ -28,11 +27,11 @@ public class CloakedBlockItem extends BlockItem implements RevelationAware {
 	
 	@Override
 	public Map<BlockState, BlockState> getBlockStateCloaks() {
-		return Map.of(this.getBlock().getDefaultState(), this.cloakItem.getBlock().getDefaultState());
+		return Map.of(this.getBlock().defaultBlockState(), this.cloakItem.getBlock().defaultBlockState());
 	}
 	
 	@Override
-	public Pair<Item, Item> getItemCloak() {
-		return new Pair<>(this, cloakItem);
+	public Tuple<Item, Item> getItemCloak() {
+		return new Tuple<>(this, cloakItem);
 	}
 }
