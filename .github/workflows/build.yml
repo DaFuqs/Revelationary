@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         # Use these Java versions
-        java: [21] # Current Java LTS & minimum supported by Minecraft
+        java: [25] # Current Java LTS & minimum supported by Minecraft
         # Test on both Linux and Windows
         os: [ubuntu-latest, windows-latest]
     
