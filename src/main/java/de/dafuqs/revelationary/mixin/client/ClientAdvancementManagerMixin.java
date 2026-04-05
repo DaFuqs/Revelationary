@@ -1,14 +1,13 @@
 package de.dafuqs.revelationary.mixin.client;
 
 import de.dafuqs.revelationary.ClientAdvancements;
-import net.minecraft.client.network.ClientAdvancementManager;
-import net.minecraft.network.packet.s2c.play.AdvancementUpdateS2CPacket;
+import net.minecraft.network.protocol.game.ClientboundUpdateAdvancementsPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientAdvancementManager.class)
+@Mixin(net.minecraft.client.multiplayer.ClientAdvancements.class)
 public abstract class ClientAdvancementManagerMixin {
 	/**
 	 * Intercepts advancement packets sent from server to client
@@ -18,8 +17,8 @@ public abstract class ClientAdvancementManagerMixin {
 	 * @param packet The vanilla advancement packet
 	 * @param info   Mixin callback info
 	 */
-	@Inject(at = @At("RETURN"), method = "onAdvancements")
-	public void revelationary$onAdvancementSync(AdvancementUpdateS2CPacket packet, CallbackInfo info) {
+	@Inject(at = @At("RETURN"), method = "update")
+	public void revelationary$onAdvancementSync(ClientboundUpdateAdvancementsPacket packet, CallbackInfo info) {
 		ClientAdvancements.onClientPacket(packet);
 	}
 }

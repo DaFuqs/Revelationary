@@ -24,9 +24,6 @@
     ],
     "jade": [
       "de.dafuqs.revelationary.compat.jade.RevelationaryJadePlugin"
-    ],
-    "rei_client": [
-      "de.dafuqs.revelationary.compat.rei.RevelationaryREIPlugin"
     ]
   },
   "mixins": [

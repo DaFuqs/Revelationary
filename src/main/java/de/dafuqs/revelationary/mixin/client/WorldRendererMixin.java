@@ -4,26 +4,26 @@ import de.dafuqs.revelationary.api.revelations.WorldRendererAccessor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.render.BuiltChunkStorage;
-import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.render.chunk.ChunkBuilder;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.ViewArea;
+import net.minecraft.client.renderer.chunk.SectionRenderDispatcher;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 @Environment(EnvType.CLIENT)
-@Mixin(value = WorldRenderer.class, priority = 900)
+@Mixin(value = LevelRenderer.class, priority = 900)
 public abstract class WorldRendererMixin implements WorldRendererAccessor {
 	@Shadow
-	private BuiltChunkStorage chunks;
+	private ViewArea viewArea;
 	
 	@Shadow
-	public abstract void scheduleTerrainUpdate();
+	public abstract void needsUpdate();
 	
 	/**
 	 * When triggered on client side lets the client redraw ALL chunks
@@ -35,42 +35,42 @@ public abstract class WorldRendererMixin implements WorldRendererAccessor {
 			return;
 		}
 		
-		if (MinecraftClient.getInstance().world != null) {
-			if (MinecraftClient.getInstance().worldRenderer != null && MinecraftClient.getInstance().player != null) {
-				for (ChunkBuilder.BuiltChunk chunk : this.chunks.chunks) {
-					chunk.scheduleRebuild(true);
+		if (Minecraft.getInstance().level != null) {
+			if (Minecraft.getInstance().levelRenderer != null && Minecraft.getInstance().player != null) {
+				for (SectionRenderDispatcher.RenderSection chunk : this.viewArea.sections) {
+					chunk.setDirty(true);
 				}
-				scheduleTerrainUpdate();
+				needsUpdate();
 			}
 		}
 	}
 	
 	@Unique
 	private static void rebuildAllChunksSodium() {
-		World world = MinecraftClient.getInstance().world;
+		Level world = Minecraft.getInstance().level;
 		if (world == null) {
 			return;
 		}
 		
-		WorldRenderer worldRenderer = MinecraftClient.getInstance().worldRenderer;
+		LevelRenderer worldRenderer = Minecraft.getInstance().levelRenderer;
 		if (worldRenderer == null) {
 			return;
 		}
 		
 		WorldRendererMixinAccessor wra = (de.dafuqs.revelationary.mixin.client.WorldRendererMixinAccessor) worldRenderer;
-		ClientPlayerEntity clientPlayerEntity = MinecraftClient.getInstance().player;
-		ChunkPos chunkPos = clientPlayerEntity.getChunkPos();
-		int viewDistance = MinecraftClient.getInstance().options.getViewDistance().getValue();
+		LocalPlayer clientPlayerEntity = Minecraft.getInstance().player;
+		ChunkPos chunkPos = clientPlayerEntity.chunkPosition();
+		int viewDistance = Minecraft.getInstance().options.renderDistance().get();
 		
-		int startY = world.getBottomSectionCoord();
-		int endY = world.getTopSectionCoord();
+		int startY = world.getMinSectionY();
+		int endY = world.getMaxSectionY();
 		
 		for (int x = -viewDistance; x < viewDistance; x++) {
 			for (int z = -viewDistance; z < viewDistance; z++) {
-				WorldChunk chunk = MinecraftClient.getInstance().world.getChunkManager().getWorldChunk(chunkPos.x + x, chunkPos.z + z, false);
+				LevelChunk chunk = Minecraft.getInstance().level.getChunkSource().getChunk(chunkPos.x() + x, chunkPos.z() + z, false);
 				if (chunk != null) {
 					for (int y = startY; y <= endY; y++) {
-						wra.invokeScheduleChunkRender(chunk.getPos().x, y, chunk.getPos().z, false);
+						wra.invokeScheduleChunkRender(chunk.getPos().x(), y, chunk.getPos().z(), false);
 					}
 				}
 			}

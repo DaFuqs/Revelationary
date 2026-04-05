@@ -2,40 +2,42 @@ package de.dafuqs.revelationary.advancement_criteria;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancement.*;
-import net.minecraft.advancement.criterion.*;
-import net.minecraft.predicate.*;
-import net.minecraft.predicate.entity.*;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.criterion.ContextAwarePredicate;
+import net.minecraft.advancements.criterion.MinMaxBounds;
+import net.minecraft.advancements.criterion.SimpleCriterionTrigger;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.*;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.*;
 import net.minecraft.util.*;
 
 import java.util.*;
 
-public class AdvancementCountCriterion extends AbstractCriterion<AdvancementCountCriterion.Conditions> {
-	public void trigger(ServerPlayerEntity player) {
+public class AdvancementCountCriterion extends SimpleCriterionTrigger<AdvancementCountCriterion.Conditions> {
+	public void trigger(ServerPlayer player) {
 		this.trigger(player, (conditions) -> conditions.matches(player));
 	}
 
 	@Override
-	public Codec<Conditions> getConditionsCodec() {
+	public Codec<Conditions> codec() {
 		return Conditions.CODEC;
 	}
 
-	public record Conditions(Optional<LootContextPredicate> player, List<Identifier> advancementIdentifiers, NumberRange.IntRange range) implements AbstractCriterion.Conditions {
+	public record Conditions(Optional<ContextAwarePredicate> player, List<Identifier> advancementIdentifiers, MinMaxBounds.Ints range) implements SimpleCriterionTrigger.SimpleInstance {
 
 		public static final Codec<Conditions> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-				LootContextPredicate.CODEC.optionalFieldOf("player").forGetter(Conditions::player),
+				ContextAwarePredicate.CODEC.optionalFieldOf("player").forGetter(Conditions::player),
 				Identifier.CODEC.listOf().fieldOf("advancement_identifiers").forGetter(Conditions::advancementIdentifiers),
-				NumberRange.IntRange.CODEC.fieldOf("count").forGetter(Conditions::range))
+				MinMaxBounds.Ints.CODEC.fieldOf("count").forGetter(Conditions::range))
 			.apply(inst, Conditions::new));
 
-		public boolean matches(ServerPlayerEntity serverPlayerEntity) {
-			ServerAdvancementLoader loader = serverPlayerEntity.getWorld().getServer().getAdvancementLoader();
+		public boolean matches(ServerPlayer serverPlayerEntity) {
+			ServerAdvancementManager loader = serverPlayerEntity.level().getServer().getAdvancements();
 			if(loader == null) {
 				return false;
 			}
-			PlayerAdvancementTracker tracker = serverPlayerEntity.getAdvancementTracker();
+			PlayerAdvancements tracker = serverPlayerEntity.getAdvancements();
 			if(tracker == null) {
 				return false;
 			}
@@ -43,15 +45,15 @@ public class AdvancementCountCriterion extends AbstractCriterion<AdvancementCoun
 			int matchingAdvancements = 0;
 			boolean allMatched = true;
 			for(Identifier advancementIdentifier : this.advancementIdentifiers) {
-				AdvancementEntry advancement = loader.get(advancementIdentifier);
-				if(advancement != null && tracker.getProgress(advancement).isDone()) {
+				AdvancementHolder advancement = loader.get(advancementIdentifier);
+				if(advancement != null && tracker.getOrStartProgress(advancement).isDone()) {
 					matchingAdvancements++;
 				} else {
 					allMatched = false;
 				}
 			}
 			
-			return this.range == null ? allMatched : this.range.test(matchingAdvancements);
+			return this.range == null ? allMatched : this.range.matches(matchingAdvancements);
 		}
 	}
 }

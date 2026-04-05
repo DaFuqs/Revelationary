@@ -4,10 +4,10 @@ import de.dafuqs.revelationary.ClientAdvancements;
 import de.dafuqs.revelationary.Revelationary;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.advancement.AdvancementEntry;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 public class AdvancementHelper {
 	/**
@@ -21,20 +21,20 @@ public class AdvancementHelper {
 	 * @param advancementIdentifier the advancement identifier
 	 * @return weather or not the player has the advancement with the given identifier
 	 */
-	public static boolean hasAdvancement(PlayerEntity playerEntity, Identifier advancementIdentifier) {
+	public static boolean hasAdvancement(Player playerEntity, Identifier advancementIdentifier) {
 		if (playerEntity == null) {
 			return false;
 		} else if (advancementIdentifier == null) {
 			return true;
 		}
 		
-		if (playerEntity instanceof ServerPlayerEntity serverPlayerEntity) {
-			AdvancementEntry advancement = serverPlayerEntity.getWorld().getServer().getAdvancementLoader().get(advancementIdentifier);
+		if (playerEntity instanceof ServerPlayer serverPlayerEntity) {
+			AdvancementHolder advancement = serverPlayerEntity.level().getServer().getAdvancements().get(advancementIdentifier);
 			if (advancement == null) {
 				Revelationary.logError("Player " + playerEntity.getName() + " was getting an advancement check for an advancement that does not exist: " + advancementIdentifier);
 				return false;
 			} else {
-				return serverPlayerEntity.getAdvancementTracker().getProgress(advancement).isDone();
+				return serverPlayerEntity.getAdvancements().getOrStartProgress(advancement).isDone();
 			}
 			// we cannot test for "net.minecraft.client.network.ClientPlayerEntity" there because that will get obfuscated
 			// to "net.minecraft.class_xxxxx" in compiled versions => works in dev env, breaks in prod

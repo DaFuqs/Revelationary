@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -18,21 +18,20 @@ repositories {
 dependencies {
 	// fabric
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// dependencies
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	// mod compat
-	modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
-	modCompileOnly "maven.modrinth:jade:${project.jade_version}"
+	//	compileOnly "me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}"
+	compileOnly "maven.modrinth:jade:${project.jade_version}"
 	// https://maven4.bai.lol/mcp/mobius/waila/
-	modCompileOnly "mcp.mobius.waila:wthit-api:fabric-${project.wthit_version}"
+	compileOnly "mcp.mobius.waila:wthit-api:fabric-${project.wthit_version}"
 
-	// not yet updated
-	// modImplementation("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
-	// modRuntimeOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
+	// broken dependencies
+	//compileOnly("mezz.jei:jei-${minecraft_version}-fabric-api:${jei_version}")
+	//runtimeOnly("mezz.jei:jei-${minecraft_version}-fabric:${jei_version}")
 }
 
 processResources {
@@ -53,7 +52,7 @@ processResources {
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
-	it.options.release = 21 // Minecraft 1.20.5 upwards uses Java 21.
+	it.options.release = 25 // Minecraft 26.1 upwards uses Java 25.
 }
 
 java {
@@ -69,7 +68,7 @@ base {
 
 jar {
 	from("LICENSE.md") {
-		rename { "${it}_${project.archivesBaseName}"}
+		rename { "${it}_${project.archives_base_name}"}
 	}
 }
 

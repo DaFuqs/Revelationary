@@ -1,11 +1,10 @@
 package de.dafuqs.revelationary.api.revelations;
 
 import de.dafuqs.revelationary.ClientRevelationHolder;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.util.Identifier;
-
 import java.util.Set;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 /**
  * Interface to react to the event of blocks/items getting revealed after getting advancements

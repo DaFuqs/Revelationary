@@ -4,14 +4,13 @@ import de.dafuqs.revelationary.api.advancements.ClientAdvancementPacketCallback;
 import de.dafuqs.revelationary.mixin.client.AccessorClientAdvancementManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.advancement.AdvancementEntry;
-import net.minecraft.advancement.AdvancementProgress;
-import net.minecraft.advancement.PlacedAdvancement;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientAdvancementManager;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.s2c.play.AdvancementUpdateS2CPacket;
-import net.minecraft.util.Identifier;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.AdvancementNode;
+import net.minecraft.advancements.AdvancementProgress;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.protocol.game.ClientboundUpdateAdvancementsPacket;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -21,14 +20,14 @@ public class ClientAdvancements {
 	protected static boolean receivedFirstAdvancementPacket = false;
 	public static List<ClientAdvancementPacketCallback> callbacks = new ArrayList<>();
 	
-	public static void onClientPacket(@NotNull AdvancementUpdateS2CPacket packet) {
+	public static void onClientPacket(@NotNull ClientboundUpdateAdvancementsPacket packet) {
 		boolean hadPacketBefore = receivedFirstAdvancementPacket;
 		receivedFirstAdvancementPacket = true;
-		boolean isReset = packet.shouldClearCurrent();
+		boolean isReset = packet.shouldReset();
 		boolean isFirstPacket = !hadPacketBefore || isReset;
 		
 		Set<Identifier> doneAdvancements = getDoneAdvancements(packet);
-		Set<Identifier> removedAdvancements = packet.getAdvancementIdsToRemove();
+		Set<Identifier> removedAdvancements = packet.getRemoved();
 		
 		ClientRevelationHolder.processRemovedAdvancements(removedAdvancements);
 		ClientRevelationHolder.processNewAdvancements(doneAdvancements, isFirstPacket);
@@ -45,13 +44,13 @@ public class ClientAdvancements {
 		}
 		
 		if (identifier != null) {
-			ClientPlayNetworkHandler conn = MinecraftClient.getInstance().getNetworkHandler();
+			ClientPacketListener conn = Minecraft.getInstance().getConnection();
 			if (conn != null) {
-				ClientAdvancementManager cm = conn.getAdvancementHandler();
-				PlacedAdvancement adv = cm.getManager().get(identifier);
+				net.minecraft.client.multiplayer.ClientAdvancements cm = conn.getAdvancements();
+				AdvancementNode adv = cm.getTree().get(identifier);
 				if (adv != null) {
-					Map<AdvancementEntry, AdvancementProgress> progressMap = ((AccessorClientAdvancementManager) cm).getAdvancementProgresses();
-					AdvancementProgress progress = progressMap.get(adv.getAdvancementEntry());
+					Map<AdvancementHolder, AdvancementProgress> progressMap = ((AccessorClientAdvancementManager) cm).getProgress();
+					AdvancementProgress progress = progressMap.get(adv.holder());
 					return progress != null && progress.isDone();
 				}
 			}
@@ -59,13 +58,13 @@ public class ClientAdvancements {
 		return false;
 	}
 	
-	public static @NotNull Set<Identifier> getDoneAdvancements(@NotNull AdvancementUpdateS2CPacket packet) {
+	public static @NotNull Set<Identifier> getDoneAdvancements(@NotNull ClientboundUpdateAdvancementsPacket packet) {
 		Set<Identifier> doneAdvancements = new HashSet<>();
 		
-		for (AdvancementEntry earnedAdvancementEntry : packet.getAdvancementsToEarn()) {
+		for (AdvancementHolder earnedAdvancementEntry : packet.getAdded()) {
 			doneAdvancements.add(earnedAdvancementEntry.id());
 		}
-		for (Map.Entry<Identifier, AdvancementProgress> progressedAdvancement : packet.getAdvancementsToProgress().entrySet()) {
+		for (Map.Entry<Identifier, AdvancementProgress> progressedAdvancement : packet.getProgress().entrySet()) {
 			if (progressedAdvancement.getValue().isDone()) {
 				doneAdvancements.add(progressedAdvancement.getKey());
 			}
