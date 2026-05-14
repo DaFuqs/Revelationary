@@ -5,6 +5,7 @@ import net.minecraft.world.entity.player.*;
 import net.minecraft.world.level.block.state.*;
 import snownee.jade.api.*;
 
+@WailaPlugin
 public class RevelationaryJadePlugin implements IWailaPlugin {
     @Override
     public void registerClient(IWailaClientRegistration registration) {
