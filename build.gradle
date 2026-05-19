@@ -73,7 +73,7 @@ neoForge {
 dependencies {
 	// mod compat
 	compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:${project.rei_version}"
-	// implementation "maven.modrinth:jade:${project.jade_version}"
+	implementation "maven.modrinth:jade:${project.jade_version}"
 	// implementation "mcp.mobius.waila:wthit-api:neo-${project.wthit_version}"
 }
 
