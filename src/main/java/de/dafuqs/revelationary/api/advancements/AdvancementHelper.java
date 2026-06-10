@@ -3,8 +3,10 @@ package de.dafuqs.revelationary.api.advancements;
 import de.dafuqs.revelationary.*;
 import net.minecraft.advancements.*;
 import net.minecraft.resources.*;
+import net.minecraft.server.*;
 import net.minecraft.server.level.*;
 import net.minecraft.world.entity.player.*;
+import net.neoforged.neoforge.common.util.*;
 
 public class AdvancementHelper {
 	
@@ -17,7 +19,7 @@ public class AdvancementHelper {
 	 *
 	 * @param playerEntity          the player
 	 * @param advancementIdentifier the advancement identifier
-	 * @return weather or not the player has the advancement with the given identifier
+	 * @return weather or not the player has the advancement with the given identifier. If the player is a fake player, returns the state of its owner
 	 */
 	public static boolean hasAdvancement(Player playerEntity, ResourceLocation advancementIdentifier) {
 		if (playerEntity == null) {
@@ -31,6 +33,9 @@ public class AdvancementHelper {
 			if (advancement == null) {
 				Revelationary.logError("Player " + playerEntity.getName() + " was getting an advancement check for an advancement that does not exist: " + advancementIdentifier);
 				return false;
+			} else if(playerEntity instanceof FakePlayer fakePlayer && fakePlayer.getServer() != null) {
+				PlayerAdvancements ownerPlayerAdvancements = fakePlayer.getServer().getPlayerList().getPlayerAdvancements(fakePlayer);
+				return ownerPlayerAdvancements.getOrStartProgress(advancement).isDone();
 			} else {
 				return serverPlayerEntity.getAdvancements().getOrStartProgress(advancement).isDone();
 			}
@@ -38,10 +43,10 @@ public class AdvancementHelper {
 			// to "net.minecraft.class_xxxxx" in compiled versions => works in dev env, breaks in prod
 		} else if (playerEntity.getClass().getCanonicalName().startsWith("net.minecraft")) {
 			return hasAdvancementClient(advancementIdentifier);
-		} else {
-			// Kibe's FakePlayerEntity is neither is a ServerPlayerEntity, nor a ClientPlayerEntity
-			return false;
 		}
+
+		// Kibe's FakePlayerEntity is neither is a ServerPlayerEntity, nor a ClientPlayerEntity
+		return false;
 	}
 	
 	/**
