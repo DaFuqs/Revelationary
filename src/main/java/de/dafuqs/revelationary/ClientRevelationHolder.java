@@ -1,22 +1,15 @@
 package de.dafuqs.revelationary;
 
-import de.dafuqs.revelationary.api.revelations.RevealingCallback;
-import de.dafuqs.revelationary.api.revelations.RevelationAware;
-import de.dafuqs.revelationary.api.revelations.WorldRendererAccessor;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.resources.Identifier;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
+import de.dafuqs.revelationary.api.revelations.*;
+import net.fabricmc.api.*;
+import net.minecraft.client.*;
+import net.minecraft.resources.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.*;
+import org.jetbrains.annotations.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Environment(EnvType.CLIENT)
 public class ClientRevelationHolder {
@@ -115,8 +108,7 @@ public class ClientRevelationHolder {
 	
 	// rerender chunks to show newly swapped blocks
 	static void rebuildAllChunks() {
-		LevelRenderer renderer = Minecraft.getInstance().levelRenderer;
-		((WorldRendererAccessor) renderer).revelationary$rebuildAllChunks();
+		Minecraft.getInstance().levelExtractor.allChanged();
 	}
 	
 	// BLOCKS

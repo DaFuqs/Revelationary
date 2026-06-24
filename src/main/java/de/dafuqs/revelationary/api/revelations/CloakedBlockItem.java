@@ -1,12 +1,12 @@
 package de.dafuqs.revelationary.api.revelations;
 
-import java.util.Map;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Tuple;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
+import com.mojang.datafixers.util.*;
+import net.minecraft.resources.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.*;
+
+import java.util.*;
 
 public class CloakedBlockItem extends BlockItem implements RevelationAware {
 	Identifier cloakAdvancementIdentifier;
@@ -31,7 +31,7 @@ public class CloakedBlockItem extends BlockItem implements RevelationAware {
 	}
 	
 	@Override
-	public Tuple<Item, Item> getItemCloak() {
-		return new Tuple<>(this, cloakItem);
+	public Pair<Item, Item> getItemCloak() {
+		return new Pair<>(this, cloakItem);
 	}
 }

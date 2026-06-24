@@ -15,9 +15,7 @@
     "client.BlockModelsMixin",
     "client.ClientAdvancementManagerMixin",
     "client.ItemMixin",
-    "client.MinecraftClientMixin",
-    "client.WorldRendererMixin",
-    "client.WorldRendererMixinAccessor"
+    "client.MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1

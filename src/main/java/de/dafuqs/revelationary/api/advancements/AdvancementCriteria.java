@@ -1,7 +1,11 @@
 package de.dafuqs.revelationary.api.advancements;
 
+import de.dafuqs.revelationary.*;
 import de.dafuqs.revelationary.advancement_criteria.*;
-import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.triggers.*;
+import net.minecraft.core.*;
+import net.minecraft.core.registries.*;
+import net.minecraft.resources.*;
 
 public class AdvancementCriteria {
 	/**
@@ -19,8 +23,13 @@ public class AdvancementCriteria {
 	public static HadRevelationCriterion HAD_REVELATION;
 	
 	public static void register() {
-		ADVANCEMENT_COUNT = CriteriaTriggers.register("revelationary:advancement_count", new AdvancementCountCriterion());
-		HAD_REVELATION = CriteriaTriggers.register("revelationary:had_revelation", new HadRevelationCriterion());
-		ADVANCEMENT_GOTTEN = CriteriaTriggers.register("revelationary:advancement_gotten", new AdvancementGottenCriterion());
+		ADVANCEMENT_COUNT = register("advancement_count", new AdvancementCountCriterion());
+		HAD_REVELATION = register("had_revelation", new HadRevelationCriterion());
+		ADVANCEMENT_GOTTEN = register("advancement_gotten", new AdvancementGottenCriterion());
 	}
+
+	private static <T extends CriterionTrigger<?>> T register(final String name, final T criterion) {
+		return (T) (Registry.register(BuiltInRegistries.TRIGGER_TYPES, Identifier.fromNamespaceAndPath(Revelationary.MOD_ID, name), criterion));
+	}
+
 }

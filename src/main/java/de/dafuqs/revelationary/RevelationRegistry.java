@@ -1,24 +1,19 @@
 package de.dafuqs.revelationary;
 
-import de.dafuqs.revelationary.api.advancements.AdvancementHelper;
-import de.dafuqs.revelationary.api.revelations.RevelationAware;
-import de.dafuqs.revelationary.config.RevelationaryConfig;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.locale.Language;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Tuple;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.mojang.datafixers.util.*;
+import de.dafuqs.revelationary.api.advancements.*;
+import de.dafuqs.revelationary.api.revelations.*;
+import de.dafuqs.revelationary.config.*;
+import it.unimi.dsi.fastutil.objects.*;
+import net.minecraft.core.registries.*;
+import net.minecraft.locale.*;
+import net.minecraft.network.chat.*;
+import net.minecraft.resources.*;
+import net.minecraft.world.entity.player.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.*;
+import org.jetbrains.annotations.*;
 
 import java.util.*;
 
@@ -115,18 +110,18 @@ public class RevelationRegistry {
 				registerBlockState(advancementIdentifier, sourceBlockState, states.getValue());
 			}
 
-			Tuple<Item, Item> item = revelationAware.getItemCloak();
+			Pair<Item, Item> item = revelationAware.getItemCloak();
 			if (item != null) {
-				registerItem(advancementIdentifier, item.getA(), item.getB());
+				registerItem(advancementIdentifier, item.getFirst(), item.getSecond());
 			}
-			
-			Tuple<Block, MutableComponent> blockTranslation = revelationAware.getCloakedBlockTranslation();
+
+			Pair<Block, MutableComponent> blockTranslation = revelationAware.getCloakedBlockTranslation();
 			if (blockTranslation != null) {
-				registerBlockTranslation(blockTranslation.getA(), blockTranslation.getB());
+				registerBlockTranslation(blockTranslation.getFirst(), blockTranslation.getSecond());
 			}
-			Tuple<Item, MutableComponent> itemTranslation = revelationAware.getCloakedItemTranslation();
+			Pair<Item, MutableComponent> itemTranslation = revelationAware.getCloakedItemTranslation();
 			if (itemTranslation != null) {
-				registerItemTranslation(itemTranslation.getA(), itemTranslation.getB());
+				registerItemTranslation(itemTranslation.getFirst(), itemTranslation.getSecond());
 			}
 		}
 	}

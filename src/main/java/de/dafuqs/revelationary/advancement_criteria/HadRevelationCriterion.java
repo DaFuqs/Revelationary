@@ -1,15 +1,16 @@
 package de.dafuqs.revelationary.advancement_criteria;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancements.criterion.ContextAwarePredicate;
-import net.minecraft.advancements.criterion.SimpleCriterionTrigger;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import java.util.Optional;
+import com.mojang.serialization.*;
+import com.mojang.serialization.codecs.*;
+import net.minecraft.advancements.predicates.*;
+import net.minecraft.advancements.triggers.*;
+import net.minecraft.core.registries.*;
+import net.minecraft.resources.*;
+import net.minecraft.server.level.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.*;
+
+import java.util.*;
 
 public class HadRevelationCriterion extends SimpleCriterionTrigger<HadRevelationCriterion.Conditions> {
 	public void trigger(ServerPlayer player, Block block) {

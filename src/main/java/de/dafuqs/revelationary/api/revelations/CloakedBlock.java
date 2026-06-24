@@ -1,11 +1,11 @@
 package de.dafuqs.revelationary.api.revelations;
 
-import java.util.Hashtable;
-import java.util.Map;
-import net.minecraft.util.Tuple;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
+import com.mojang.datafixers.util.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.*;
+
+import java.util.*;
 
 public abstract class CloakedBlock extends Block implements RevelationAware {
 	final Block cloakedBlock;
@@ -24,7 +24,7 @@ public abstract class CloakedBlock extends Block implements RevelationAware {
 	}
 	
 	@Override
-	public Tuple<Item, Item> getItemCloak() {
+	public Pair<Item, Item> getItemCloak() {
 		return null;
 	}
 }

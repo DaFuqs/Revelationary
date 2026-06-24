@@ -1,10 +1,10 @@
 package de.dafuqs.revelationary.mixin.client;
 
 import de.dafuqs.revelationary.*;
-import net.fabricmc.fabric.api.client.renderer.v1.model.FabricBlockStateModelSet;
-import net.minecraft.client.renderer.block.BlockStateModelSet;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
-import net.minecraft.world.level.block.state.BlockState;
+import net.fabricmc.fabric.api.client.renderer.v1.model.*;
+import net.minecraft.client.renderer.block.*;
+import net.minecraft.client.renderer.block.dispatch.*;
+import net.minecraft.world.level.block.state.*;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.*;
@@ -24,9 +24,9 @@ public class BlockModelsMixin implements FabricBlockStateModelSet {
 	private BlockStateModel missingModel;
 	
 	@Inject(at = @At("HEAD"), method = "get", cancellable = true)
-	private void revelationary$getModel(BlockState blockState, CallbackInfoReturnable<BlockStateModel> callbackInfoReturnable) {
-		if (ClientRevelationHolder.isCloaked(blockState)) {
-			BlockState destinationBlockState = ClientRevelationHolder.getCloakTarget(blockState);
+	private void revelationary$getModel(BlockState state, CallbackInfoReturnable<BlockStateModel> callbackInfoReturnable) {
+		if (ClientRevelationHolder.isCloaked(state)) {
+			BlockState destinationBlockState = ClientRevelationHolder.getCloakTarget(state);
 			BlockStateModel overriddenModel = this.modelByState.getOrDefault(destinationBlockState, this.missingModel);
 			callbackInfoReturnable.setReturnValue(overriddenModel);
 		}

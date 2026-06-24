@@ -1,22 +1,21 @@
 package de.dafuqs.revelationary.api.revelations;
 
-import de.dafuqs.revelationary.RevelationRegistry;
-import de.dafuqs.revelationary.api.advancements.AdvancementHelper;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Tuple;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.EntityCollisionContext;
-import org.jetbrains.annotations.Nullable;
+import com.mojang.datafixers.util.*;
+import de.dafuqs.revelationary.*;
+import de.dafuqs.revelationary.api.advancements.*;
+import net.minecraft.network.chat.*;
+import net.minecraft.resources.*;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.*;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.*;
+import net.minecraft.world.level.storage.loot.*;
+import net.minecraft.world.level.storage.loot.parameters.*;
+import net.minecraft.world.phys.shapes.*;
+import org.jetbrains.annotations.*;
 
-import java.util.Map;
+import java.util.*;
 
 /**
  * Interface for defining a block/item/blockitem/... as revealable.
@@ -54,7 +53,7 @@ public interface RevelationAware {
 	 * If you are implementing a BlockItem something like "new Pair<>(this.asItem(), Blocks.OAK_LOG.asItem())"
 	 * If you use this interace on a block without item representation (like vanilla end portal) return null
 	 */
-	@Nullable Tuple<Item, Item> getItemCloak();
+	@Nullable Pair<Item, Item> getItemCloak();
 	
 	/**
 	 * Optionally, return a mapping of a revelation aware item and the text that should be used as translation
@@ -63,7 +62,7 @@ public interface RevelationAware {
 	 * @return the matching of the item and the text it will use when not revealed
 	 */
 	@Nullable
-	default Tuple<Item, MutableComponent> getCloakedItemTranslation() {
+	default Pair<Item, MutableComponent> getCloakedItemTranslation() {
 		return null;
 	}
 	
@@ -74,7 +73,7 @@ public interface RevelationAware {
 	 * @return the matching of the block and the text it will use when not revealed
 	 */
 	@Nullable
-	default Tuple<Block, MutableComponent> getCloakedBlockTranslation() {
+	default Pair<Block, MutableComponent> getCloakedBlockTranslation() {
 		return null;
 	}
 	

@@ -1,16 +1,13 @@
 package de.dafuqs.revelationary.advancement_criteria;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.advancements.criterion.ContextAwarePredicate;
-import net.minecraft.advancements.criterion.MinMaxBounds;
-import net.minecraft.advancements.criterion.SimpleCriterionTrigger;
-import net.minecraft.resources.Identifier;
+import com.mojang.serialization.*;
+import com.mojang.serialization.codecs.*;
+import net.minecraft.advancements.*;
+import net.minecraft.advancements.predicates.*;
+import net.minecraft.advancements.triggers.*;
+import net.minecraft.resources.*;
 import net.minecraft.server.*;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.*;
-import net.minecraft.util.*;
+import net.minecraft.server.level.*;
 
 import java.util.*;
 
@@ -34,14 +31,8 @@ public class AdvancementCountCriterion extends SimpleCriterionTrigger<Advancemen
 
 		public boolean matches(ServerPlayer serverPlayerEntity) {
 			ServerAdvancementManager loader = serverPlayerEntity.level().getServer().getAdvancements();
-			if(loader == null) {
-				return false;
-			}
 			PlayerAdvancements tracker = serverPlayerEntity.getAdvancements();
-			if(tracker == null) {
-				return false;
-			}
-			
+
 			int matchingAdvancements = 0;
 			boolean allMatched = true;
 			for(Identifier advancementIdentifier : this.advancementIdentifiers) {
