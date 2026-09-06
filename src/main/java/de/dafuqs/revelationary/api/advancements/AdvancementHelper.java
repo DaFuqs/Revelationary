@@ -3,10 +3,12 @@ package de.dafuqs.revelationary.api.advancements;
 import de.dafuqs.revelationary.*;
 import net.minecraft.advancements.*;
 import net.minecraft.resources.*;
-import net.minecraft.server.*;
 import net.minecraft.server.level.*;
+import net.minecraft.server.players.*;
 import net.minecraft.world.entity.player.*;
 import net.neoforged.neoforge.common.util.*;
+
+import java.util.*;
 
 public class AdvancementHelper {
 	
@@ -34,8 +36,20 @@ public class AdvancementHelper {
 				Revelationary.logError("Player " + playerEntity.getName() + " was getting an advancement check for an advancement that does not exist: " + advancementIdentifier);
 				return false;
 			} else if(playerEntity instanceof FakePlayer fakePlayer && fakePlayer.getServer() != null) {
-				PlayerAdvancements ownerPlayerAdvancements = fakePlayer.getServer().getPlayerList().getPlayerAdvancements(fakePlayer);
-				return ownerPlayerAdvancements.getOrStartProgress(advancement).isDone();
+				PlayerList playerList = fakePlayer.getServer().getPlayerList();
+
+				// since https://github.com/neoforged/NeoForge/pull/3260/ Neo fake players do not hold advancements anymore, breaking this simple & performant check
+				// PlayerAdvancements ownerPlayerAdvancements = playerList.getPlayerAdvancements(fakePlayer.getUUID());
+				// return ownerPlayerAdvancements.getOrStartProgress(advancement).isDone();
+
+				// it is good practice to use the owners UUID as the fake players uuid, so this is what we check now
+				// if the fake players owner is not online... tough luck
+				UUID uuid = fakePlayer.getGameProfile().getId();
+				ServerPlayer serverPlayer = playerList.getPlayer(uuid);
+				if (serverPlayer == null) {
+					return false;
+				}
+				return playerList.getPlayerAdvancements(serverPlayer).getOrStartProgress(advancement).isDone();
 			} else {
 				return serverPlayerEntity.getAdvancements().getOrStartProgress(advancement).isDone();
 			}

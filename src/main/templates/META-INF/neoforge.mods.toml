@@ -8,7 +8,7 @@ issueTrackerURL = "https://github.com/DaFuqs/Revelationary/issues"
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]]
 modId = "revelationary"
-version = "${version}"
+version = "${mod_version}"
 displayName = "Revelationary"
 displayURL = "https://github.com/DaFuqs/Revelationary"
 logoFile = "assets/revelationary/icon.png"

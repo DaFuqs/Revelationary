@@ -84,6 +84,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
 			version               : version,
 			minecraft_version     : minecraft_version,
 			neoforge_version_range: neoforge_version_range,
+			mod_version: mod_version,
 	]
 	inputs.properties replaceProperties
 	expand replaceProperties
