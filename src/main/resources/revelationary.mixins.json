@@ -15,6 +15,7 @@
     "client.BlockModelsMixin",
     "client.ClientAdvancementManagerMixin",
     "client.ItemMixin",
+    "client.ItemModelResolverMixin",
     "client.MinecraftClientMixin"
   ],
   "injectors": {
