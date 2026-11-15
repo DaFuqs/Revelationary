@@ -36,8 +36,8 @@ public class RevelationDataLoader extends SimpleJsonResourceReloadListener<Revel
 	
 	@Override
 	protected void apply(Map<Identifier, RevelationEntry> prepared, @NonNull ResourceManager manager, @NonNull ProfilerFiller profiler) {
-		HolderLookup.Provider lookup = VanillaRegistries.createLookup();
-		HolderLookup<Block> blockRegistryWrapper = CommandBuildContext.simple(lookup, FeatureFlags.REGISTRY.allFlags()).lookupOrThrow(Registries.BLOCK);;
+		HolderLookup.Provider lookup = VanillaRegistries.createWorldLookup();
+		HolderLookup<Block> blockRegistryWrapper = CommandBuildContext.simple(lookup, FeatureFlags.REGISTRY.allFlags()).lookupOrThrow(Registries.BLOCK);
 		
 		prepared.forEach((identifier, revelationEntry) -> registerFromJson(blockRegistryWrapper, revelationEntry));
 		RevelationRegistry.deepTrim();

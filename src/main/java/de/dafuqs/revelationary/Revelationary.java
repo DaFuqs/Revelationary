@@ -4,7 +4,6 @@ import de.dafuqs.revelationary.api.advancements.*;
 import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.*;
-import net.fabricmc.fabric.api.resource.*;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.loader.api.*;
 import net.minecraft.server.packs.PackType;

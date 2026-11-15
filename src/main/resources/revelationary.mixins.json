@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "de.dafuqs.revelationary.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "plugin": "de.dafuqs.revelationary.mixin.Plugin",
   "mixins": [
     "AbstractBlockMixin",
@@ -10,7 +10,6 @@
     "PlayerAdvancementTrackerMixin"
   ],
   "client": [
-    "client.AccessorClientAdvancementManager",
     "client.BlockClientMixin",
     "client.BlockModelsMixin",
     "client.ClientAdvancementManagerMixin",

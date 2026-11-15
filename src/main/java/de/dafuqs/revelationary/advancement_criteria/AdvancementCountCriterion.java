@@ -5,9 +5,11 @@ import com.mojang.serialization.codecs.*;
 import net.minecraft.advancements.*;
 import net.minecraft.advancements.predicates.*;
 import net.minecraft.advancements.triggers.*;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.*;
 import net.minecraft.server.*;
 import net.minecraft.server.level.*;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import org.jspecify.annotations.NonNull;
 
 import java.util.*;
@@ -22,10 +24,10 @@ public class AdvancementCountCriterion extends SimpleCriterionTrigger<Advancemen
 		return Conditions.CODEC;
 	}
 
-	public record Conditions(Optional<ContextAwarePredicate> player, List<Identifier> advancementIdentifiers, MinMaxBounds.Ints range) implements SimpleCriterionTrigger.SimpleInstance {
+	public record Conditions(Optional<Holder<LootItemCondition>> player, List<Identifier> advancementIdentifiers, MinMaxBounds.Ints range) implements SimpleCriterionTrigger.SimpleInstance {
 
 		public static final Codec<Conditions> CODEC = RecordCodecBuilder.create(inst -> inst.group(
-				ContextAwarePredicate.CODEC.optionalFieldOf("player").forGetter(Conditions::player),
+				LootItemCondition.CODEC.optionalFieldOf("player").forGetter(Conditions::player),
 				Identifier.CODEC.listOf().fieldOf("advancement_identifiers").forGetter(Conditions::advancementIdentifiers),
 				MinMaxBounds.Ints.CODEC.fieldOf("count").forGetter(Conditions::range))
 			.apply(inst, Conditions::new));
