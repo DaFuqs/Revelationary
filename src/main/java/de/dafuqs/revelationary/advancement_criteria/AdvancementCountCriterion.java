@@ -8,6 +8,7 @@ import net.minecraft.advancements.triggers.*;
 import net.minecraft.resources.*;
 import net.minecraft.server.*;
 import net.minecraft.server.level.*;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -17,7 +18,7 @@ public class AdvancementCountCriterion extends SimpleCriterionTrigger<Advancemen
 	}
 
 	@Override
-	public Codec<Conditions> codec() {
+	public @NonNull Codec<Conditions> codec() {
 		return Conditions.CODEC;
 	}
 

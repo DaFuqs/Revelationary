@@ -9,6 +9,7 @@ import net.minecraft.resources.*;
 import net.minecraft.server.level.*;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.*;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -18,7 +19,7 @@ public class HadRevelationCriterion extends SimpleCriterionTrigger<HadRevelation
 	}
 
 	@Override
-	public Codec<Conditions> codec() {
+	public @NonNull Codec<Conditions> codec() {
 		return Conditions.CODEC;
 	}
 

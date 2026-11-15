@@ -7,6 +7,7 @@ import net.minecraft.advancements.predicates.*;
 import net.minecraft.advancements.triggers.*;
 import net.minecraft.resources.*;
 import net.minecraft.server.level.*;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
@@ -16,7 +17,7 @@ public class AdvancementGottenCriterion extends SimpleCriterionTrigger<Advanceme
 	}
 
 	@Override
-	public Codec<Conditions> codec() {
+	public @NonNull Codec<Conditions> codec() {
 		return Conditions.CODEC;
 	}
 
