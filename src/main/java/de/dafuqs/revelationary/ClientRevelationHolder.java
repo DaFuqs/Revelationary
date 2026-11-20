@@ -38,10 +38,8 @@ public class ClientRevelationHolder {
 				for (BlockState revealedBlockState : revealedBlockStates) {
 					activeBlockStateSwaps.remove(revealedBlockState);
 					Item blockItem = revealedBlockState.getBlock().asItem();
-					if (blockItem != null) {
-						activeItemSwaps.remove(blockItem);
-					}
-				}
+                    activeItemSwaps.remove(blockItem);
+                }
 				rebuildAllChunks();
 			}
 			
@@ -86,7 +84,7 @@ public class ClientRevelationHolder {
 				for (BlockState concealedBlockState : concealedBlockStates) {
 					activeBlockStateSwaps.add(concealedBlockState);
 					Item blockItem = concealedBlockState.getBlock().asItem();
-					if (blockItem != null) activeItemSwaps.add(blockItem);
+                    activeItemSwaps.add(blockItem);
 				}
 				rebuildAllChunks();
 			}

@@ -71,7 +71,7 @@ public class RevelationaryNetworking {
 		public static RevelationSync read(RegistryFriendlyByteBuf buf) {
 			/* Block States */
 			
-			final HolderLookup<Block> blockRegistryWrapper = VanillaRegistries.createLookup().lookupOrThrow(Registries.BLOCK);
+			final HolderLookup<Block> blockRegistryWrapper = VanillaRegistries.createWorldLookup().lookupOrThrow(Registries.BLOCK);
 			final Object2ObjectOpenHashMap<Block, Block> blockCloaks = new Object2ObjectOpenHashMap<>(buf.readInt());
 			final Object2ObjectOpenHashMap<BlockState, Identifier> blockStateToAdv = new Object2ObjectOpenHashMap<>(buf.readInt());
 			final Object2ObjectOpenHashMap<BlockState, BlockState> blockStateCloaks = new Object2ObjectOpenHashMap<>(buf.readInt());

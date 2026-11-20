@@ -1,11 +1,9 @@
 package de.dafuqs.revelationary;
 
 import de.dafuqs.revelationary.api.advancements.ClientAdvancementPacketCallback;
-import de.dafuqs.revelationary.mixin.client.AccessorClientAdvancementManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.advancements.AdvancementNode;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -27,7 +25,7 @@ public class ClientAdvancements {
 		boolean isFirstPacket = !hadPacketBefore || isReset;
 		
 		Set<Identifier> doneAdvancements = getDoneAdvancements(packet);
-		Set<Identifier> removedAdvancements = packet.getRemoved();
+		Set<Identifier> removedAdvancements = packet.removed();
 		
 		ClientRevelationHolder.processRemovedAdvancements(removedAdvancements);
 		ClientRevelationHolder.processNewAdvancements(doneAdvancements, isFirstPacket);
@@ -47,10 +45,9 @@ public class ClientAdvancements {
 			ClientPacketListener conn = Minecraft.getInstance().getConnection();
 			if (conn != null) {
 				net.minecraft.client.multiplayer.ClientAdvancements cm = conn.getAdvancements();
-				AdvancementNode adv = cm.getTree().get(identifier);
+				AdvancementHolder adv = cm.get(identifier);
 				if (adv != null) {
-					Map<AdvancementHolder, AdvancementProgress> progressMap = ((AccessorClientAdvancementManager) cm).getProgress();
-					AdvancementProgress progress = progressMap.get(adv.holder());
+					AdvancementProgress progress = cm.progress().get(adv);
 					return progress != null && progress.isDone();
 				}
 			}
@@ -61,10 +58,10 @@ public class ClientAdvancements {
 	public static @NotNull Set<Identifier> getDoneAdvancements(@NotNull ClientboundUpdateAdvancementsPacket packet) {
 		Set<Identifier> doneAdvancements = new HashSet<>();
 		
-		for (AdvancementHolder earnedAdvancementEntry : packet.getAdded()) {
-			doneAdvancements.add(earnedAdvancementEntry.id());
+		for (ClientboundUpdateAdvancementsPacket.PositionedAdvancement earnedAdvancementEntry : packet.added()) {
+			doneAdvancements.add(earnedAdvancementEntry.advancement().id());
 		}
-		for (Map.Entry<Identifier, AdvancementProgress> progressedAdvancement : packet.getProgress().entrySet()) {
+		for (Map.Entry<Identifier, AdvancementProgress> progressedAdvancement : packet.progress().entrySet()) {
 			if (progressedAdvancement.getValue().isDone()) {
 				doneAdvancements.add(progressedAdvancement.getKey());
 			}
