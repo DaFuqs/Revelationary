@@ -5,6 +5,7 @@ import net.fabricmc.api.*;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.*;
 import net.fabricmc.fabric.api.resource.*;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.loader.api.*;
 import net.minecraft.server.packs.PackType;
 import org.slf4j.*;
@@ -36,7 +37,7 @@ public class Revelationary implements ModInitializer {
 
         AdvancementCriteria.register();
         CommandRegistrationCallback.EVENT.register(RevelationaryCommands::register);
-        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(RevelationDataLoader.INSTANCE);
+        ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(RevelationDataLoader.ID, RevelationDataLoader.INSTANCE);
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             RevelationRegistry.addRevelationAwares();
